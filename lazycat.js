@@ -3,7 +3,7 @@ const { config } = require("dotenv"); // подгрузка библиотеки
 const { Player } = require('discord-player'); // подгрузка библиотеки плеера для радио
 const chalk = require("chalk"); // библиотека для красивой консоли
 console.log(chalk.hex("#B88FFF")(`[!] Загрузка файлов...`));
-const fs = require("fs"); // чтение json файлов
+const fs = require("fs") // чтение json файлов
 const client = new Client({ intents: ['GUILDS', 'GUILD_MESSAGES'] }); // интенты для бота
 
 config({

@@ -11,12 +11,11 @@ module.exports = async (client, message) => {
 	var user = await client.db.get(message.author.id, 'users');
 	let fetchedUser = client.users.cache.get(message.author.id)
 	if(!user){
-		const add_user = await client.db.add(message.author.id, 'users');
+		await client.db.add(message.author.id, 'users');
 		user = await client.db.get(message.author.id, 'users');
 	}
 	if(!user){
 		client.logger.log(`Ошибка получения данных. User ID: ${message.author.id}`, 'err');
-		console.log(user, user[0]);
 		let dataError = new MessageEmbed()
 			.setColor('#b88fff')
 			.setTitle('Ошибка')

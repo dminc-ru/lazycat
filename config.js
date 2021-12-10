@@ -1,4 +1,5 @@
 module.exports = {
     token: "",
-    databasePath: "H:\\dminc_dev\\lazycat\\db\\lazy.db"
+    databasePath: "H:\\dminc_dev\\lazycat\\db\\lazy.db",
+    embedColor: "#b88fff"
 }

@@ -66,7 +66,6 @@ try{
 
 module.exports.help = {
 	name: "lzban",
-	aliases: [],
 	permissions: ["lia"],
-	modules: ["admin"]
+	type: "message"
 }

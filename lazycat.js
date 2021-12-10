@@ -9,6 +9,7 @@ const client = new Client({ intents: ['GUILDS', 'GUILD_MESSAGES'] }); // инт�
 config({
     path: __dirname + "/.env" // открытие конфига
 });
+client.config = require('./config')
 
 client.commands = new Collection(); // коллекция команд
 client.aliases = new Collection(); // коллекция алиасов (outdated)

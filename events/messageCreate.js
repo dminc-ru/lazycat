@@ -48,7 +48,11 @@ module.exports = async (client, message) => {
 		stats.commands += 1;
 		fs.writeFileSync("./base/stats.json", JSON.stringify(stats, null, "\t"));
 		client.logger.log(`MESSAGE || ${fetchedUser.tag} || ${message.author.id} || ${lzcmd}`, 'cmd')
-		commandfile.run(client, message, args);
+		if (commandfile.type == "message") {
+			commandfile.run(client, message, args);
+		}else {
+			return
+		}
 	}else{
 		return;
 	}

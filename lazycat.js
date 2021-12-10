@@ -12,11 +12,7 @@ config({
 client.config = require('./config')
 
 client.commands = new Collection(); // коллекция команд
-client.aliases = new Collection(); // коллекция алиасов (outdated)
 client.permissions = new Collection(); // коллекция прав юзеров
-client.modules = new Collection(); // коллекция для модулей (блокмод)
-client.queue = new Collection(); // коллекция очереди для радио
-client.player = new Player(client); // подгрузка плеера для радио
 client.logger = require('./utils/logger'); // утилита для логов
 client.db = require('./utils/db') // утилита для базы данных
 client.emoji = require('./emojis.json') //кастом эмодзи

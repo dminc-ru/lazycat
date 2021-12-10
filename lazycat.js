@@ -61,7 +61,6 @@ client.ws.on("INTERACTION_CREATE", async interaction => {
 	}
 	if(!user){
 		client.logger.log(`Ошибка получения данных. User ID: ${interaction.member.user.id}`, 'err');
-		console.log(user, user[0]);
 		return interaction.reply({ content: `Произошла ошибка. Попробуйте ещё раз или обратитесь на наш сервер поддержки.\nКод ошибки: LZE-179`})
 	}
 	var guild = await client.db.get(interaction.guild_id, 'guilds');

@@ -53,39 +53,23 @@ let shop = require('./base/shop.json'); // текущая витрина в ма
 let bans = require('./base/bans.json'); // база данных текущих банов
 client.ws.on("INTERACTION_CREATE", async interaction => {
 	if (!interaction.guild_id)
-		return client.api.interactions(interaction.id, interaction.token).callback.post({
-			data: {
-				type: 4,
-				data: {
-					flags: 64,
-					content: `На данный момент команды можно использовать только на сервере.`
-				}
-			}
-		});
+		return interaction.reply({ content: "На данный момент команды можно использовать только на сервере.", ephemeral: true });
 	if(bans[interaction.member.user.id])
 		return;
 	var user = await client.db.get(interaction.member.user.id, 'users');
 	let fetchedUser = await client.users.cache.get(interaction.member.user.id)
 	if(!user){
-		const add_user = await client.db.add(interaction.member.user.id, 'users');
+		await client.db.add(interaction.member.user.id, 'users');
 		user = await client.db.get(interaction.member.user.id, 'users');
 	}
-	if(user.length == 0){
+	if(!user){
 		client.logger.log(`Ошибка получения данных. User ID: ${interaction.member.user.id}`, 'err');
 		console.log(user, user[0]);
-		return client.api.interactions(interaction.id, interaction.token).callback.post({
-			data: {
-				type: 4,
-				data: {
-					flags: 64,
-					content: `Произошла ошибка. Попробуйте ещё раз или обратитесь на наш сервер поддержки.\nКод ошибки: LZE-179`
-				}
-			}
-		});
+		return interaction.reply({ content: `Произошла ошибка. Попробуйте ещё раз или обратитесь на наш сервер поддержки.\nКод ошибки: LZE-179`})
 	}
 	var guild = await client.db.get(interaction.guild_id, 'guilds');
 	if(!guild){
-		const add_guild = await client.db.add(interaction.guild_id, 'guilds')
+		await client.db.add(interaction.guild_id, 'guilds')
 		guild = await client.db.get(interaction.guild_id, 'guilds');
 	}
 	let commandfile = client.commands.get(interaction.data.name);

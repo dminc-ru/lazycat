@@ -1,45 +1,53 @@
 const { MessageEmbed } = require("discord.js");
-let stats = require(`${process.env.PATHTOBASE}/stats.json`);
+const beautify = require('js-beautify').js;
 module.exports.run = async (client, message, args) => {
 	if(message.author.id != '561822820632494081')
 		return;
-	
-	
-	const cleann = text => {
-		if (typeof(text) === "string")
-			return text.replace(/`/g, "`" + String.fromCharCode(8203)).replace(/@/g, "@" + String.fromCharCode(8203));
-		else
-			return text;
-	}
 	const code = args.join(" ");
-	try {
-      let evaled = await eval("(async () => {" + code + "})()");
- 
-      if (typeof evaled !== "string")
-        evaled = require("util").inspect(evaled);
-	  let embedEval = new MessageEmbed()
-		.setColor("#b88fff")
-		.addField(':inbox_tray: Input:', `\`\`\`js\n${code}\n\`\`\``, false)
-		.addField(':outbox_tray: Output:', `\`\`\`js\n${cleann(evaled)}\n\`\`\``, false)
-		.setTimestamp()
-		.setFooter(`${stats.version}`, client.user.avatarURL());
-      message.channel.send(embedEval);
-    } catch (err) {
+	const result = new Promise((resolve) => resolve(eval(code)));
+	return result.then((output) => {
+		if (typeof output !== "string") {
+			output = require('util').inspect(output, { depth: 0 });
+		}
+		if (output.includes(client.config.token)) {
+			output = output.replace(client.config.token, "[REDACTED]")
+		}
+		if (output.includes(client.config.webhookBanToken)) {
+			output = output.replace(client.config.webhookBanToken, "[REDACTED]")
+		}
+		if (output.includes(client.config.secretKey)) {
+			output = output.replace(client.config.secretKey, "[REDACTED]")
+		}
 		let embedEval = new MessageEmbed()
-			.setColor("#b88fff")
-			.addField(':inbox_tray: Input:', `\`\`\`js\n${code}\n\`\`\``, false)
-			.addField(':outbox_tray: Output:', `\`\`\`js\n${cleann(err)}\n\`\`\``, false)
-			.setTimestamp()
-			.setFooter(`${stats.version}`, client.user.avatarURL());
-      message.channel.send(embedEval);
-    }
+			.setColor(client.config.embedColor)
+			.addField(':inbox_tray: Input:', `\`\`\`js\n${beautify(code)}\n\`\`\``, false)
+			.addField(':outbox_tray: Output:', `\`\`\`js\n${output}\n\`\`\``, false)
+			.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
+      	message.channel.send(embedEval);
+	}).catch((err) => {
+		err = err.toString()
+		if (err.includes(client.config.token)) {
+			err = err.replace(client.config.token, "[REDACTED]")
+		}
+		if (err.includes(client.config.webhookBanToken)) {
+			err = err.replace(client.config.webhookBanToken, "[REDACTED]")
+		}
+		if (err.includes(client.config.secretKey)) {
+			err = err.replace(client.config.secretKey, "[REDACTED]")
+		}
+		let embedEvalErr = new MessageEmbed()
+			.setColor(client.config.embedColor)
+			.addField(':inbox_tray: Input:', `\`\`\`js\n${beautify(code)}\n\`\`\``, false)
+			.addField(':outbox_tray: Output:', `\`\`\`js\n${output}\n\`\`\``, false)
+			.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
+      	message.channel.send(embedEvalErr);
+	})
 }
 
 
 
-module.exports.help = {
+module.exports.data = {
 	name: "lzeval",
-	aliases: [],
 	permissions: ["developer"],
-	modules: ["admin"]
+	type: "message"
 }

@@ -1,12 +1,9 @@
-const { Client, Collection, MessageEmbed } = require("discord.js"); // подгрузка библиотеки discord.js
+const { Client, Collection } = require("discord.js"); // подгрузка библиотеки discord.js
 const chalk = require("chalk"); // библиотека для красивой консоли
 console.log(chalk.hex("#B88FFF")(`[!] Загрузка файлов...`));
 const fs = require("fs"); // чтение json файлов
 const client = new Client({ intents: ['GUILDS', 'GUILD_MESSAGES'] }); // интенты для бота
 
-config({
-    path: __dirname + "/.env" // открытие конфига
-});
 client.config = require('./config')
 
 client.commands = new Collection(); // коллекция команд
@@ -40,18 +37,12 @@ function LazyLoader() {
 			let props = require(`./commands/${dirs}/${file}`);
 			client.logger.log(`[!] Загружена команда ${file}`, "log")
 			client.commands.set(props.help.name, props);
-			props.help.aliases.forEach(alias => {
-				client.aliases.set(alias, props.help.name)
-			});
 			props.help.permissions.forEach(permission => {
 				client.permissions.set(permission, props.help.name)
 			});
-			props.help.modules.forEach(module => {
-				client.modules.set(module, props.help.name)
-			});
 		};
 	});
-	client.login(process.env.TOKEN);
+	client.login(client.config.token);
 };
 
 LazyLoader();
@@ -61,7 +52,7 @@ let exchange = require('./base/exchange.json'); // курс обмена жуч�
 let shop = require('./base/shop.json'); // текущая витрина в магазине
 let bans = require('./base/bans.json'); // база данных текущих банов
 client.ws.on("INTERACTION_CREATE", async interaction => {
-	if (!interaction.guild_id) 
+	if (!interaction.guild_id)
 		return client.api.interactions(interaction.id, interaction.token).callback.post({
 			data: {
 				type: 4,

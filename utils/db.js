@@ -1,11 +1,6 @@
 const sqlite3 = require('sqlite3').verbose();
+const config = require('../config.js')
 module.exports = class db {
-    /**
-     * Добавить новую запись в БД
-     * @param {string} id ID пользователя/сервера
-     * @param {string} table Изменяемая таблица
-     * @returns {Promise<any>}
-     */
     static add (id, table){
         return new Promise((resolve, reject) => {
             var db = new sqlite3.Database(`${process.env.PATHTOSQLITE}/lazy.db`);
@@ -17,12 +12,6 @@ module.exports = class db {
             resolve()
         });
     }
-    /**
-     * Получить запись из БД
-     * @param {string} id ID пользователя/сервера
-     * @param {string} table Таблица
-     * @returns {Promise<any>}
-     */
     static get (id, table){
         return new Promise((resolve, reject) => {
             var db = new sqlite3.Database(`${process.env.PATHTOSQLITE}/lazy.db`);
@@ -35,11 +24,6 @@ module.exports = class db {
             db.close()
         });
     }
-    /**
-     * Получить всю таблицу данных
-     * @param {string} table Таблица 
-     * @returns {Promise<any>} 
-     */
     static getTable (table) {
         return new Promise((resolve, reject) => {
             var db = new sqlite3.Database(`${process.env.PATHTOSQLITE}/lazy.db`);
@@ -52,14 +36,6 @@ module.exports = class db {
             db.close()
         })
     }
-    /**
-     * Изменить значение в базе данных
-     * @param {string} id ID пользователя/сервера
-     * @param {string} table Изменяемая таблица
-     * @param {string} column Изменяемая колонка
-     * @param {string} new_value Новое значение
-     * @returns {Promise<any>}
-     */
     static change (id, table, column, new_value){
         return new Promise((resolve, reject) => {
             var db = new sqlite3.Database(`${process.env.PATHTOSQLITE}/lazy.db`);

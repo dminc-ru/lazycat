@@ -64,7 +64,7 @@ try{
 		}
 }
 
-module.exports.help = {
+module.exports.data = {
 	name: "lzban",
 	permissions: ["lia"],
 	type: "message"

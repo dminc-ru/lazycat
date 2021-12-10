@@ -1,6 +1,4 @@
 const { Client, Collection, MessageEmbed } = require("discord.js"); // подгрузка библиотеки discord.js
-const { config } = require("dotenv"); // подгрузка библиотеки dotenv для конфига
-const { Player } = require('discord-player'); // подгрузка библиотеки плеера для радио
 const chalk = require("chalk"); // библиотека для красивой консоли
 console.log(chalk.hex("#B88FFF")(`[!] Загрузка файлов...`));
 const fs = require("fs"); // чтение json файлов
@@ -61,8 +59,6 @@ LazyLoader();
 let stats = require('./base/stats.json'); // статистика использования команд
 let exchange = require('./base/exchange.json'); // курс обмена жучков
 let shop = require('./base/shop.json'); // текущая витрина в магазине
-let mutes = require('./base/mutes.json') // база данных текущих мутов
-let chats = require('./base/chats.json') // база данных гильдий (outdated, migrated to sqlite)
 let bans = require('./base/bans.json'); // база данных текущих банов
 client.ws.on("INTERACTION_CREATE", async interaction => {
 	if (!interaction.guild_id) 

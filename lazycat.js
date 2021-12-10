@@ -50,12 +50,9 @@ LazyLoader();
 let stats = require('./base/stats.json'); // статистика использования команд
 let exchange = require('./base/exchange.json'); // курс обмена жучков
 let shop = require('./base/shop.json'); // текущая витрина в магазине
-let bans = require('./base/bans.json'); // база данных текущих банов
 client.ws.on("INTERACTION_CREATE", async interaction => {
 	if (!interaction.guild_id)
 		return interaction.reply({ content: "На данный момент команды можно использовать только на сервере.", ephemeral: true });
-	if(bans[interaction.member.user.id])
-		return;
 	var user = await client.db.get(interaction.member.user.id, 'users');
 	let fetchedUser = await client.users.cache.get(interaction.member.user.id)
 	if(!user){

@@ -151,7 +151,7 @@ module.exports.run = async (client, interaction) => {
 			});
 			}
 			let embedResult = new MessageEmbed()
-				.setColor(`#b88fff`)
+				.setColor(client.config.embedColor)
 				.setTitle(`Мегакейсы: предмет #${num}`)
 				.setDescription(`Поздравляем! Вам выпал предмет: ${cases[IDcase].items[result].name}`)
 				.addField(`Описание`,`${cases[IDcase].items[result].description}`, false)
@@ -160,7 +160,7 @@ module.exports.run = async (client, interaction) => {
 				.addField(`Кейс`, `${cases[IDcase].name}`)
 				.setThumbnail(`${cases[IDcase].items[result].image}`)
 				.setTimestamp()
-				.setFooter(`${user.tag} • /инвентарь`, user.displayAvatarURL());
+				.setFooter(`${user.tag} • /инвентарь`, user.displayAvatarURL({dynamic: true}));
 				
 				setTimeout(() => {
 					interaction.followUp({embeds: [embedResult], ephemeral: true});

@@ -5,3 +5,4 @@ db/
 base/
 package.json
 package-lock.json
+config.js

@@ -1,9 +1,8 @@
 const { MessageEmbed } = require("discord.js"); 
-let cases = require(`${process.env.PATHTOBASE}/cases.json`);
-let inventory = require(`${process.env.PATHTOBASE}/inventory.json`);
+let cases = require(`${client.config.jsonPath}cases.json`);
+let inventory = require(`${client.config.jsonPath}inventory.json`);
 module.exports.run = async (client, interaction) => {
-try{
-	let user = client.users.cache.get(interaction.member.user.id);
+	let user = await client.users.fetch(interaction.member.user.id);
 	var IDcase;
 	if(interaction.data.options) 
 		IDcase = interaction.data.options[0].value;
@@ -11,88 +10,40 @@ try{
 	let memIndex2 = inventory[interaction.member.user.id].cases.findIndex((obj => obj.caseID == "2"));
 	let numberOfCase1 = inventory[interaction.member.user.id].cases[memIndex1].megaCount;
 	let numberOfCase2 = inventory[interaction.member.user.id].cases[memIndex2].megaCount;
-	if(!IDcase)
-	return client.api.interactions(interaction.id, interaction.token).callback.post({
-		data: {
-			type: 4,
-			data: {
-				embeds: [
-					{
-						color: 0xb88fff,
-						title: `Мегакейсы`,
-						description: `Доступные кейсы:\n1. <:lz_tree:774622409621897306> Кейс садовника • У вас: ${numberOfCase1} шт.\n2. <:lz_cmd:774302538626498580> Школьная библиотека • У вас: ${numberOfCase2} шт.`,
-						fields: [
-							{
-								name: 'Редкости:',
-								value: `<:lz_ph:742051100068413540> Обычный <:lz_ph:742051100068413540>\n<:lz_bh:773816589442875393> Стандартный <:lz_bh:773816589442875393>\n<:lz_gh:773816562284888115> __Особый__ <:lz_gh:773816562284888115>\n<:lz_yh:773816540616589372> *Редкий*  <:lz_yh:773816540616589372>\n<:lz_oh:773815092130480138> **Тайный** <:lz_oh:773815092130480138>\n<:lz_rh:773814278864109589> ***Легендарный***  <:lz_rh:773814278864109589>`,
-								inline: true
-							},
-							{
-								name: 'Команды:',
-								value: `Открыть: /мегакейс <номер_кейса>\nИнвентарь: /инвентарь`,
-								inline: true
-							}
-						],
-						timestamp: new Date(),
-						footer: {
-							text: `${user.tag}`,
-							icon_url: `${user.displayAvatarURL()}`,
-						}
-					}
-				]
-			}
-		}
-	});
-	if(IDcase < 1)
-	return client.api.interactions(interaction.id, interaction.token).callback.post({
-		data: {
-			type: 4,
-			data: {
-				flags: 64,
-				content: `Введите корректный номер кейса.`
-			}
-		}
-	}); 
-		let num = 1;
-		if(!cases[IDcase])
-		return client.api.interactions(interaction.id, interaction.token).callback.post({
-			data: {
-				type: 4,
-				data: {
-					flags: 64,
-					content: `Введите корректный номер кейса.`
-				}
-			}
-		}); 
-		let memIndex = inventory[interaction.member.user.id].cases.findIndex((obj => obj.caseID == IDcase));
+	if(!IDcase) {
+		let caseInfo = new MessageEmbed()
+			.setColor(client.config.embedColor)
+			.setTitle(`Мегакейсы`)
+			.setDescription(`Доступные кейсы:
+				1. ${client.emoji.tree} Кейс садовника • У вас: ${numberOfCase1} шт.
+				2. ${client.emoji.cmd} Школьная библиотека • У вас: ${numberOfCase2} шт.`)
+			.addField(`Редкости:`, `${client.emoji.ph} Обычный ${client.emoji.ph}
+				${client.emoji.bh} Стандартный ${client.emoji.bh}
+				${client.emoji.gh} __Особый__ ${client.emoji.gh}
+				${client.emoji.yh} *Редкий* ${client.emoji.yh}
+				${client.emoji.oh} **Тайный** ${client.emoji.oh}
+				${client.emoji.rh} ***Легендарный*** ${client.emoji.rh}`, true)
+			.addField(`Команды:`, `Открыть: /мегакейс <номер_кейса>
+			Инвентарь: /инвентарь`, true)
+			.setTimestamp()
+			.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+		return interaction.reply({embeds: [caseInfo]})
+	}
+	if( (IDcase < 1) || (!cases[IDcase]) ) 
+		return interaction.reply({content: "Введите корректный номер кейса.", ephemeral: true})
+	let num = 1;
+	let memIndex = inventory[interaction.member.user.id].cases.findIndex((obj => obj.caseID == IDcase));
 	let balances = Number(inventory[interaction.member.user.id].cases[memIndex].megaCount);
 	if(balances > 0){
 		inventory[interaction.member.user.id].cases[memIndex].megaCount = balances - 1;
 		let fs = require('fs');
 		fs.writeFileSync(`${process.env.PATHTOBASE}/inventory.json`, JSON.stringify(inventory, null, "\t"));
 	}else{
-		return client.api.interactions(interaction.id, interaction.token).callback.post({
-			data: {
-				type: 4,
-				data: {
-					flags: 64,
-					content: `У вас нет мегакейсов.`
-				}
-			}
-		}); 
+		return interaction.reply({content: "У вас нет мегакейсов.", ephemeral: true})
 	}
 		var ogr = 10;
 		var delay = 3000;
-		var channel = client.channels.cache.get(interaction.channel_id)
-		client.api.interactions(interaction.id, interaction.token).callback.post({
-			data: {
-				type: 4,
-				data: {
-					flags: 64,
-					content: `Успешно: мегакейс открывается.`
-				}
-			}
-		}); 
+		interaction.reply({content: `Успешно: мегакейс открывается.`, ephemeral: true})
 		for(var a = 0; a<ogr; a++){
 			function random(min, max) {
 				let rand = min - 0.5 + Math.random() * (max - min + 1);
@@ -146,31 +97,31 @@ try{
 			let resheart = "";
 			let resclass = "";
 			if(cases[IDcase].items[result].class == 'Обычный'){
-				resheart = "<:lz_ph:742051100068413540>";
+				resheart = client.emoji.ph;
 				resclass = `${cases[IDcase].items[result].class}`;
 			}
 			if(cases[IDcase].items[result].class == 'Стандартный'){
-				resheart = "<:lz_bh:773816589442875393>";
+				resheart = client.emoji.bh;
 				resclass = `${cases[IDcase].items[result].class}`;
 			}
 			if(cases[IDcase].items[result].class == 'Особый'){
-				resheart = "<:lz_gh:773816562284888115>";
+				resheart = client.emoji.gh;
 				resclass = `__${cases[IDcase].items[result].class}__`;
 			}
 			if(cases[IDcase].items[result].class == 'Редкий'){
-				resheart = "<:lz_yh:773816540616589372>";
+				resheart = client.emoji.yh;
 				resclass = `*${cases[IDcase].items[result].class}* `;
 			}
 			if(cases[IDcase].items[result].class == 'Тайный'){
-				resheart = "<:lz_oh:773815092130480138>";
+				resheart = client.emoji.oh;
 				resclass = `**${cases[IDcase].items[result].class}**`;
 			}
 			if(cases[IDcase].items[result].class == 'Легендарный'){
-				resheart = "<:lz_rh:773814278864109589>";
+				resheart = client.emoji.rh;
 				resclass = `***${cases[IDcase].items[result].class}*** `;
 			}
 			if(cases[IDcase].items[result].class == 'ОфИгЕнНоЕ'){
-				resheart = "<:lz_wh:773996117863825438><:lz_wh:773996117863825438><:lz_wh:773996117863825438><:lz_wh:773996117863825438><:lz_wh:773996117863825438>";
+				resheart = `${client.emoji.wh}${client.emoji.wh}${client.emoji.wh}${client.emoji.wh}${client.emoji.wh}`;
 				resclass = `__***~~ОфИгЕнНоЕ~~***__ `;
 			}
 			let comlength = Object.keys(inventory[interaction.member.user.id].items).length;
@@ -212,20 +163,16 @@ try{
 				.setFooter(`${user.tag} • /инвентарь`, user.displayAvatarURL());
 				
 				setTimeout(() => {
-					channel.send(embedResult);
+					interaction.followUp({embeds: [embedResult], ephemeral: true});
 				}, delay);
 				delay += 3000;
 				num+=1;
 		}
 		let fs = require("fs");
-		fs.writeFileSync(`${process.env.PATHTOBASE}/inventory.json`, JSON.stringify(inventory, null, "\t"));
-}catch(error){
-			client.logger.log(`${error}`, "err");
-		}
+		fs.writeFileSync(`${client.config.jsonPath}inventory.json`, JSON.stringify(inventory, null, "\t"));
 }
-module.exports.help = {
+module.exports.data = {
 	name: "мегакейс",
-	aliases: ["mtufrtqc"],
 	permissions: ["member"],
-	modules: ["cases"]
+	type: "interaction"
 }

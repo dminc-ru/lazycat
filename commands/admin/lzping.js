@@ -2,7 +2,7 @@ const { MessageEmbed } = require("discord.js");
 const ms = require("ms");
 const os = require('os');
 module.exports.run = async (client, message, args) => {
-	let stats = require(`${client.config.pathToDatabaseJSON}stats.json`);
+	let stats = require(`${client.config.jsonPath}stats.json`);
 	var busymem = os.totalmem() - os.freemem()
 	let pongEmbed = new MessageEmbed()
 			.setColor(client.config.embedColor)

@@ -1,7 +1,7 @@
 const { MessageEmbed } = require("discord.js");
 const fs = require("fs");
-let stats = require(`${process.env.PATHTOBASE}/stats.json`);
-let badgebase = require(`${process.env.PATHTOBASE}/badges.json`);
+let stats = require(`${client.config.jsonPath}stats.json`);
+let badgebase = require(`${client.config.jsonPath}/badges.json`);
 module.exports.run = async (client, message, args) => {
 try{
 	const argus = message.content.split(' ').slice(1);
@@ -25,7 +25,7 @@ try{
 				name: strings[0],
 				description: strings[1]
 			});
-			fs.writeFileSync(`${process.env.PATHTOBASE}/badges.json`, JSON.stringify(badgebase, null, "\t"));
+			fs.writeFileSync(`${client.config.jsonPath}badges.json`, JSON.stringify(badgebase, null, "\t"));
 			let createdBadge = new MessageEmbed()
 				.setColor(client.config.embedColor)
 				.setTitle(`Значок успешно создан.`)
@@ -53,7 +53,7 @@ try{
 			let badgeCheck = badgebase.findIndex((badge => badge.codename == args[1]));
 			if(badgeCheck != -1){
 				badgebase.splice(badgeCheck, 1);
-				fs.writeFileSync(`${process.env.PATHTOBASE}/badges.json`, JSON.stringify(badgebase, null, "\t"));
+				fs.writeFileSync(`${client.config.jsonPath}badges.json`, JSON.stringify(badgebase, null, "\t"));
 				let deletedBadge = new MessageEmbed()
 					.setColor(client.config.embedColor)
 					.setTitle(`Значок успешно удалён.`)

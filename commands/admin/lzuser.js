@@ -1,5 +1,5 @@
 const moment = require("moment")
-const stats = require(`${process.env.PATHTOBASE}/stats.json`)
+const stats = require(`${client.config.jsonPath}/stats.json`)
 const { MessageEmbed } = require('discord.js')
 module.exports.run = async (client, message, args) => {
 	if (!args[0]) {

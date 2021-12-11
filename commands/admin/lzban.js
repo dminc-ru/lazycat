@@ -1,5 +1,5 @@
 const { MessageEmbed, WebhookClient } = require("discord.js");
-const webhookBan = new WebhookClient('795934524604416000', '2b4PbpsJc6AnzFDMGhTKElsvGE27bzXsBMTjlUZZ7V2G9tSJRf1lHPBpI5fMcFbxVPyZ');
+const webhookBan = new WebhookClient(client.config.webhookBan.id, client.config.webhookBan.token);
 module.exports.run = async (client, message, args) => {
 try{
 	var user = await client.users.fetch(message.mentions.users.first());

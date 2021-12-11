@@ -3,3 +3,5 @@ node_modules/
 .vscode/
 db/
 base/
+emojis.js
+config.js

@@ -5,3 +5,5 @@ db/
 base/
 emojis.js
 config.js
+package.json
+package-lock.json

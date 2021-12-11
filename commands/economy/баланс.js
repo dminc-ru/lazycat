@@ -13,9 +13,8 @@ module.exports.run = async (client, interaction) => {
 	interaction.reply({embeds: [userProfile]})
 }
 
-module.exports.help = {
+module.exports.data = {
 	name: "баланс",
-	aliases: [",fkfyc"],
 	permissions: ["member"],
-	modules: ["economy"]
+	type: "interaction"
 }

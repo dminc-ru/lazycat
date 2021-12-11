@@ -1,9 +1,9 @@
 let inventory = require(`${client.config.jsonPath}inventory.json`);
 let cases = require(`${client.config.jsonPath}cases.json`);
 module.exports.run = async (client, interaction) => {
-	let userdb = await client.db.get(interaction.member.user.id, 'users')
+	let userdb = await client.db.getUser(interaction.member.user.id)
 	var whattoDo = interaction.data.options[0].name;
-	let user = client.users.cache.get(interaction.member.user.id);
+	let user = await client.users.fetch(interaction.member.user.id);
 	let comlength = Object.keys(inventory[interaction.member.user.id].items).length;
 	let fishsell = 0;
 	var totalsum = 0;

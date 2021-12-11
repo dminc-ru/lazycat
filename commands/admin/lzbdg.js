@@ -271,7 +271,7 @@ try{
 				if(member.badges.includes(args[2])){
 					let currentBadges = member.badges;
 					let newBadges = currentBadges.replace(`${args[2]},`, '');
-					client.db.change_user(membermention.id, 'badges', newBadges);
+					client.db.changeUser(membermention.id, 'badges', newBadges);
 					let Success = new MessageEmbed()
 						.setColor(client.config.embedColor)
 						.setTitle(`Успешно`)

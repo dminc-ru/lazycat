@@ -19,7 +19,7 @@ module.exports.run = async (client, message, args) => {
 	let reasonUnban = argus.slice(1).join(' ');
 	if(!reasonUnban)
 		reasonUnban = `Рассмотрение апелляции`
-	client.db.change_user(user.discord_id, 'permissions_member', 1);
+	client.db.changeUser(user.discord_id, 'permissions_member', 1);
 	let lazyBan = new MessageEmbed()
 		.setColor(client.config.embedColor)
 		.setTitle(`Глобальная разблокировка`)

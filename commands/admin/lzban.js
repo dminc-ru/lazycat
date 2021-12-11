@@ -17,7 +17,7 @@ try{
 		}
 	}
 
-	var userdb = await client.db.get_user(user.id);
+	var userdb = await client.db.getUser(user.id);
 	noUser = new MessageEmbed()
 		.setColor(client.config.embedColor)
 		.setTitle('Ошибка')
@@ -28,10 +28,10 @@ try{
 	let reasonBan = args[1];
 	if(!reasonBan)
 		reasonBan = `Нарушение Пользовательского соглашения`;
-	await client.db.change_user(user.id, 'permissions_member', 0);
-	await client.db.change_user(user.id, 'permissions_tester', 0);
-	await client.db.change_user(user.id, 'permissions_lia', 0);
-	await client.db.change_user(user.id, 'permissions_developer', 0);
+	await client.db.changeUser(user.id, 'permissions_member', 0);
+	await client.db.changeUser(user.id, 'permissions_tester', 0);
+	await client.db.changeUser(user.id, 'permissions_lia', 0);
+	await client.db.changeUser(user.id, 'permissions_developer', 0);
 	let lazyBan = new MessageEmbed()
 		.setColor(client.config.embedColor)
 		.setTitle(`Глобальная блокировка`)

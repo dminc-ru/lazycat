@@ -1,53 +1,23 @@
 module.exports.run = async (client, interaction) => {
-	try{
-		let userdb = await client.db.get(interaction.member.user.id, 'users')
-		let user = client.users.cache.get(interaction.member.user.id);
-		let channel = client.channels.cache.get(interaction.channel_id);
+		let userdb = await client.db.getUser(interaction.member.user.id)
+		let user = await client.users.fetch(interaction.member.user.id);
+		let channel = await client.channels.fetch(interaction.channel_id);
 		var whattoDo = interaction.data.options[0].name;	
 		if(whattoDo == "положить"){
 			var money = interaction.data.options[0].options[0].value;
 			if(money < 1)
-			return client.api.interactions(interaction.id, interaction.token).callback.post({
-				data: {
-					type: 4,
-					data: {
-						flags: 64,
-						content: `Укажите корректное количество <:lz_fish:742459590087803010>`
-					}
-				}
-			});
+				return interaction.reply({content: `Укажите корректное количество ${client.emoji.fish}`, ephemeral: true})
 			if(userdb.balance_fish < money)
-			return client.api.interactions(interaction.id, interaction.token).callback.post({
-				data: {
-					type: 4,
-					data: {
-						flags: 64,
-						content: `У вас недостаточно средств.`
-					}
-				}
-			});
-			client.db.change(interaction.member.user.id, 'users', 'balance_fish', (userdb.balance_fish - money))
-			client.db.change(interaction.member.user.id, 'users', 'balance_bank', (userdb.balance_bank + money))
-
-			return client.api.interactions(interaction.id, interaction.token).callback.post({
-				data: {
-					type: 4,
-					data: {
-						embeds: [
-							{
-								color: 0xb88fff,
-								title: 'Транзакция',
-								description: `Успешно! На ваш счёт зачислено ${money} <:lz_fish:742459590087803010>.`,
-								timestamp: new Date(),
-								footer: {
-									text: `${user.tag}`,
-									icon_url: `${user.displayAvatarURL()}`,
-								}
-							}
-						]
-					}
-				}
-			});
+				return interaction.reply({content: `У вас недостаточно средств.`, ephemeral: true})
+			client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_fish - money))
+			client.db.changeUser(interaction.member.user.id, 'balance_bank', (userdb.balance_bank + money))
+			let successEmbed = new MessageEmbed()
+				.setColor(client.config.embedColor)
+				.setTitle('Транзакция')
+				.setDescription(`Успешно! На ваш счёт зачислено ${money} ${client.emoji.fish}`)
+				.setTimestamp()
+				.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+			return interaction.reply({embeds: [successEmbed]})
 		}
 		
 		
@@ -55,47 +25,18 @@ module.exports.run = async (client, interaction) => {
 		if(whattoDo == "снять"){
 			var money = interaction.data.options[0].options[0].value;
 			if(money < 1)
-			return client.api.interactions(interaction.id, interaction.token).callback.post({
-				data: {
-					type: 4,
-					data: {
-						flags: 64,
-						content: `Укажите корректное количество <:lz_fish:742459590087803010>`
-					}
-				}
-			});
+				return interaction.reply({content: `Укажите корректное количество ${client.emoji.fish}`, ephemeral: true})
 			if(userdb.balance_bank < money)
-			return client.api.interactions(interaction.id, interaction.token).callback.post({
-				data: {
-					type: 4,
-					data: {
-						flags: 64,
-						content: `У вас недостаточно средств.`
-					}
-				}
-			});
-			client.db.change(interaction.member.user.id, 'users', 'balance_fish', (userdb.balance_bank - money))
-			client.db.change(interaction.member.user.id, 'users', 'balance_bank', (userdb.balance_fish + money))
-
-			return client.api.interactions(interaction.id, interaction.token).callback.post({
-				data: {
-					type: 4,
-					data: {
-						embeds: [
-							{
-								color: 0xb88fff,
-								title: 'Транзакция',
-								description: `Успешно! Вы сняли ${money} <:lz_fish:742459590087803010> с вашего счёта.`,
-								timestamp: new Date(),
-								footer: {
-									text: `${user.tag}`,
-									icon_url: `${user.displayAvatarURL()}`,
-								}
-							}
-						]
-					}
-				}
-			});
+				return interaction.reply({content: `У вас недостаточно средств.`, ephemeral: true})
+			client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_bank - money))
+			client.db.changeUser(interaction.member.user.id, 'balance_bank', (userdb.balance_fish + money))
+			let successEmbed = new MessageEmbed()
+				.setColor(client.config.embedColor)
+				.setTitle('Транзакция')
+				.setDescription(`Успешно! Вы сняли ${money} ${client.emoji.fish} с вашего счёта.`)
+				.setTimestamp()
+				.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+			return interaction.reply({embeds: [successEmbed]})
 		}
 		
 		
@@ -126,24 +67,15 @@ module.exports.run = async (client, interaction) => {
 			generatedCode += "[]"
 			let fiveNumber = randomBank(1, 9);
 			generatedCode += fiveNumber;
-			client.api.interactions(interaction.id, interaction.token).callback.post({
-				data: {
-					type: 4,
-					data: {
-						embeds: [{
-							color: 0xb88fff,
-							title: "Банк: ограбление",
-							description: `Вы подошли к хранилищу банка и достали кусок бумаги, купленный в DarkCat.\n\`${generatedCode}\`\nУгадайте цифру кода.`,
-							timestamp: new Date(),
-							footer: {
-								text: `${user.tag}`,
-								icon_url: `${user.displayAvatarURL()}`,
-							}
-						}]
-						
-					}
-				}
-			});
+			let robberyEmbed = new MessageEmbed()
+				.setColor(client.config.embedColor)
+				.setTitle('Банк: ограбление')
+				.setDescription(`Вы подошли к хранилищу банка и достали кусок бумаги, купленный в DarkCat.
+				\`${generatedCode}\`
+				Угадайте цифру кода.`)
+				.setTimestamp()
+				.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+			interaction.reply({embeds: [robberyEmbed]})
 			let response;
 			try {
 				response = await channel.awaitMessages((message2) => interaction.member.user.id === message2.author.id, {
@@ -152,70 +84,40 @@ module.exports.run = async (client, interaction) => {
 					errors: ['time']
 				});
 			}catch(error){
-				return client.api.interactions(interaction.id, interaction.token).callback.post({
-					data: {
-						type: 4,
-						data: {
-							embeds: [{
-								color: 0xb88fff,
-								title: 'Банк: ограбление',
-								description: `Сработала сигнализация! Вы смогли убежать от охраны этого банка.`,
-								timestamp: new Date(),
-								footer: {
-									text: `${user.tag}`,
-									icon_url: `${user.displayAvatarURL()}`,
-								}
-							}]
-						}
-					}
-				});
+				let failEmbed = new MessageEmbed()
+					.setColor(client.config.embedColor)
+					.setTitle('Банк: ограбление')
+					.setDescription(`Сработала сигнализация! Вы смогли убежать от охраны этого банка.`)
+					.setTimestamp()
+					.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+				return interaction.reply({embeds: [failEmbed]})
 			}
 			if(response.first().content == 1 || response.first().content == 2 || response.first().content == 3 || response.first().content == 4 || response.first().content == 5){
 				if (response.first().content === `${guessNumber}`) {
 					let reward = randomBank(150, 200);
-					userdb = await client.db.get(interaction.member.user.id, 'users')
-					client.db.change(interaction.member.user.id, 'users', 'balance_fish', (userdb.balance_fish + reward))
-					return client.api.webhooks(client.user.id, interaction.token).messages('@original').patch({
-						data: {
-							type: 4,
-						  	embeds: [{
-								color: 0xb88fff,
-								title: 'Банк: ограбление',
-								description: `Код введён. Хранилище открылось! Вы забрали ${reward} <:lz_fish:742459590087803010>`,
-								timestamp: new Date(),
-								footer: {
-									text: `${user.tag}`,
-									icon_url: `${user.displayAvatarURL()}`,
-								}
-						 	}]
-						}
-					  });
+					userdb = await client.db.getUser(interaction.member.user.id)
+					client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_fish + reward))
+					let successEmbed = new MessageEmbed()
+						.setColor(client.config.embedColor)
+						.setTitle(`Банк: ограбление`)
+						.setDescription(`Код введён. Хранилище открылось! Вы забрали ${reward} ${client.emoji.fish}`)
+						.setTimestamp()
+						.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+					return interaction.editReply({embeds: [successEmbed]})
 				} else {
-					return client.api.webhooks(client.user.id, interaction.token).messages('@original').patch({
-						data: {
-							type: 4,
-						  	embeds: [{
-								color: 0xb88fff,
-								title: 'Банк: ограбление',
-								description: `Код введён. Сработала сигнализация! Вы смогли убежать от охраны этого банка.`,
-								timestamp: new Date(),
-								footer: {
-									text: `${user.tag}`,
-									icon_url: `${user.displayAvatarURL()}`,
-								}
-						 	}]
-						}
-					  });
+					let failEmbed = new MessageEmbed()
+						.setColor(client.config.embedColor)
+						.setTitle('Банк: ограбление')
+						.setDescription(`Код введён. Сработала сигнализация! Вы смогли убежать от охраны этого банка.`)
+						.setTimestamp()
+						.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+					return interaction.editReply({embeds: [failEmbed]})
 				}
 			}				
 		}
-	}catch(error){
-		client.logger.log(`${error}`, "err");
-	}
 }
 module.exports.help = {
 	name: "банк",
-	aliases: [",fyr"],
 	permissions: ["member"],
-	modules: ["economy"]
+	type: "interaction"
 }

@@ -1,6 +1,6 @@
 module.exports.run = async (client, interaction) => {
 	let user = await client.users.fetch(interaction.member.user.id);
-	let userdb = await client.db.get(interaction.member.user.id, 'users')
+	let userdb = await client.db.getUser(interaction.member.user.id)
 	let userProfile = new MessageEmbed()
 		.setColor(client.config.embedColor)
 		.setTitle('Баланс')

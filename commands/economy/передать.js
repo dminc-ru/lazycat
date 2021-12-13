@@ -28,7 +28,7 @@ module.exports.run = async (client, interaction) => {
 	return interaction.reply({embeds: [successTransaction]})
 }
 
-module.exports.help = {
+module.exports.data = {
 	name: "передать",
 	permissions: ["member"],
 	type: "interaction"

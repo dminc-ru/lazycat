@@ -267,7 +267,7 @@ module.exports.run = async (client, interaction) => {
         }
 };
 
-module.exports.help = {
+module.exports.data = {
     name: "работа",
 	permissions: ["member"],
 	type: "interaction"

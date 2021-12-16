@@ -1,145 +1,64 @@
-let badgebase = require(`${process.env.PATHTOBASE}/badges.json`);
+let badgebase = require(`${client.config.jsonPath}badges.json`);
 module.exports.run = async (client, interaction) => {
-try{
-	let userdb = await client.db.get(interaction.member.user.id, 'users')
+	let userdb = await client.db.getUser(interaction.member.user.id)
 	var memberProfile
 	if(interaction.data.options)
-		memberProfile = client.users.cache.get(interaction.data.options[0].value);
-	let user = client.users.cache.get(interaction.member.user.id);
+		memberProfile = await client.users.fetch(interaction.data.options[0].value);
+	let user = await client.users.fetch(interaction.member.user.id);
 	let badgess = [];
 	if(!memberProfile) {
-			let userbadges = userdb.badges.split(',')
-			userbadges.length--
-			userbadges.map(badge => {
-				let emoji = badgebase.find(badg => badg.codename === badge).emoji;
-				let name = badgebase.find(badg => badg.codename === badge).name;
-				badgess.push(`${emoji} ${name}`);
-			});
-			if(badgess == '')
-				badgess.push(`-`);
-			return client.api.interactions(interaction.id, interaction.token).callback.post({
-				data: {
-					type: 4,
-					data: {
-						embeds: [
-							{
-								color: 0xb88fff,
-								title: 'Профиль',
-								author: {
-									name: `${user.tag}`,
-									icon_url: `${user.displayAvatarURL()}`,
-								},
-								description: `**Описание:** ${userdb.description}`,
-								fields: [
-									{
-										name: 'Баланс',
-										value: `${userdb.balance_fish} <:lz_fish:742459590087803010>`,
-										inline: true
-									},
-									{
-										name: `В банке:`,
-										value: `${userdb.balance_bank} <:lz_fish:742459590087803010>`,
-										inline: true
-									},
-									{
-										name: 'Жучков:',
-										value: `${userdb.balance_bugs} <:lz_bug:742039591929905223>`,
-										inline: true
-									},
-									{
-										name: 'Значки:',
-										value: `${badgess.join('\n')}`,
-										inline: false
-									}
-								],
-								timestamp: new Date(),
-								footer: {
-									text: `${user.tag}`,
-									icon_url: `${user.displayAvatarURL()}`,
-								}
-							}
-						]
-					}
-				}
-			});
+		let userbadges = userdb.badges.split(',')
+		userbadges.length--
+		userbadges.map(badge => {
+			let emoji = badgebase.find(badg => badg.codename === badge).emoji;
+			let name = badgebase.find(badg => badg.codename === badge).name;
+			badgess.push(`${emoji} ${name}`);
+		});
+		if(badgess == '')
+			badgess.push(`-`);
+		let profileEmbed = new MessageEmbed()
+			.setColor(client.config.embedColor)
+			.setTitle('Профиль')
+			.setAuthor(user.tag, user.displayAvatarURL({dynamic: true}))
+			.setDescription(`**Описание:** ${userdb.description}`)
+			.addField('Баланс', `${userdb.balance_fish} ${client.emoji.fish}`, true)
+			.addField('В банке:', `${userdb.balance_bank} ${client.emoji.fish}`, true)
+			.addField('Жучков:', `${userdb.balance_bugs} ${client.emoji.bug}`, true)
+			.addField('Значки:', `${badgess.join('\n')}`, false)
+			.setTimestamp()
+			.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+		return interaction.reply({embeds: [profileEmbed]})
 	}
 	else {
-		let memberdb = await client.db.get(memberProfile.id, 'users')
-		if(!memberdb){
-				return client.api.interactions(interaction.id, interaction.token).callback.post({
-					data: {
-						type: 4,
-						data: {
-							flags: 64,
-							content: `Указанный пользователь не зарегистрирован в системе Lazy Cat.`
-						}
-					}
-				});
-		}
-			let memberbadges = memberdb.badges.split(',')
-			memberbadges.length--
-			memberbadges.map(badge => {
-				let emoji = badgebase.find(badg => badg.codename === badge).emoji;
-				let name = badgebase.find(badg => badg.codename === badge).name;
-				badgess.push(`${emoji} ${name}`);
-			});
-			if(badgess == '')
-				badgess.push(`-`);
-				return client.api.interactions(interaction.id, interaction.token).callback.post({
-					data: {
-						type: 4,
-						data: {
-							embeds: [
-								{
-									color: 0xb88fff,
-									title: 'Профиль',
-									author: {
-										name: `${memberProfile.tag}`,
-										icon_url: `${memberProfile.displayAvatarURL()}`,
-									},
-									description: `**Описание:** ${memberdb.description}`,
-									fields: [
-										{
-											name: 'Баланс',
-											value: `${memberdb.balance_fish} <:lz_fish:742459590087803010>`,
-											inline: true
-										},
-										{
-											name: `В банке:`,
-											value: `${memberdb.balance_bank} <:lz_fish:742459590087803010>`,
-											inline: true
-										},
-										{
-											name: 'Жучков:',
-											value: `${memberdb.balance_bugs} <:lz_bug:742039591929905223>`,
-											inline: true
-										},
-										{
-											name: 'Значки:',
-											value: `${badgess.join('\n')}`,
-											inline: false
-										}
-									],
-									timestamp: new Date(),
-									footer: {
-										text: `${user.tag}`,
-										icon_url: `${user.displayAvatarURL()}`,
-									}
-								}
-							]
-						}
-					}
-				});
-	}
-}catch(error){
-		client.logger.log(`${error}`, "err");
-		console.log(error);
+		let memberdb = await client.db.getUser(memberProfile.id)
+		if(!memberdb)
+			return interaction.reply({content: "Указанный пользователь не зарегистрирован в системе Lazy Cat.", ephemeral: true})
+		let memberbadges = memberdb.badges.split(',')
+		memberbadges.length--
+		memberbadges.map(badge => {
+			let emoji = badgebase.find(badg => badg.codename === badge).emoji;
+			let name = badgebase.find(badg => badg.codename === badge).name;
+			badgess.push(`${emoji} ${name}`);
+		});
+		if(badgess == '')
+			badgess.push(`-`);
+		let profileEmbed = new MessageEmbed()
+			.setColor(client.config.embedColor)
+			.setTitle('Профиль')
+			.setAuthor(memberProfile.tag, memberProfile.displayAvatarURL({dynamic: true}))
+			.setDescription(`**Описание:** ${memberdb.description}`)
+			.addField('Баланс', `${memberdb.balance_fish} ${client.emoji.fish}`, true)
+			.addField('В банке:', `${memberdb.balance_bank} ${client.emoji.fish}`, true)
+			.addField('Жучков:', `${memberdb.balance_bugs} ${client.emoji.bug}`, true)
+			.addField('Значки:', `${badgess.join('\n')}`, false)
+			.setTimestamp()
+			.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+		return interaction.reply({embeds: [profileEmbed]})
 	}
 }
 
-module.exports.help = {
+module.exports.data = {
 	name: "профиль",
-	aliases: ["ghjabkm"],
 	permissions: ["member"],
-	modules: ["info"]
+	type: "interaction"
 }

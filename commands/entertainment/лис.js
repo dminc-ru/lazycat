@@ -1,36 +1,17 @@
 const request = require('node-superfetch');
 module.exports.run = async (client, interaction) => {
-	try{
-		const { body } = await request.get('https://randomfox.ca/floof');
-		let user = client.users.cache.get(interaction.member.user.id);
-		client.api.interactions(interaction.id, interaction.token).callback.post({
-			data: {
-				type: 4,
-				data: {
-					embeds: [
-						{
-							color: 0xb88fff,
-							timestamp: new Date(),
-							footer: {
-								text: `${user.tag}`,
-								icon_url: `${user.displayAvatarURL()}`,
-							},
-							image: {
-								url: body.image,
-							},
-						}
-					]
-				}
-			}
-		});
-	}catch(error){
-		client.logger.log(`${error}`, "err");
-	}
+	const { body } = await request.get('https://randomfox.ca/floof');
+	let user = await client.users.fetch(interaction.member.user.id);
+	let foxEmbed = new MessageEmbed()
+		.setColor(client.config.embedColor)
+		.setImage(body.image)
+		.setTimestamp()
+		.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+	interaction.reply({embeds: [foxEmbed]})
 }
 
-module.exports.help = {
+module.exports.data = {
 	name: "лис",
-	aliases: ["лиса", "лисы", "kbc", "kbcf", "kbcs"],
 	permissions: ["member"],
-	modules: ["entertainment"]
+	type: "interaction"
 }

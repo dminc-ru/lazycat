@@ -1,18 +1,8 @@
 module.exports.run = async (client, interaction) => {
-try{
-	let user = client.users.cache.get(interaction.member.user.id);
+	let user = await client.users.fetch(interaction.member.user.id);
 	const descript = interaction.data.options[0].value;
-	if(descript.length > 150){
-		return client.api.interactions(interaction.id, interaction.token).callback.post({
-			data: {
-				type: 4,
-				data: {
-					flags: 64,
-					content: `Максимальное количество символов в описании — 150.`
-				}
-			}
-		}); 
-	}
+	if(descript.length > 150)
+		return interaction.reply({content: "Максимальное количество символов в описании — 150.", ephemeral: true})
 	function occurrence(string, substring) {
 		var counter = 0;
 		var sub = substring.toLowerCase();
@@ -30,46 +20,20 @@ try{
 
 		return counter;
 	}
-	if(occurrence(descript, "\n") > 5){
-		return client.api.interactions(interaction.id, interaction.token).callback.post({
-			data: {
-				type: 4,
-				data: {
-					flags: 64,
-					content: `Максимальное количество переносов в описании — 5`
-				}
-			}
-		});
-	}
-	client.db.change(interaction.member.user.id, 'users', 'description', descript)
-	return client.api.interactions(interaction.id, interaction.token).callback.post({
-		data: {
-			type: 4,
-			data: {
-				embeds: [
-					{
-						color: 0xb88fff,
-						title: 'Успешно',
-						description: `Описание изменено.`,
-						timestamp: new Date(),
-						footer: {
-							text: `${user.tag}`,
-							icon_url: `${user.displayAvatarURL()}`,
-						}
-					}
-				]
-			}
-		}
-	});
-	
-}catch(error){
-		client.logger.log(`${error}`, "err");
-	}
+	if(occurrence(descript, "\n") > 5)
+		return interaction.reply({content: "Максимальное количество переносов в описании — 5.", ephemeral: true})
+	client.db.changeUser(interaction.member.user.id, 'description', descript)
+	let successEmbed = new MessageEmbed()
+		.setColor(client.config.embedColor)
+		.setTitle('Успешно')
+		.setDescription('Описание изменено.')
+		.setTimestamp()
+		.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+	return interaction.reply({embeds: [successEmbed]})
 }
 
-module.exports.help = {
+module.exports.data = {
 	name: "описание",
-	aliases: ["jgbcfybt"],
 	permissions: ["member"],
-	modules: ["info"]
+	type: "interaction"
 }

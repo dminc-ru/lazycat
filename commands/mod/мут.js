@@ -1,142 +1,62 @@
 const { MessageEmbed } = require("discord.js");
 const fs = require("fs");
 const ms = require("ms");
-let mutes = require(`${process.env.PATHTOBASE}/mutes.json`);
+let mutes = require(`${client.config.jsonPath}mutes.json`);
 module.exports.run = async (client, interaction) => {
-try{
 	if(!mutes[interaction.guild_id])
 		mutes[interaction.guild_id] = [];
-	let user = client.users.cache.get(interaction.member.user.id);
-	let guild = client.guilds.cache.get(interaction.guild_id);
-	let guilddb = await client.db.get(interaction.guild_id, 'guilds')
-	let member = guild.members.cache.get(interaction.member.user.id);
-	if(!member.hasPermission('MANAGE_MESSAGES'))
-	return client.api.interactions(interaction.id, interaction.token).callback.post({
-		data: {
-			type: 4,
-			data: {
-				flags: 64,
-				content: `У вас недостаточно прав для выполнения этой команды.`
-			}
-		}
-	});
-	if(guilddb.muteRole == '')
-	return client.api.interactions(interaction.id, interaction.token).callback.post({
-		data: {
-			type: 4,
-			data: {
-				flags: 64,
-				content: `На этом сервере не установлена роль для мута. Обратитесь к администратору сервера.`
-			}
-		}
-	});
+	let user = await client.users.fetch(interaction.member.user.id);
+	let guild = await client.guilds.fetch(interaction.guild_id);
+	let guilddb = await client.db.getGuild(interaction.guild_id)
+	let member = await guild.members.fetch(interaction.member.user.id);
+	if ( !member.hasPermission('MANAGE_MESSAGES') ) {
+		return interaction.reply({content: `У вас недостаточно прав для выполнения этой команды.`, ephemeral: true})
+	}
+	if (guilddb.muteRole == '') {
+		return interaction.reply({content: `На этом сервере не установлена роль для мута. Обратитесь к администратору сервера.`, ephemeral: true})
+	}
 	var muteUser = interaction.data.options[0].value;
-	var muteUserClientResolve = client.users.cache.get(interaction.data.options[0].value)
-	var muteUserResolve = guild.members.cache.get(muteUser);
+	var muteUserClientResolve = await client.users.fetch(interaction.data.options[0].value)
+	var muteUserResolve = await guild.members.fetch(muteUser);
 	let usernames = muteUserClientResolve.tag;
-	if(muteUserResolve){
+	if (muteUserResolve) {
 		const memberPosition = muteUserResolve.roles.highest.position;
 		const moderationPosition = member.roles.highest.position;
-		if(!(moderationPosition > memberPosition)){
-			return client.api.interactions(interaction.id, interaction.token).callback.post({
-				data: {
-					type: 4,
-					data: {
-						flags: 64,
-						content: `У вас недостаточно прав для выполнения этой команды.`
-					}
-				}
-			});
+		if( !(moderationPosition > memberPosition) ) {
+			return interaction.reply({content: `У вас недостаточно прав для выполнения этой команды.`, ephemeral: true})
 		}
-	}else{
-		return client.api.interactions(interaction.id, interaction.token).callback.post({
-			data: {
-				type: 4,
-				data: {
-					flags: 64,
-					content: `Пользователь не найден.`
-				}
-			}
-		});
+	} else {
+		return interaction.reply({content: `Пользователь не найден.`, ephemeral: true})
 	}
-	if(muteUser == interaction.member.user.id)
-	return client.api.interactions(interaction.id, interaction.token).callback.post({
-		data: {
-			type: 4,
-			data: {
-				flags: 64,
-				content: `Вы не можете замутить себя.`
-			}
-		}
-	});
-	if(muteUser == client.user.id)
-	return client.api.interactions(interaction.id, interaction.token).callback.post({
-		data: {
-			type: 4,
-			data: {
-				flags: 64,
-				content: `У вас недостаточно прав для выполнения этой команды.`
-			}
-		}
-	});
-	if(interaction.data.options.length > 2)
+	if (muteUser == interaction.member.user.id) {
+		return interaction.reply({content: `Вы не можете замутить себя.`, ephemeral: true})
+	}
+	if (muteUser == client.user.id) {
+		return interaction.reply({content: `У вас недостаточно прав для выполнения этой команды.`, ephemeral: true})
+	}
+	if (interaction.data.options.length > 2) {
 		var reason = interaction.data.options[2].value
-	else
+	} else {
 		var reason = `не указана`;
+	}
 	const role = guilddb.muteRole;
     const mutetime = ms(interaction.data.options[1].value);
-	if(mutetime < 60000){
-		return client.api.interactions(interaction.id, interaction.token).callback.post({
-			data: {
-				type: 4,
-				data: {
-					flags: 64,
-					content: `Минимальное время мута — 1 минута.`
-				}
-			}
-		});
+	if (mutetime < 60000) {
+		return interaction.reply({content: `Минимальное время мута — 1 минута.`, ephemeral: true})
 	}
-	if(mutetime > 1209600000){
-		return client.api.interactions(interaction.id, interaction.token).callback.post({
-			data: {
-				type: 4,
-				data: {
-					flags: 64,
-					content: `Максимальное время мута — 14 дней.`
-				}
-			}
-		});
+	if (mutetime > 1209600000) {
+		return interaction.reply({content: `Максимальное время мута — 14 дней.`, ephemeral: true})
 	}
-    if (typeof mutetime === 'undefined')
-	return client.api.interactions(interaction.id, interaction.token).callback.post({
-		data: {
-			type: 4,
-			data: {
-				flags: 64,
-				content: `Неправильный формат времени.`
-			}
-		}
-	});
-	if (mutes[interaction.guild_id].find(us => us.memberid == muteUser)) 
-	return client.api.interactions(interaction.id, interaction.token).callback.post({
-		data: {
-			type: 4,
-			data: {
-				flags: 64,
-				content: `Пользователь уже замьючен.`
-			}
-		}
-	});
-	 try {muteUserResolve.roles.add(role, {reason});}catch (error) {
-		return client.api.interactions(interaction.id, interaction.token).callback.post({
-			data: {
-				type: 4,
-				data: {
-					flags: 64,
-					content: `Произошла ошибка при попытке мута. Возможно, у меня недостаточно прав для выполнения этого действия.`
-				}
-			}
-		});
+    if (typeof mutetime === 'undefined') {
+		return interaction.reply({content: `Неправильный формат времени.`, ephemeral: true})
+	}
+	if ( mutes[interaction.guild_id].find(us => us.memberid == muteUser) ) {
+		return interaction.reply({content: `Пользователь уже замьючен.`, ephemeral: true})
+	}
+	try {
+		muteUserResolve.roles.add(role, {reason});
+	} catch (error) {
+		return interaction.reply({content: `Произошла ошибка при попытке мута. Возможно, у меня недостаточно прав для выполнения этого действия.`, ephemeral: true})
 	 }
 	mutes[interaction.guild_id].push({
 		discordserverid: interaction.guild_id,
@@ -149,47 +69,17 @@ try{
 		muteCreatedAt: Date.now(),
 		muteEndDate: Date.now() + mutetime
 	});
-	fs.writeFileSync(`${process.env.PATHTOBASE}/mutes.json`, JSON.stringify(mutes, null, "\t"));
-	client.api.interactions(interaction.id, interaction.token).callback.post({
-		data: {
-			type: 4,
-			data: {
-				embeds: [
-					{
-						color: 0xb88fff,
-						title: 'Мут: успешно',
-						fields: [
-							{
-								name: "Модератор:",
-								value: `${user.tag}`,
-								inline: true
-							},
-							{
-								name: "Пользователь:",
-								value: `${usernames}`,
-								inline: true
-							},
-							{
-								name: "Длительность:",
-								value: `${ms(mutetime, {long: true})}`,
-								inline: false
-							},
-							{
-								name: "Причина:",
-								value: `${reason}`,
-								inline: false
-							},
-						],
-						timestamp: new Date(),
-						footer: {
-							text: `${user.tag}`,
-							icon_url: `${user.displayAvatarURL()}`,
-						}
-					}
-				]
-			}
-		}
-	});
+	fs.writeFileSync(`${client.config.jsonPath}mutes.json`, JSON.stringify(mutes, null, "\t"));
+	let muteSuccess = new MessageEmbed()
+		.setColor(client.config.embedColor)
+		.setTitle('Мут: успешно')
+		.addField('Модератор', user.tag, true)
+		.addField('Пользователь', usernames, true)
+		.addField('Длительность', ms(mutetime, { long: true }))
+		.addField('Причина:', reason, false)
+		.setTimestamp()
+		.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+	interaction.reply({embeds: [muteSuccess]})
 	if(guilddb.logmsg_channel != ""){
 		try{
 			let muteMessage = new MessageEmbed()
@@ -200,21 +90,17 @@ try{
 				.addField('Длительность:', `${ms(mutetime, {long: true})}`, false)
 				.addField('Причина:', `${reason}`, false)
 				.setTimestamp()
-				.setFooter(`${user.tag}`, user.displayAvatarURL());
-			const channel = guild.channels.cache.get(guilddb.logmsg_channel);
+				.setFooter(`${user.tag}`, user.displayAvatarURL({dynamic: true}));
+			const channel = await guild.channels.fetch(guilddb.logmsg_channel);
 			channel.send(muteMessage);
 		}catch(error){
-			client.db.change(interaction.guild_id, 'guilds', 'logmsg_channel', '')
+			client.db.changeGuild(interaction.guild_id, 'logmsg_channel', '')
 		}
-	}
-}catch(error){
-		client.logger.log(`${error}`, "err");
 	}
 }
 
-module.exports.help = {
+module.exports.data = {
 	name: "мут",
-	aliases: ["ven"],
 	permissions: ["member"],
-	modules: ["mod"]
+	type: "interaction"
 }

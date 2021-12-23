@@ -15,7 +15,7 @@ try{
 					.setDescription(`/lzbdg create <codename> <emoji> <name>|<description>`)
 					.setTimestamp()
 					.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
-				message.channel.send(noCodename);
+				message.channel.send({embeds: [noCodename]});
 				break;
 			}
 			let strings = argus.slice(3).join(' ').split(/[|]/g);
@@ -35,7 +35,7 @@ try{
 				.addField(`Description`, `${strings[1]}`, false)
 				.setTimestamp()
 				.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
-			message.channel.send(createdBadge);
+			message.channel.send({embeds: [createdBadge]});
 			break;
 		}
 
@@ -47,7 +47,7 @@ try{
 					.setDescription(`/lzbdg delete <codename>`)
 					.setTimestamp()
 					.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
-				message.channel.send(noCodename);
+				message.channel.send({embeds: [noCodename]});
 				break;
 			}
 			let badgeCheck = badgebase.findIndex((badge => badge.codename == args[1]));
@@ -59,7 +59,7 @@ try{
 					.setTitle(`Значок успешно удалён.`)
 					.setTimestamp()
 					.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
-				message.channel.send(deletedBadge);
+				message.channel.send({embeds: [deletedBadge]});
 				break;
 			}else{
 				let deletedBadge = new MessageEmbed()
@@ -67,7 +67,7 @@ try{
 					.setTitle(`Значка не существует.`)
 					.setTimestamp()
 					.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
-				message.channel.send(deletedBadge);
+				message.channel.send({embeds: [deletedBadge]});
 				break;
 			}
 		}
@@ -80,7 +80,7 @@ try{
 					.setDescription(`/lzbdg info <codename>`)
 					.setTimestamp()
 					.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
-				message.channel.send(noCodename);
+				message.channel.send({embeds: [noCodename]});
 				break;
 			};
 			try{
@@ -96,10 +96,10 @@ try{
 					.addField(`Description`, `${bdgDesc}`, false)
 					.setTimestamp()
 					.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
-				message.channel.send(fetchedBadge);
+				message.channel.send({embeds: [fetchedBadge]});
 				break;
 			}catch(error){
-				message.channel.send(catchedError);
+				message.channel.send({embeds: [catchedError]});
 				break;
 			}
 		}
@@ -115,7 +115,7 @@ try{
 				.addField(`Description`, `${strings[1]}`, false)
 				.setTimestamp()
 				.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
-			message.channel.send(testBadge);
+			message.channel.send({embeds: [testBadge]});
 			break;
 		}
 
@@ -130,7 +130,7 @@ try{
 				.setDescription(`${list}`)
 				.setTimestamp()
 				.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
-			message.channel.send(noCodename);
+			message.channel.send({embeds: [noCodename]});
 			break;
 		}
 
@@ -153,12 +153,12 @@ try{
 					.setTimestamp()
 					.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
 				if(typeof found === 'undefined') {
-					message.channel.send(noBadge);
+					message.channel.send({embeds: [noBadge]});
 					break;
 				}
 				var member = await client.db.getUser(membermention.id);
 				if(!member){
-					message.channel.send(noUser);
+					message.channel.send({embeds: [noUser]});
 					break;
 				}
 				if(!member.badges.includes(args[2])){
@@ -177,7 +177,7 @@ try{
 							.setDescription(`Значок ${args[2]} добавлен пользователю.`)
 							.setTimestamp()
 							.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
-					message.channel.send(Success);
+					message.channel.send({embeds: [Success]});
 					break;
 				}else{
 					let alreadyHas = new MessageEmbed()
@@ -186,7 +186,7 @@ try{
 						.setDescription(`Пользователь уже имеет значок.`)
 						.setTimestamp()
 						.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
-					message.channel.send(alreadyHas);
+					message.channel.send({embeds: [alreadyHas]});
 					break;
 				}
 			}
@@ -194,7 +194,7 @@ try{
 				try {
 					var member = await client.db.getUser(args[1]);
 					if(!member){
-						message.channel.send(noUser);
+						message.channel.send({embeds: [noUser]});
 						break;
 					}
 					let found = badgebase.find(bdg => bdg.codename === args[2]);
@@ -224,7 +224,7 @@ try{
 							.setDescription(`Значок ${args[2]} добавлен пользователю.`)
 							.setTimestamp()
 							.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
-						message.channel.send(Success);
+						message.channel.send({embeds: [Success]});
 						break;
 					}else{
 						let alreadyHas = new MessageEmbed()
@@ -233,11 +233,11 @@ try{
 							.setDescription(`Пользователь уже имеет значок.`)
 							.setTimestamp()
 							.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
-						message.channel.send(alreadyHas);
+						message.channel.send({embeds: [alreadyHas]});
 						break;
 					}
 				}catch (error) {
-					return message.channel.send(noUser);
+					return message.channel.send({embeds: [noUser]});
 				}
 			}
 		}
@@ -278,7 +278,7 @@ try{
 						.setDescription(`Значок ${args[2]} удалён у пользователя.`)
 						.setTimestamp()
 						.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
-					message.channel.send(Success);
+					message.channel.send({embeds: [Success]});
 					break;
 				}else{
 					let alreadyHas = new MessageEmbed()
@@ -287,7 +287,7 @@ try{
 						.setDescription(`Пользователь не обладает этим значком.`)
 						.setTimestamp()
 						.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
-					message.channel.send(alreadyHas);
+					message.channel.send({embeds: [alreadyHas]});
 					break;
 				}
 			}
@@ -306,7 +306,7 @@ try{
 						.setTimestamp()
 						.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
 					if(typeof found === 'undefined') {
-						message.channel.send(noBadge);
+						message.channel.send({embeds: [noBadge]});
 						break;
 					}
 					if(member.badges.includes(args[2])){
@@ -319,7 +319,7 @@ try{
 							.setDescription(`Значок ${args[2]} удалён у пользователя.`)
 							.setTimestamp()
 							.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
-						message.channel.send(Success);
+						message.channel.send({embeds: [Success]});
 						break;
 					}else{
 						let alreadyHas = new MessageEmbed()
@@ -328,12 +328,12 @@ try{
 							.setDescription(`Пользователь не обладает этим значком.`)
 							.setTimestamp()
 							.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
-						message.channel.send(alreadyHas);
+						message.channel.send({embeds: [alreadyHas]});
 						break;
 					}
 					}
 				catch (error) {
-					message.channel.send(noUser);
+					message.channel.send({embeds: [noUser]});
 					break;
 				}
 			}
@@ -345,7 +345,7 @@ try{
 				.addField(`Субкоманда`, `create, info, all, add, remove`, false)
 				.setTimestamp()
 				.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
-			message.channel.send(Syntax);
+			message.channel.send({embeds: [Syntax]});
 			break;
 		}
 	}

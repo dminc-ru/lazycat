@@ -10,10 +10,10 @@ module.exports.run = async (client, message, args) => {
 	if (!user) {
 		try {
 		  user = await client.users.fetch(args[0])
-		  if (!user) return message.channel.send(noUser);
+		  if (!user) return message.channel.send({embeds: [noUser]});
 		}
 		catch (error) {
-		  return message.channel.send(noUser);
+		  return message.channel.send({embeds: [noUser]});
 		}
 	}
 	let reasonUnban = argus.slice(1).join(' ');
@@ -24,7 +24,7 @@ module.exports.run = async (client, message, args) => {
 		.setColor(client.config.embedColor)
 		.setTitle(`Глобальная разблокировка`)
 		.setDescription(`Пользователь ${user.tag} успешно разблокирован в системе Lazy Cat.`)
-	message.channel.send(lazyBan)
+	message.channel.send({embeds: [lazyBan]});
 	let newUnban = new MessageEmbed()
 		.setColor("#8b0000")
 		.setTitle(`Пользователь разблокирован`)
@@ -34,7 +34,7 @@ module.exports.run = async (client, message, args) => {
 		.addField(`Модератор`, `${message.author.tag}`, true)
 		.setFooter(`Moderator ID: ${message.author.id} • User ID: ${user.id}`)
 		.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
-	webhookBan.send(newUnban);
+	webhookBan.send({embeds: [newUnban]});
 	let lazyUnbanUser = new MessageEmbed()
 		.setColor(client.config.embedColor)
 		.setTitle(`Глобальная разблокировка`)
@@ -42,7 +42,7 @@ module.exports.run = async (client, message, args) => {
 		.addField(`Причина`, `${reasonUnban}`, true)
 		.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
 	try{
-		await client.users.fetch(user.id).send(lazyUnbanUser);
+		await client.users.fetch(user.id).send({embeds: [lazyUnbanUser]});
 	} catch (error) {
 		return;
 	};

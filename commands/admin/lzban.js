@@ -10,10 +10,10 @@ try{
 	if (!user) {
 		try {
 		  user = await client.users.fetch(args[0])
-		  if (!user) return message.channel.send(noUser);
+		  if (!user) return message.channel.send({embeds: [noUser]});
 		}
 		catch (error) {
-		  return message.channel.send(noUser);
+		  return message.channel.send({embeds: [noUser]});
 		}
 	}
 
@@ -22,7 +22,7 @@ try{
 		.setColor(client.config.embedColor)
 		.setTitle('Ошибка')
 		.setDescripiton('Пользователь не найден в базе данных.')
-	if (!userdb) return message.channel.send(noUser);
+	if (!userdb) return message.channel.send({embeds: [noUser]});
 	if(member.permissions_lia == true) return;
 	if(member.permissions_member == false) return;
 	let reasonBan = args[1];
@@ -36,7 +36,7 @@ try{
 		.setColor(client.config.embedColor)
 		.setTitle(`Глобальная блокировка`)
 		.setDescription(`Пользователь ${membermention.user.tag} успешно заблокирован в системе Lazy Cat.`)
-   	message.channel.send(lazyBan);
+   	message.channel.send({embeds: [lazyBan]});
 	let newBan = new MessageEmbed()
 		.setColor(client.config.embedColor)
 		.setTitle(`Пользователь заблокирован`)
@@ -46,7 +46,7 @@ try{
 		.addField(`Пользователь`, `${user.tag}`, true)
 		.addField(`Модератор`, `${message.author.tag}`, true)
 		.setFooter(`Moderator ID: ${message.author.id} • User ID: ${user.id}`);
-	webhookBan.send(newBan);
+	webhookBan.send({embeds: [newBan]});
 	let lazyBanUser = new MessageEmbed()
 		.setColor(client.config.embedColor)
 		.setTitle(`Глобальная блокировка`)
@@ -55,7 +55,7 @@ try{
 		.addField(`Срок`, `навсегда`, true)
 		.addField(`Модератор`, `${message.author.id}`, true)
 	try {
-		await client.users.fetch(user.id).send(lazyBanUser);
+		await client.users.fetch(user.id).send({embeds: [lazyBanUser]});
 	} catch(error) {
 		return;
 	};

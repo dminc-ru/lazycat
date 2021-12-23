@@ -9,7 +9,7 @@ module.exports.run = async (client, message, args) => {
 		.setDescription(`Пользователь не найден.`)
         .setTimestamp()
         .setFooter(`${stats.version}`, client.user.avatarURL()) 
-        return message.channel.send(noInfo)
+        return message.channel.send({embeds: [noInfo]})
     }
     var user = await client.users.fetch(message.mentions.users.first());
 	let noUser = new MessageEmbed()
@@ -19,19 +19,19 @@ module.exports.run = async (client, message, args) => {
 	if (!user) {
 		try {
 		  user = await client.users.fetch(args[0])
-		  if (!user) return message.channel.send(noUser);
+		  if (!user) return message.channel.send({embeds: [noUser]});
 		}
 		catch (error) {
-		  return message.channel.send(noUser);
+		  return message.channel.send({embeds: [noUser]});
 		}
 	}
-    let userdb = await client.db.get_user(user.id);
+    let userdb = await client.db.getUser(user.id);
     if (!userdb) {
         let noInfo = new MessageEmbed()
 		.setColor(client.config.embedColor)
 		.setTitle(`Ошибка`)
 		.setDescription(`Пользователь не найден.`)
-        return message.channel.send(noInfo)
+        return message.channel.send({embeds: [noUser]});
     }
     let userInfo = new MessageEmbed()
 		.setColor(client.config.embedColor)
@@ -49,7 +49,7 @@ module.exports.run = async (client, message, args) => {
         .addField(`Текущий ранг:`, `${userdb.work_rank}`, true)
         .addField(`Количество XP:`, `${userdb.work_currentXP}`, true)
         .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
-    message.channel.send(userInfo)
+        message.channel.send({embeds: [userInfo]});
 }
 
 module.exports.data = {

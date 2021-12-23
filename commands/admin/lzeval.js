@@ -23,7 +23,7 @@ module.exports.run = async (client, message, args) => {
 			.addField(':inbox_tray: Input:', `\`\`\`js\n${beautify(code)}\n\`\`\``, false)
 			.addField(':outbox_tray: Output:', `\`\`\`js\n${output}\n\`\`\``, false)
 			.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
-      	message.channel.send(embedEval);
+      	message.channel.send({embeds: [embedEval]});
 	}).catch((err) => {
 		err = err.toString()
 		if (err.includes(client.config.token)) {
@@ -40,7 +40,7 @@ module.exports.run = async (client, message, args) => {
 			.addField(':inbox_tray: Input:', `\`\`\`js\n${beautify(code)}\n\`\`\``, false)
 			.addField(':outbox_tray: Output:', `\`\`\`js\n${output}\n\`\`\``, false)
 			.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
-      	message.channel.send(embedEvalErr);
+      	message.channel.send({embeds: [embedEvalErr]});
 	})
 }
 

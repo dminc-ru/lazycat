@@ -1,46 +1,22 @@
 module.exports.run = async (client, interaction) => {
-try{
-	let user = client.users.cache.get(interaction.member.user.id);
-	let guild = client.guilds.cache.get(interaction.guild_id);
-	let member = guild.members.cache.get(interaction.member.user.id);
-	if(!member.hasPermission('ADMINISTRATOR'))
-		return client.api.interactions(interaction.id, interaction.token).callback.post({
-			data: {
-				type: 4,
-				data: {
-					flags: 64,
-					content: `У вас недостаточно прав для выполнения этой команды.`
-				}
-			}
-		});
-	client.db.change(interaction.guild_id, 'guilds', 'muteRole', interaction.data.options[0].value)
-	return client.api.interactions(interaction.id, interaction.token).callback.post({
-		data: {
-			type: 4,
-			data: {
-				embeds: [
-					{
-						color: 0xb88fff,
-						title: 'Успешно',
-						description: `Роль для мута установлена.`,
-						timestamp: new Date(),
-						footer: {
-							text: `${user.tag}`,
-							icon_url: `${user.displayAvatarURL()}`,
-						}
-					}
-				]
-			}
-		}
-	});
-}catch(error){
-		client.logger.log(`${error}`, "err");
+	let user = await client.users.fetch(interaction.member.user.id);
+	let guild = await client.guilds.fetch(interaction.guild_id);
+	let member = await guild.members.fetch(interaction.member.user.id);
+	if( !member.hasPermission('ADMINISTRATOR') ) {
+		return interaction.reply({content: `У вас недостаточно прав для выполнения этой команды.`, ephemeral: true})
 	}
+	client.db.changeGuild(interaction.guild_id, 'muteRole', interaction.data.options[0].value)
+	let successEmbed = new MessageEmbed()
+		.setColor(client.config.embedColor)
+		.setTitle('Успешно')
+		.setDescription('Роль для мута установлена.')
+		.setTimestamp()
+		.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+	return interaction.reply({embeds: [successEmbed]})
 }
 
-module.exports.help = {
+module.exports.data = {
 	name: "мутроль",
-	aliases: ["venhjkm"],
 	permissions: ["member"],
-	modules: ["tech"]
+	type: "interaction"
 }

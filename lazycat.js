@@ -1,8 +1,8 @@
-const { Client, Collection } = require("discord.js"); // подгрузка библиотеки discord.js
+const { Client, Collection, Intents } = require("discord.js"); // подгрузка библиотеки discord.js
 const chalk = require("chalk"); // библиотека для красивой консоли
 console.log(chalk.hex("#B88FFF")(`[!] Загрузка файлов...`));
 const fs = require("fs"); // чтение json файлов
-const client = new Client({ intents: ['GUILDS', 'GUILD_MESSAGES'] }); // интенты для бота
+const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.DIRECT_MESSAGES] }); // интенты для бота
 
 client.config = require('./config')
 
@@ -43,8 +43,9 @@ LazyLoader();
 let stats = require(`${client.config.jsonPath}stats.json`); // статистика использования команд
 let exchange = require(`${client.config.jsonPath}exchange.json`); // курс обмена жучков
 let shop = require(`${client.config.jsonPath}shop.json`); // текущая витрина в магазине
-client.ws.on("INTERACTION_CREATE", async interaction => {
-	if (!interaction.guild_id)
+client.on("interactionCreate", async interaction => {
+	console.log(interaction)
+	if (!interaction.guildId)
 		return interaction.reply({ content: "На данный момент команды можно использовать только на сервере.", ephemeral: true });
 	var user = await client.db.getUser(interaction.member.user.id);
 	let fetchedUser = await client.users.fetch(interaction.member.user.id)
@@ -56,12 +57,12 @@ client.ws.on("INTERACTION_CREATE", async interaction => {
 		client.logger.log(`Ошибка получения данных. User ID: ${interaction.member.user.id}`, 'err');
 		return interaction.reply({ content: `Произошла ошибка. Попробуйте ещё раз или обратитесь на наш сервер поддержки.\nКод ошибки: LZE-179`, ephemeral: true})
 	}
-	var guild = await client.db.getGuild(interaction.guild_id);
+	var guild = await client.db.getGuild(interaction.guildId);
 	if(!guild){
-		await client.db.addGuild(interaction.guild_id)
-		guild = await client.db.getGuild(interaction.guild_id);
+		await client.db.addGuild(interaction.guildId)
+		guild = await client.db.getGuild(interaction.guildId);
 	}
-	let commandfile = client.commands.get(interaction.data.name);
+	let commandfile = client.commands.get(interaction.commandName);
 	if(commandfile) {
 		switch (commandfile.permissions) {
 			case 'member': {
@@ -90,7 +91,7 @@ client.ws.on("INTERACTION_CREATE", async interaction => {
 		stats.commands += 1;
 		fs.writeFileSync(`${client.config.jsonPath}stats.json`, JSON.stringify(stats, null, "\t"));
 		if(commandfile){
-			client.logger.log(`INTERACTION || ${fetchedUser.tag} || ${interaction.member.user.id} || ${interaction.data.name}`, 'cmd')
+			client.logger.log(`INTERACTION || ${fetchedUser.tag} || ${interaction.member.user.id} || ${interaction.commandName}`, 'cmd')
 			commandfile.run(client, interaction);
 		}else{
 			return; 

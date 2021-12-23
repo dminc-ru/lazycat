@@ -24,7 +24,7 @@ module.exports = async (client, message) => {
 			.setFooter(message.author.tag, message.author.displayAvatarURL({dynamic: true}));
 		return message.channel.send(dataError)
 	}
-	let commandfile = client.commands.get(lzcmd) || client.commands.get(client.aliases.get(lzcmd));
+	let commandfile = client.commands.get(lzcmd);
 	if(commandfile) {
 		switch (commandfile.permissions) {
 			case 'tester': {
@@ -48,7 +48,7 @@ module.exports = async (client, message) => {
 		stats.commands += 1;
 		fs.writeFileSync(`${client.config.jsonPath}stats.json`, JSON.stringify(stats, null, "\t"));
 		client.logger.log(`MESSAGE || ${fetchedUser.tag} || ${message.author.id} || ${lzcmd}`, 'cmd')
-		if (commandfile.type == "message") {
+		if (commandfile.data.type == "message") {
 			commandfile.run(client, message, args);
 		}else {
 			return

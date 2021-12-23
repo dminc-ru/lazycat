@@ -1,137 +1,57 @@
 module.exports.run = async (client, interaction) => {
-try{
-	let guild = client.guilds.cache.get(interaction.guild_id);
-	let guilddb = await client.db.get(interaction.guild_id, 'guilds')
-	let user = client.users.cache.get(interaction.member.user.id);
-	let member = guild.members.cache.get(interaction.member.user.id);
+	let guild = await client.guilds.fetch(interaction.guild_id);
+	let guilddb = await client.db.getGuild(interaction.guild_id)
+	let user = await client.users.fetch(interaction.member.user.id);
+	let member = await guild.members.fetch(interaction.member.user.id);
 	var whattoDo = interaction.data.options[0].name;
-	if(!member.hasPermission('ADMINISTRATOR'))
-		return client.api.interactions(interaction.id, interaction.token).callback.post({
-			data: {
-				type: 4,
-				data: {
-					flags: 64,
-					content: `У вас недостаточно прав для выполнения этой команды.`
-				}
-			}
-		});
-	if(whattoDo == 'выкл'){
-		if(guilddb.giveRole == "false"){
-			return client.api.interactions(interaction.id, interaction.token).callback.post({
-				data: {
-					type: 4,
-					data: {
-						flags: 64,
-						content: `Автоматическая выдача роли уже отключена. Включить — /стартроль вкл`
-					}
-				}
-			});
-		}
-		if(guilddb.welcomeRole == ''){
-			return client.api.interactions(interaction.id, interaction.token).callback.post({
-				data: {
-					type: 4,
-					data: {
-						flags: 64,
-						content: `Сначала необходимо установить роль — /стартроль установить <@Роль>`
-					}
-				}
-			});
-		}
-		client.db.change(interaction.guild_id, 'guilds', 'giveRole', 'false')
-		return client.api.interactions(interaction.id, interaction.token).callback.post({
-			data: {
-				type: 4,
-				data: {
-					embeds: [
-						{
-							color: 0xb88fff,
-							title: 'Успешно',
-							description: `Автоматическая выдача роли новым участникам отключена. Включить снова - /стартроль вкл`,
-							timestamp: new Date(),
-							footer: {
-								text: `${user.tag}`,
-								icon_url: `${user.displayAvatarURL()}`,
-							}
-						}
-					]
-				}
-			}
-		});
+	if ( !member.hasPermission('ADMINISTRATOR') ) {
+		return interaction.reply({content: `У вас недостаточно прав для выполнения этой команды.`, ephemeral: true})
 	}
-	if(whattoDo == 'вкл'){
-		if(guilddb.giveRole == 'true'){
-			return client.api.interactions(interaction.id, interaction.token).callback.post({
-				data: {
-					type: 4,
-					data: {
-						flags: 64,
-						content: `Автоматическая выдача роли уже включена. Отключить — /стартроль выкл`
-					}
-				}
-			});
+	if (whattoDo == 'выкл') {
+		if (guilddb.giveRole == "false") {
+			return interaction.reply({content: `Автоматическая выдача роли уже отключена. Включить — /стартроль вкл`, ephemeral: true})
 		}
-		if(guilddb.welcomeRole == ''){
-			return client.api.interactions(interaction.id, interaction.token).callback.post({
-				data: {
-					type: 4,
-					data: {
-						flags: 64,
-						content: `Сначала необходимо установить роль — /стартроль установить @Роль`
-					}
-				}
-			});
+		if (guilddb.welcomeRole == '') {
+			return interaction.reply({content: `Сначала необходимо установить роль — /стартроль установить <@Роль>`, ephemeral: true})
 		}
-		client.db.change(interaction.guild_id, 'guilds', 'giveRole', 'true')
-		return client.api.interactions(interaction.id, interaction.token).callback.post({
-			data: {
-				type: 4,
-				data: {
-					embeds: [
-						{
-							color: 0xb88fff,
-							title: 'Успешно',
-							description: `Автоматическая выдача роли новым участникам включена. Отключить — /стартроль выкл`,
-							timestamp: new Date(),
-							footer: {
-								text: `${user.tag}`,
-								icon_url: `${user.displayAvatarURL()}`,
-							}
-						}
-					]
-				}
-			}
-		});
+		client.db.changeGuild(interaction.guild_id, 'giveRole', 'false')
+		let autoRoleDisabled = new MessageEmbed()
+			.setColor(client.config.embedColor)
+			.setTitle('Успешно')
+			.setDescription('Автоматическая выдача роли новым участникам отключена. Включить снова — /стартроль вкл')
+			.setTimestamp()
+			.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+		return interaction.reply({embeds: [autoRoleDisabled]})
+	}
+	if (whattoDo == 'вкл') {
+		if (guilddb.giveRole == 'true') {
+			return interaction.reply({content: `Автоматическая выдача роли уже включена. Отключить — /стартроль выкл`, ephemeral: true})
+		}
+		if (guilddb.welcomeRole == '') {
+			return interaction.reply({content: `Сначала необходимо установить роль — /стартроль установить @Роль`, ephemeral: true})
+		}
+		client.db.changeGuild(interaction.guild_id, 'giveRole', 'true')
+		let autoRoleEnabled = new MessageEmbed()
+			.setColor(client.config.embedColor)
+			.setTitle('Успешно')
+			.setDescription('Автоматическая выдача роли новым участникам включена. Отключить — /стартроль выкл')
+			.setTimestamp()
+			.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+		return interaction.reply({embeds: [autoRoleEnabled]})
 	}
 	startRole = interaction.data.options[0].options[0].value;
-	client.db.change(interaction.guild_id, 'guilds', 'welcomeRole', startRole)
-	return client.api.interactions(interaction.id, interaction.token).callback.post({
-		data: {
-			type: 4,
-			data: {
-				embeds: [
-					{
-						color: 0xb88fff,
-						title: 'Успешно',
-						description: `Теперь эта роль будет выдаваться всем участникам. Выдачу роли можно отключить командой /стартроль выкл`,
-						timestamp: new Date(),
-						footer: {
-							text: `${user.tag}`,
-							icon_url: `${user.displayAvatarURL()}`,
-						}
-					}
-				]
-			}
-		}
-	});
-}catch(error){
-		client.logger.log(`${error}`, "err");
-	}
+	client.db.changeGuild(interaction.guild_id, 'welcomeRole', startRole)
+	let successEmbed = new MessageEmbed()
+		.setColor(client.config.embedColor)
+		.setTitle('Успешно')
+		.setDescription('Теперь эта роль будет выдаваться всем участникам. Выдачу роли можно отключить командой /стартроль выкл')
+		.setTimestamp()
+		.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+	return interaction.reply({embeds: [successEmbed]})
 }
 
-module.exports.help = {
+module.exports.data = {
 	name: "стартроль",
-	aliases: ["cnfhnhjkm"],
 	permissions: ["member"],
-	modules: ["tech"]
+	type: "interaction"
 }

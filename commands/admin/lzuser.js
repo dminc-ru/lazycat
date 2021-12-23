@@ -1,7 +1,7 @@
 const moment = require("moment")
-const stats = require(`${client.config.jsonPath}/stats.json`)
 const { MessageEmbed } = require('discord.js')
 module.exports.run = async (client, message, args) => {
+    const stats = require(`${client.config.jsonPath}/stats.json`)
 	if (!args[0]) {
         let noInfo = new MessageEmbed()
 		.setColor(client.config.embedColor)

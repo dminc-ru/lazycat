@@ -1,9 +1,9 @@
 const ms = require("ms");
 var fs = require('fs');
-let inventory = require(`${client.config.jsonPath}inventory.json`);
-let shop = require(`${client.config.jsonPath}shop.json`);
-let cases = require(`${client.config.jsonPath}cases.json`);
 module.exports.run = async (client, interaction) => {
+	let inventory = require(`${client.config.jsonPath}inventory.json`);
+	let shop = require(`${client.config.jsonPath}shop.json`);
+	let cases = require(`${client.config.jsonPath}cases.json`);
 	var whattoDo = interaction.data.options[0].name;
 	let user = await client.users.fetch(interaction.member.user.id);
 

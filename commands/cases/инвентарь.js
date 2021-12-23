@@ -1,6 +1,6 @@
 const fs = require("fs");
-let inventory = require(`${client.config.jsonPath}inventory.json`);
 module.exports.run = async (client, interaction) => {
+	let inventory = require(`${client.config.jsonPath}inventory.json`);
 	let user = await client.users.fetch(interaction.member.user.id);
 	if(!inventory[interaction.member.user.id]){
 		inventory[interaction.member.user.id] = {

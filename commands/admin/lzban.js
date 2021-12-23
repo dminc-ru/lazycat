@@ -1,6 +1,6 @@
 const { MessageEmbed, WebhookClient } = require("discord.js");
-const webhookBan = new WebhookClient(client.config.webhookBan.id, client.config.webhookBan.token);
 module.exports.run = async (client, message, args) => {
+	const webhookBan = new WebhookClient(client.config.webhookBan.id, client.config.webhookBan.token);
 try{
 	var user = await client.users.fetch(message.mentions.users.first());
 	let noUser = new MessageEmbed()

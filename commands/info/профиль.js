@@ -1,5 +1,5 @@
-let badgebase = require(`${client.config.jsonPath}badges.json`);
 module.exports.run = async (client, interaction) => {
+	let badgebase = require(`${client.config.jsonPath}badges.json`);
 	let userdb = await client.db.getUser(interaction.member.user.id)
 	var memberProfile
 	if(interaction.data.options)

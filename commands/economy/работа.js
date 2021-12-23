@@ -1,5 +1,5 @@
-let works = require(`${client.config.jsonPath}works.json`);
 module.exports.run = async (client, interaction) => {
+        let works = require(`${client.config.jsonPath}works.json`);
 	    let user = await client.users.fetch(interaction.member.user.id);
         let userdb = await client.db.getUser(interaction.member.user.id)
         let channel = await client.channels.fetch(interaction.channel_id);

@@ -1,8 +1,8 @@
 const { MessageEmbed } = require("discord.js");
 const fs = require("fs");
+module.exports.run = async (client, message, args) => {
 let stats = require(`${client.config.jsonPath}stats.json`);
 let badgebase = require(`${client.config.jsonPath}/badges.json`);
-module.exports.run = async (client, message, args) => {
 try{
 	const argus = message.content.split(' ').slice(1);
 	switch(args[0]){

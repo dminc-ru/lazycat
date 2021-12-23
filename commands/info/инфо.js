@@ -1,5 +1,5 @@
-let stats = require(`${client.config.jsonPath}/stats.json`);
 module.exports.run = async (client, interaction) => {
+	let stats = require(`${client.config.jsonPath}/stats.json`);
 	let user = await client.users.fetch(interaction.member.user.id);
 	var members = client.guilds.cache.reduce((a, g) => a + g.memberCount, 0);
 	let infoEmbed = new MessageEmbed()

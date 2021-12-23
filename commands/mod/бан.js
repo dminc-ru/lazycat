@@ -1,7 +1,7 @@
 const { MessageEmbed } = require("discord.js");
 const fs = require("fs");
-let bans = require(`${client.config.jsonPath}bans.json`);
 module.exports.run = async (client, interaction) => {
+	let bans = require(`${client.config.jsonPath}bans.json`);
 	let user = await client.users.fetch(interaction.member.user.id);
 	let guild = await client.guilds.fetch(interaction.guild_id);
 	let guilddb = await client.db.getGuild(interaction.guild_id)

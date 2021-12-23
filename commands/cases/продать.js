@@ -1,6 +1,6 @@
-let inventory = require(`${client.config.jsonPath}inventory.json`);
-let cases = require(`${client.config.jsonPath}cases.json`);
 module.exports.run = async (client, interaction) => {
+	let inventory = require(`${client.config.jsonPath}inventory.json`);
+	let cases = require(`${client.config.jsonPath}cases.json`);
 	let userdb = await client.db.getUser(interaction.member.user.id)
 	var whattoDo = interaction.data.options[0].name;
 	let user = await client.users.fetch(interaction.member.user.id);

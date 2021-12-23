@@ -1,8 +1,8 @@
 const { MessageEmbed } = require("discord.js");
 const fs = require("fs");
 const ms = require("ms");
-let mutes = require(`${client.config.jsonPath}mutes.json`);
 module.exports.run = async (client, interaction) => {
+	let mutes = require(`${client.config.jsonPath}mutes.json`);
 	if(!mutes[interaction.guild_id])
 		mutes[interaction.guild_id] = [];
 	let user = await client.users.fetch(interaction.member.user.id);

@@ -1,6 +1,6 @@
 const fs = require("fs");
-let exchange = require(`${client.config.jsonPath}exchange.json`);
 module.exports.run = async (client, interaction) => {
+		let exchange = require(`${client.config.jsonPath}exchange.json`);
 		let user = await client.users.fetch(interaction.member.user.id);
 		let userdb = await client.db.getUser(interaction.member.user.id);
 		var whattoDo = interaction.data.options[0].name;

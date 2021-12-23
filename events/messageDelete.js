@@ -1,6 +1,6 @@
-let messages = require(`${client.config.jsonPath}messages.json`);
 let fs = require("fs");
 module.exports = async (client, message, channel) => {
+	let messages = require(`${client.config.jsonPath}messages.json`);
 	let guilddb = await client.db.getGuild(message.guild.id)
     if (message.author.id == client.user.id)
 		return;

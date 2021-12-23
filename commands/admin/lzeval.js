@@ -10,14 +10,15 @@ module.exports.run = async (client, message, args) => {
 			output = require('util').inspect(output, { depth: 0 });
 		}
 		if (output.includes(client.config.token)) {
-			output = output.replace(client.config.token, "[REDACTED]")
+			output.replace(client.config.token, "[REDACTED]")
 		}
 		if (output.includes(client.config.webhookBanToken)) {
-			output = output.replace(client.config.webhookBanToken, "[REDACTED]")
+			output.replace(client.config.webhookBanToken, "[REDACTED]")
 		}
 		if (output.includes(client.config.secretKey)) {
-			output = output.replace(client.config.secretKey, "[REDACTED]")
+			output.replace(client.config.secretKey, "[REDACTED]")
 		}
+		if (output.length > (1024 - (message.content.length))) return
 		let embedEval = new MessageEmbed()
 			.setColor(client.config.embedColor)
 			.addField(':inbox_tray: Input:', `\`\`\`js\n${beautify(code)}\n\`\`\``, false)
@@ -27,14 +28,15 @@ module.exports.run = async (client, message, args) => {
 	}).catch((err) => {
 		err = err.toString()
 		if (err.includes(client.config.token)) {
-			err = err.replace(client.config.token, "[REDACTED]")
+			err.replace(client.config.token, "[REDACTED]")
 		}
 		if (err.includes(client.config.webhookBanToken)) {
-			err = err.replace(client.config.webhookBanToken, "[REDACTED]")
+			err.replace(client.config.webhookBanToken, "[REDACTED]")
 		}
 		if (err.includes(client.config.secretKey)) {
-			err = err.replace(client.config.secretKey, "[REDACTED]")
+			err.replace(client.config.secretKey, "[REDACTED]")
 		}
+		if (output.length > (1024 - (message.content.length))) return
 		let embedEvalErr = new MessageEmbed()
 			.setColor(client.config.embedColor)
 			.addField(':inbox_tray: Input:', `\`\`\`js\n${beautify(code)}\n\`\`\``, false)

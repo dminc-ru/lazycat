@@ -1,3 +1,4 @@
+const { MessageEmbed } = require('discord.js')
 module.exports.run = async (client, interaction) => {
 	let cases = require(`${client.config.jsonPath}cases.json`);
 	let inventory = require(`${client.config.jsonPath}inventory.json`);

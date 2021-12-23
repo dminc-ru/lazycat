@@ -1,4 +1,5 @@
 const fs = require("fs");
+const { MessageEmbed } = require('discord.js')
 module.exports.run = async (client, interaction) => {
 		let exchange = require(`${client.config.jsonPath}exchange.json`);
 		let user = await client.users.fetch(interaction.member.user.id);

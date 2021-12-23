@@ -1,3 +1,4 @@
+const { MessageEmbed } = require('discord.js')
 module.exports = async (client, oldMessage, newMessage) => {
 	let guilddb = await client.db.getGuild(oldMessage.guild.id)
     if (oldMessage.author.id == client.user.id)

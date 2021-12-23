@@ -1,4 +1,5 @@
 let fs = require("fs");
+const { MessageEmbed } = require('discord.js')
 module.exports = async (client, message, channel) => {
 	let messages = require(`${client.config.jsonPath}messages.json`);
 	let guilddb = await client.db.getGuild(message.guild.id)

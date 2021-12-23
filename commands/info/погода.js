@@ -1,3 +1,4 @@
+const { MessageEmbed } = require('discord.js')
 const weather = require('openweather-apis');
 module.exports.run = async (client, interaction) => {
 		let user = client.users.cache.get(interaction.member.user.id);

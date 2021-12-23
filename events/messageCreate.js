@@ -1,5 +1,6 @@
 const fs = require("fs");
 let cooldown = new Set();
+const { MessageEmbed } = require('discord.js')
 let cdseconds = 3;
 module.exports = async (client, message) => {
 	let stats = require(`${client.config.jsonPath}stats.json`);

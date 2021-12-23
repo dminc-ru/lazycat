@@ -1,3 +1,4 @@
+const { MessageEmbed } = require('discord.js')
 const corona = require('novelcovid');
 module.exports.run = async (client, interaction) => {
 	let user = await client.users.fetch(interaction.member.user.id);

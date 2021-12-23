@@ -1,3 +1,4 @@
+const { MessageEmbed } = require('discord.js')
 module.exports = (client, guild) => {
     let embed = new MessageEmbed()
         .setColor(client.config.embedColor)

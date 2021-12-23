@@ -1,5 +1,6 @@
 const ms = require("ms");
 var fs = require('fs');
+const { MessageEmbed } = require('discord.js')
 module.exports.run = async (client, interaction) => {
 	let inventory = require(`${client.config.jsonPath}inventory.json`);
 	let shop = require(`${client.config.jsonPath}shop.json`);

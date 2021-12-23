@@ -1,3 +1,4 @@
+const { MessageEmbed } = require('discord.js')
 module.exports.run = async (client, interaction) => {
 	function randomHelp(min, max) {
 		let rand = min - 0.5 + Math.random() * (max - min + 1);

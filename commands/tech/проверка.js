@@ -1,5 +1,5 @@
 module.exports.run = async (client, interaction) => {
-	let guild = await client.guilds.fetch(interaction.guild_id);
+	let guild = await client.guilds.fetch(interaction.guildId);
 	let user = await client.users.fetch(interaction.member.user.id);
 	let member = await guild.members.fetch(interaction.member.user.id);
 	let tick = client.emoji.tick

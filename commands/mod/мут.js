@@ -3,11 +3,11 @@ const fs = require("fs");
 const ms = require("ms");
 module.exports.run = async (client, interaction) => {
 	let mutes = require(`${client.config.jsonPath}mutes.json`);
-	if(!mutes[interaction.guild_id])
-		mutes[interaction.guild_id] = [];
+	if(!mutes[interaction.guildId])
+		mutes[interaction.guildId] = [];
 	let user = await client.users.fetch(interaction.member.user.id);
-	let guild = await client.guilds.fetch(interaction.guild_id);
-	let guilddb = await client.db.getGuild(interaction.guild_id)
+	let guild = await client.guilds.fetch(interaction.guildId);
+	let guilddb = await client.db.getGuild(interaction.guildId)
 	let member = await guild.members.fetch(interaction.member.user.id);
 	if ( !member.hasPermission('MANAGE_MESSAGES') ) {
 		return interaction.reply({content: `У вас недостаточно прав для выполнения этой команды.`, ephemeral: true})
@@ -50,7 +50,7 @@ module.exports.run = async (client, interaction) => {
     if (typeof mutetime === 'undefined') {
 		return interaction.reply({content: `Неправильный формат времени.`, ephemeral: true})
 	}
-	if ( mutes[interaction.guild_id].find(us => us.memberid == muteUser) ) {
+	if ( mutes[interaction.guildId].find(us => us.memberid == muteUser) ) {
 		return interaction.reply({content: `Пользователь уже замьючен.`, ephemeral: true})
 	}
 	try {
@@ -58,8 +58,8 @@ module.exports.run = async (client, interaction) => {
 	} catch (error) {
 		return interaction.reply({content: `Произошла ошибка при попытке мута. Возможно, у меня недостаточно прав для выполнения этого действия.`, ephemeral: true})
 	 }
-	mutes[interaction.guild_id].push({
-		discordserverid: interaction.guild_id,
+	mutes[interaction.guildId].push({
+		discordserverid: interaction.guildId,
 		moderatorid: interaction.member.user.id,
 		moderatortag: user.tag,
 		memberid: muteUser,
@@ -94,7 +94,7 @@ module.exports.run = async (client, interaction) => {
 			const channel = await guild.channels.fetch(guilddb.logmsg_channel);
 			channel.send(muteMessage);
 		}catch(error){
-			client.db.changeGuild(interaction.guild_id, 'logmsg_channel', '')
+			client.db.changeGuild(interaction.guildId, 'logmsg_channel', '')
 		}
 	}
 }

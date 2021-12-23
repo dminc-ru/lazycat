@@ -1,8 +1,8 @@
 const { MessageEmbed } = require("discord.js");
 module.exports.run = async (client, interaction) => {
 	let user = await client.users.fetch(interaction.member.user.id);
-	let guild = await client.guilds.fetch(interaction.guild_id);
-	let guilddb = await client.db.getGuild(interaction.guild_id)
+	let guild = await client.guilds.fetch(interaction.guildId);
+	let guilddb = await client.db.getGuild(interaction.guildId)
 	let member = await guild.members.fetch(interaction.member.user.id);
 	let toUnban = interaction.data.options[0].value;
 	var toUnbanClientResolve = await client.users.fetch(toUnban);
@@ -56,7 +56,7 @@ module.exports.run = async (client, interaction) => {
 			const channel = await guild.channels.fetch(guilddb.logmsg_channel);
 			channel.send(banMessage);
 		}catch(error){
-			return client.db.changeGuild(interaction.guild_id, 'logmsg_channel', '')
+			return client.db.changeGuild(interaction.guildId, 'logmsg_channel', '')
 		}
 	}
 }

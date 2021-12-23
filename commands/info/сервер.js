@@ -1,7 +1,7 @@
 let moment = require('moment');
 module.exports.run = async (client, interaction) => {
 	let user = await client.users.fetch(interaction.member.user.id);
-	let guild = await client.guilds.fetch(interaction.guild_id);
+	let guild = await client.guilds.fetch(interaction.guildId);
 	function checkDays(date) {
 		let now = new Date();
 		let diff = now.getTime() - date.getTime();
@@ -40,7 +40,7 @@ module.exports.run = async (client, interaction) => {
 		.setColor(client.config.embedColor)
 		.setTitle(`Информация о сервере ${guild.name}`)
 		.setThumbnail(guild.iconURL())
-		.addField('ID', interaction.guild_id, true)
+		.addField('ID', interaction.guildId, true)
 		.addField('Владелец', `<@${guild.owner.user.id}>`, true)
 		.addField('Регион', region[guild.region], true)
 		.addField('Всего участников', guild.memberCount, true)

@@ -1,8 +1,8 @@
 const { MessageEmbed } = require("discord.js");
 module.exports.run = async (client, interaction) => {
 	let user = await client.users.fetch(interaction.member.user.id);
-	let guild = await client.guilds.fetch(interaction.guild_id);
-	let guilddb = await client.db.getGuild(interaction.guild_id)
+	let guild = await client.guilds.fetch(interaction.guildId);
+	let guilddb = await client.db.getGuild(interaction.guildId)
 	let member = await guild.members.fetch(interaction.member.user.id);
 	let toKick = interaction.data.options[0].value;
 	let toKickClientResolve = await client.users.fetch(toKick);
@@ -59,7 +59,7 @@ module.exports.run = async (client, interaction) => {
 			.setFooter(`${user.tag}`, user.displayAvatarURL({dynamic: true}));
 			return channel.send(muteMessage);
 		} catch(error) {
-			client.db.changeGuild(interaction.guild_id, 'logmsg_channel', '');
+			client.db.changeGuild(interaction.guildId, 'logmsg_channel', '');
 		}
 	}
 }

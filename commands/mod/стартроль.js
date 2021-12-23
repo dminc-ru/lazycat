@@ -1,6 +1,6 @@
 module.exports.run = async (client, interaction) => {
-	let guild = await client.guilds.fetch(interaction.guild_id);
-	let guilddb = await client.db.getGuild(interaction.guild_id)
+	let guild = await client.guilds.fetch(interaction.guildId);
+	let guilddb = await client.db.getGuild(interaction.guildId)
 	let user = await client.users.fetch(interaction.member.user.id);
 	let member = await guild.members.fetch(interaction.member.user.id);
 	var whattoDo = interaction.data.options[0].name;
@@ -14,7 +14,7 @@ module.exports.run = async (client, interaction) => {
 		if (guilddb.welcomeRole == '') {
 			return interaction.reply({content: `Сначала необходимо установить роль — /стартроль установить <@Роль>`, ephemeral: true})
 		}
-		client.db.changeGuild(interaction.guild_id, 'giveRole', 'false')
+		client.db.changeGuild(interaction.guildId, 'giveRole', 'false')
 		let autoRoleDisabled = new MessageEmbed()
 			.setColor(client.config.embedColor)
 			.setTitle('Успешно')
@@ -30,7 +30,7 @@ module.exports.run = async (client, interaction) => {
 		if (guilddb.welcomeRole == '') {
 			return interaction.reply({content: `Сначала необходимо установить роль — /стартроль установить @Роль`, ephemeral: true})
 		}
-		client.db.changeGuild(interaction.guild_id, 'giveRole', 'true')
+		client.db.changeGuild(interaction.guildId, 'giveRole', 'true')
 		let autoRoleEnabled = new MessageEmbed()
 			.setColor(client.config.embedColor)
 			.setTitle('Успешно')
@@ -40,7 +40,7 @@ module.exports.run = async (client, interaction) => {
 		return interaction.reply({embeds: [autoRoleEnabled]})
 	}
 	startRole = interaction.data.options[0].options[0].value;
-	client.db.changeGuild(interaction.guild_id, 'welcomeRole', startRole)
+	client.db.changeGuild(interaction.guildId, 'welcomeRole', startRole)
 	let successEmbed = new MessageEmbed()
 		.setColor(client.config.embedColor)
 		.setTitle('Успешно')

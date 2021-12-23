@@ -2,11 +2,11 @@ const { MessageEmbed } = require("discord.js");
 let fs = require('fs');
 module.exports.run = async (client, interaction) => {
 	let mutes = require(`${client.config.jsonPath}mutes.json`)
-	if(!mutes[interaction.guild_id])
-		mutes[interaction.guild_id] = [];
+	if(!mutes[interaction.guildId])
+		mutes[interaction.guildId] = [];
 	let user = await client.users.fetch(interaction.member.user.id);
-	let guild = await client.guilds.fetch(interaction.guild_id);
-	let guilddb = await client.db.getGuild(interaction.guild_id)
+	let guild = await client.guilds.fetch(interaction.guildId);
+	let guilddb = await client.db.getGuild(interaction.guildId)
 	let member = await guild.members.fetch(interaction.member.user.id);
 	var unMuteUser = interaction.data.options[0].value;
 	var unMuteUserResolve = await guild.members.fetch(unMuteUser);
@@ -22,7 +22,7 @@ module.exports.run = async (client, interaction) => {
 	if (unMuteUser == interaction.member.user.id) {
 		return interaction.reply({content: `Вы не можете размутить себя.`, ephemeral: true})
 	}
-	let checkMute = mutes[interaction.guild_id].find(obj => obj.memberid == unMuteUser);
+	let checkMute = mutes[interaction.guildId].find(obj => obj.memberid == unMuteUser);
 	if ( !unMuteUserResolve.roles.cache.has(guilddb.muteRole) || !checkMute) {
 		return interaction.reply({content: `Пользователь не замьючен.`, ephemeral: true})
 	}
@@ -38,7 +38,7 @@ module.exports.run = async (client, interaction) => {
 		console.log(error);
 		return interaction.reply({content: `Произошла ошибка при попытке убрать роль. Возможно, у меня недостаточно прав для этого действия.`, ephemeral: true})
 	 }
-	var getMute = mutes[interaction.guild_id].find(mute => mute.memberid == unMuteUser);
+	var getMute = mutes[interaction.guildId].find(mute => mute.memberid == unMuteUser);
 	let unmuteSuccess = new MessageEmbed()
 	 	.setColor(client.config.embedColor)
 		.setTitle('Размут: успешно')
@@ -50,8 +50,8 @@ module.exports.run = async (client, interaction) => {
 		.setTimestamp()
 		.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
 	interaction.reply({embeds: [unmuteSuccess]})
-	var getMute = mutes[interaction.guild_id].find(mute => mute.memberid == unMuteUser);
-	mutes[interaction.guild_id].splice(checkMute, 1);
+	var getMute = mutes[interaction.guildId].find(mute => mute.memberid == unMuteUser);
+	mutes[interaction.guildId].splice(checkMute, 1);
 	fs.writeFileSync(`${client.config.jsonPath}mutes.json`, JSON.stringify(mutes, null, "\t"));
 	let muteMessage = new MessageEmbed()
 		.setColor(`#b88fff`)

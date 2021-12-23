@@ -1,6 +1,6 @@
 module.exports.run = async (client, interaction) => {
-	let guild = await client.guilds.fetch(interaction.guild_id);
-	let guilddb = await client.db.getGuild(interaction.guild_id)
+	let guild = await client.guilds.fetch(interaction.guildId);
+	let guilddb = await client.db.getGuild(interaction.guildId)
 	let user = await client.users.fetch(interaction.member.user.id);
 	let member = await guild.members.fetch(interaction.member.user.id);
 	var whattoDo = interaction.data.options[0].name;
@@ -9,7 +9,7 @@ module.exports.run = async (client, interaction) => {
 	}
 	if(whattoDo == "чат"){
 		let newChannel = interaction.data.options[0].options[0].value;
-		client.db.changeGuild(interaction.guild_id, 'farewellChannel', newChannel)
+		client.db.changeGuild(interaction.guildId, 'farewellChannel', newChannel)
 		let successEmbed = new MessageEmbed()
 			.setColor(client.config.embedColor)
 			.setTitle('Успешно')
@@ -22,7 +22,7 @@ module.exports.run = async (client, interaction) => {
 		if (guilddb.farewellChannel == '') {
 			return interaction.reply({content: `Установите текстовый канал для оповещений: /пока чат <#канал>`, ephemeral: true})
 		}
-		client.db.changeGuild(interaction.guild_id, 'farewellText', interaction.data.options[0].options[0].value)
+		client.db.changeGuild(interaction.guildId, 'farewellText', interaction.data.options[0].options[0].value)
 		let successEmbed = new MessageEmbed()
 			.setColor(client.config.embedColor)
 			.setTitle('Успешно')

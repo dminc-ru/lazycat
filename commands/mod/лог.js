@@ -1,14 +1,14 @@
 module.exports.run = async (client, interaction) => {
 	let user = await client.users.fetch(interaction.member.user.id);
-	let guild = await client.guilds.fetch(interaction.guild_id);
-	let guilddb = await client.db.getGuild(interaction.guild_id)
+	let guild = await client.guilds.fetch(interaction.guildId);
+	let guilddb = await client.db.getGuild(interaction.guildId)
 	let member = await guild.members.fetch(interaction.member.user.id);
 	var typeLog = interaction.data.options[0].name;
 	if ( !member.hasPermission('ADMINISTRATOR') ) {
 		return interaction.reply({content: `У вас недостаточно прав для выполнения этой команды.`, ephemeral: true})
 	}
 	if (typeLog == "чат") {
-		client.db.changeGuild(interaction.guild_id, 'logmsg_channel', interaction.data.options[0].options[1].value)
+		client.db.changeGuild(interaction.guildId, 'logmsg_channel', interaction.data.options[0].options[1].value)
 		let successEmbed = new MessageEmbed()
 			.setColor(client.config.embedColor)
 			.setTitle('Успешно')
@@ -26,9 +26,9 @@ module.exports.run = async (client, interaction) => {
 			if (guilddb.logmsg_channel == '') {
 				return interaction.reply({content: `Сначала необходимо установить канал для логов — /лог чат <#канал>`, ephemeral: true})
 			}
-			client.db.changeGuild(interaction.guild_id, 'logmsg_enable', 'true')
-			client.db.changeGuild(interaction.guild_id, 'logmsg_type_edit', 'false')
-			client.db.changeGuild(interaction.guild_id, 'logmsg_type_delete', 'true')
+			client.db.changeGuild(interaction.guildId, 'logmsg_enable', 'true')
+			client.db.changeGuild(interaction.guildId, 'logmsg_type_edit', 'false')
+			client.db.changeGuild(interaction.guildId, 'logmsg_type_delete', 'true')
 			let auditEnabled = new MessageEmbed()
 				.setColor(client.config.embedColor)
 				.setTitle('Успешно')
@@ -44,7 +44,7 @@ module.exports.run = async (client, interaction) => {
 			if (guilddb.logmsg_channel == ''){
 				return interaction.reply({content: `Сначала необходимо установить канал для логов — /лог чат <#канал>`, ephemeral: true})
 			}
-			client.db.changeGuild(interaction.guild_id, 'logmsg_enable', 'false')
+			client.db.changeGuild(interaction.guildId, 'logmsg_enable', 'false')
 			let auditDisabled = new MessageEmbed()
 				.setColor(client.config.embedColor)
 				.setTitle('Успешно')
@@ -65,7 +65,7 @@ module.exports.run = async (client, interaction) => {
 				if(guilddb.logmsg_type_delete == 'true'){
 					return interaction.reply({content: `Аудит удаления сообщений уже включен. Выключить — /лог мсг удалить выкл`, ephemeral: true})
 				}
-				client.db.changeGuild(interaction.guild_id, 'logmsg_type_delete', 'true')
+				client.db.changeGuild(interaction.guildId, 'logmsg_type_delete', 'true')
 				let auditDeleteEnabled = new MessageEmbed()
 					.setColor(client.config.embedColor)
 					.setTitle('Успешно')
@@ -78,7 +78,7 @@ module.exports.run = async (client, interaction) => {
 				if(guilddb.logmsg_type_delete == 'false'){
 					return interaction.reply({content: `Аудит удаления сообщений уже выключен. Включить — /лог мсг удалить вкл`, ephemeral: true})
 				}
-				client.db.changeGuild(interaction.guild_id, 'logmsg_type_delete', 'false')
+				client.db.changeGuild(interaction.guildId, 'logmsg_type_delete', 'false')
 				let auditDeleteDisabled = new MessageEmbed()
 					.setColor(client.config.embedColor)
 					.setTitle('Успешно')
@@ -100,7 +100,7 @@ module.exports.run = async (client, interaction) => {
 				if(guilddb.logmsg_type_edit == 'true'){
 					return interaction.reply({content: `Аудит редактирования сообщений уже включен. Выключить — /лог мсг эдит выкл`, ephemeral: true})
 				}
-				client.db.changeGuild(interaction.guild_id, 'logmsg_type_edit', 'true')
+				client.db.changeGuild(interaction.guildId, 'logmsg_type_edit', 'true')
 				let auditEditEnabled = new MessageEmbed()
 					.setColor(client.config.embedColor)
 					.setTitle('Успешно')
@@ -113,7 +113,7 @@ module.exports.run = async (client, interaction) => {
 				if(guilddb.logmsg_type_edit == 'false'){
 					return interaction.reply({content: `Аудит редактирования сообщений уже выключен. Включить — /лог мсг эдит вкл`, ephemeral: true})
 				}
-				client.db.changeGuild(interaction.guild_id, 'logmsg_type_edit', 'false')
+				client.db.changeGuild(interaction.guildId, 'logmsg_type_edit', 'false')
 				let auditEditDisabled = new MessageEmbed()
 					.setColor(client.config.embedColor)
 					.setTitle('Успешно')

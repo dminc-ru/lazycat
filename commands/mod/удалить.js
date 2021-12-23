@@ -1,128 +1,60 @@
 module.exports.run = async (client, interaction) => {
-try{
-	let guild = client.guilds.cache.get(interaction.guild_id);
-	let user = client.users.cache.get(interaction.member.user.id);
-	let member = guild.members.cache.get(interaction.member.user.id);
-	let channel = client.channels.cache.get(interaction.channel_id);
+	let guild = await client.guilds.fetch(interaction.guild_id);
+	let user = await client.users.fetch(interaction.member.user.id);
+	let member = await guild.members.fetch(interaction.member.user.id);
+	let channel = await client.channels.fetch(interaction.channel_id);
 	let toClear = interaction.data.options[0].value;
-	if(interaction.data.options.length > 1)
+	if (interaction.data.options.length > 1) {
 		var memberClear = interaction.data.options[1].value;
-	if(!member.hasPermission('MANAGE_MESSAGES'))
-	return client.api.interactions(interaction.id, interaction.token).callback.post({
-		data: {
-			type: 4,
-			data: {
-				flags: 64,
-				content: `У вас недостаточно прав для выполнения этой команды.`
-			}
-		}
-	});
-	if(!memberClear){
-		if(toClear < 1){
-			return client.api.interactions(interaction.id, interaction.token).callback.post({
-				data: {
-					type: 4,
-					data: {
-						flags: 64,
-						content: `Укажите корректное количество удаляемых сообщений.`
-					}
-				}
-			});
+	}
+	if( !member.hasPermission('MANAGE_MESSAGES') ) {
+		return interaction.reply({content: `У вас недостаточно прав для выполнения этой команды.`, ephemeral: true})
+	}
+	if (!memberClear) {
+		if (toClear < 1) {
+			return interaction.reply({content: `Укажите корректное количество удаляемых сообщений.`, ephemeral: true})
 		}
 		if(toClear > 100){
-			return client.api.interactions(interaction.id, interaction.token).callback.post({
-				data: {
-					type: 4,
-					data: {
-						flags: 64,
-						content: `Вы можете удалить только 100 сообщений за одно использование команды.`
-					}
-				}
-			});
+			return interaction.reply({content: `Вы можете удалить только 100 сообщений за одно использование команды.`, ephemeral: true})
 		}
 		channel.messages.fetch({limit: toClear}).then((messages) =>{
 			var botMessages = [];
 			messages.forEach(msg => botMessages.push(msg));
-			if(botMessages.length < 1){
-				return client.api.interactions(interaction.id, interaction.token).callback.post({
-					data: {
-						type: 4,
-						data: {
-							flags: 64,
-							content: `Сообщений не обнаружено.`
-						}
-					}
-				});
+			if (botMessages.length < 1) {
+				return interaction.reply({content: `Сообщений не обнаружено.`, ephemeral: true})
 			}
 			channel.bulkDelete(botMessages, true).then((_message) => {
-				return client.api.interactions(interaction.id, interaction.token).callback.post({
-					data: {
-						type: 4,
-						data: {
-							embeds: [
-								{
-									color: 0xb88fff,
-									title: 'Успешно',
-									description: `Удалено ${_message.size} сообщений.`,
-									timestamp: new Date(),
-									footer: {
-										text: `${user.tag}`,
-										icon_url: `${user.displayAvatarURL()}`,
-									}
-								}
-							]
-						}
-					}
-				});
+				let deletedEmbed = new MessageEmbed()
+					.setColor(client.config.embedColor)
+					.setTitle('Успешно')
+					.setDescription(`Удалено ${_message.size} сообщений.`)
+					.setTimestamp()
+					.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+				return interaction.reply({embeds: [deletedEmbed]})
 			});
 		});
-	}else{
+	} else {
 		channel.messages.fetch({limit: toClear}).then((messages) =>{
 			var botMessages = [];
 			messages.filter(m => m.author.id === memberClear).forEach(msg => botMessages.push(msg));
-			if(botMessages.length < 1){
-				return client.api.interactions(interaction.id, interaction.token).callback.post({
-					data: {
-						type: 4,
-						data: {
-							flags: 64,
-							content: `Сообщений не обнаружено.`
-						}
-					}
-				});
+			if (botMessages.length < 1) {
+				return interaction.reply({content: `Сообщений не обнаружено.`, ephemeral: true})
 			}
 			channel.bulkDelete(botMessages, true).then((_message) => {
-				return client.api.interactions(interaction.id, interaction.token).callback.post({
-					data: {
-						type: 4,
-						data: {
-							embeds: [
-								{
-									color: 0xb88fff,
-									title: 'Успешно',
-									description: `Удалено ${_message.size} сообщений.`,
-									timestamp: new Date(),
-									footer: {
-										text: `${user.tag}`,
-										icon_url: `${user.displayAvatarURL()}`,
-									}
-								}
-							]
-						}
-					}
-				});
+				let deletedEmbed = new MessageEmbed()
+					.setColor(client.config.embedColor)
+					.setTitle('Успешно')
+					.setDescription(`Удалено ${_message.size} сообщений.`)
+					.setTimestamp()
+					.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+				return interaction.reply({embeds: [deletedEmbed]})
 			});
 		});
 	}
-
-}catch(error){
-		client.logger.log(`${error}`, "err");
-	}
 }
 
-module.exports.help = {
+module.exports.data = {
 	name: "удалить",
-	aliases: ["elfkbnm"],
 	permissions: ["tester"],
-	modules: ["mod"]
+	type: "interaction"
 }

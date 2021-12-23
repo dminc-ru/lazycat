@@ -1,18 +1,18 @@
-let stats = require(`${process.env.PATHTOBASE}//stats.json`);
+let stats = require(`${client.config.jsonPath}stats.json`);
 const fs = require("fs");
 let cooldown = new Set();
 let cdseconds = 3;
 module.exports = async (client, message) => {
 	if (!message.content.startsWith('/')) return
 	const args = message.content.slice(1).split(" ");
-	if(message.author.id == client.user.id)
+	if (message.author.id == client.user.id)
 		return;
 	const lzcmd = args.shift().toLowerCase();
-	var user = await client.db.get(message.author.id, 'users');
-	let fetchedUser = client.users.cache.get(message.author.id)
+	var user = await client.db.getUser(message.author.id);
+	let fetchedUser = await client.users.fetch(message.author.id)
 	if(!user){
-		await client.db.add(message.author.id, 'users');
-		user = await client.db.get(message.author.id, 'users');
+		await client.db.addUser(message.author.id);
+		user = await client.db.getUser(message.author.id);
 	}
 	if(!user){
 		client.logger.log(`Ошибка получения данных. User ID: ${message.author.id}`, 'err');
@@ -46,7 +46,7 @@ module.exports = async (client, message) => {
 		}
 		cooldown.add(message.author.id);
 		stats.commands += 1;
-		fs.writeFileSync("./base/stats.json", JSON.stringify(stats, null, "\t"));
+		fs.writeFileSync(`${client.config.jsonPath}stats.json`, JSON.stringify(stats, null, "\t"));
 		client.logger.log(`MESSAGE || ${fetchedUser.tag} || ${message.author.id} || ${lzcmd}`, 'cmd')
 		if (commandfile.type == "message") {
 			commandfile.run(client, message, args);

@@ -40,26 +40,26 @@ function LazyLoader() {
 
 LazyLoader();
 
-let stats = require('./base/stats.json'); // статистика использования команд
-let exchange = require('./base/exchange.json'); // курс обмена жучков
-let shop = require('./base/shop.json'); // текущая витрина в магазине
+let stats = require(`${client.config.jsonPath}stats.json`); // статистика использования команд
+let exchange = require(`${client.config.jsonPath}exchange.json`); // курс обмена жучков
+let shop = require(`${client.config.jsonPath}shop.json`); // текущая витрина в магазине
 client.ws.on("INTERACTION_CREATE", async interaction => {
 	if (!interaction.guild_id)
 		return interaction.reply({ content: "На данный момент команды можно использовать только на сервере.", ephemeral: true });
-	var user = await client.db.get(interaction.member.user.id, 'users');
-	let fetchedUser = await client.users.cache.get(interaction.member.user.id)
+	var user = await client.db.getUser(interaction.member.user.id);
+	let fetchedUser = await client.users.fetch(interaction.member.user.id)
 	if(!user){
-		await client.db.add(interaction.member.user.id, 'users');
-		user = await client.db.get(interaction.member.user.id, 'users');
+		await client.db.addUser(interaction.member.user.id);
+		user = await client.db.getUser(interaction.member.user.id);
 	}
 	if(!user){
 		client.logger.log(`Ошибка получения данных. User ID: ${interaction.member.user.id}`, 'err');
-		return interaction.reply({ content: `Произошла ошибка. Попробуйте ещё раз или обратитесь на наш сервер поддержки.\nКод ошибки: LZE-179`})
+		return interaction.reply({ content: `Произошла ошибка. Попробуйте ещё раз или обратитесь на наш сервер поддержки.\nКод ошибки: LZE-179`, ephemeral: true})
 	}
-	var guild = await client.db.get(interaction.guild_id, 'guilds');
+	var guild = await client.db.getGuild(interaction.guild_id);
 	if(!guild){
-		await client.db.add(interaction.guild_id, 'guilds')
-		guild = await client.db.get(interaction.guild_id, 'guilds');
+		await client.db.addGuild(interaction.guild_id)
+		guild = await client.db.getGuild(interaction.guild_id);
 	}
 	let commandfile = client.commands.get(interaction.data.name);
 	if(commandfile) {
@@ -88,7 +88,7 @@ client.ws.on("INTERACTION_CREATE", async interaction => {
 		}
 
 		stats.commands += 1;
-		fs.writeFileSync("./base/stats.json", JSON.stringify(stats, null, "\t"));
+		fs.writeFileSync(`${client.config.jsonPath}stats.json`, JSON.stringify(stats, null, "\t"));
 		if(commandfile){
 			client.logger.log(`INTERACTION || ${fetchedUser.tag} || ${interaction.member.user.id} || ${interaction.data.name}`, 'cmd')
 			commandfile.run(client, interaction);
@@ -111,15 +111,15 @@ setInterval(() =>{
 		exchange.currentBugPrice -= randInt(1, 3);
 	exchange.boughtBugs = 0;
 	exchange.sellBugs = 0;
-	fs.writeFileSync("./base/exchange.json", JSON.stringify(exchange, null, "\t"));
+	fs.writeFileSync(`${client.config.jsonPath}exchange.json`, JSON.stringify(exchange, null, "\t"));
 }, 86400000);
 setInterval( async () => {
 	let userTable = await client.db.getTable('users')
 	userTable.forEach((user) => {
 		if(user.shop_first == true)
-			client.db.change(user.discord_id, 'users', 'shop_first', 0)
+			client.db.changeUser(user.discord_id, 'shop_first', 0)
 		if(user.shop_second == true)
-			client.db.change(user.discord_id, 'users', 'shop_second', 0)
+			client.db.changeUser(user.discord_id, 'shop_second', 0)
 	})
 }, 86400000);
 setInterval(() => {
@@ -132,13 +132,13 @@ setInterval(() => {
 				if(numCase == 1){
 					shop[i].name = "Лакикейс садовника";
 					shop[i].cost = 20;
-					shop[i].currency = "<:lz_bug:742039591929905223>";
+					shop[i].currency = client.emoji.bug;
 					shop[i].type = "luckycase"
 					shop[i].uid = 1;
 				}else{
 					shop[i].name = "Лакикейс «Школьная библиотека»";
 					shop[i].cost = 20;
-					shop[i].currency = "<:lz_bug:742039591929905223>";
+					shop[i].currency = client.emoji.bug;
 					shop[i].type = "luckycase"
 					shop[i].uid = 2;
 				}
@@ -151,14 +151,14 @@ setInterval(() => {
 			if(numCase == 1){
 				shop[i].name = "Мегакейс садовника";
 				shop[i].cost = 15;
-				shop[i].currency = "<:lz_bug:742039591929905223>";
+				shop[i].currency = client.emoji.bug;
 				shop[i].type = "megacase"
 				shop[i].uid = 1;
 			}
 			if(numCase == 2){
 				shop[i].name = "Мегакейс «Школьная библиотека»";
 				shop[i].cost = 15;
-				shop[i].currency = "<:lz_bug:742039591929905223>";
+				shop[i].currency = client.emoji.bug;
 				shop[i].type = "megacase"
 				shop[i].uid = 2;
 			}
@@ -168,14 +168,14 @@ setInterval(() => {
 			if(numItem == 1){
 				shop[i].name = "Кусочек янтаря";
 				shop[i].cost = 90;
-				shop[i].currency = "<:lz_fish:742459590087803010>";
+				shop[i].currency = client.emoji.fish;
 				shop[i].type = "item"
 				shop[i].uid = 5;
 			}
 			if(numItem == 2){
 				shop[i].name = "Лопата";
 				shop[i].cost = 25;
-				shop[i].currency = "<:lz_fish:742459590087803010>";
+				shop[i].currency = client.emoji.fish;
 				shop[i].type = "item"
 				shop[i].uid = 2;
 			}
@@ -184,11 +184,11 @@ setInterval(() => {
 			let numCost = randInt(90, 110);
 			shop[i].name = "Жучок";
 			shop[i].cost = numCost;
-			shop[i].currency = "<:lz_fish:742459590087803010>";
+			shop[i].currency = client.emoji.fish;
 			shop[i].type = "money"
 			shop[i].uid = 0;
 		}
 	}
-	fs.writeFileSync("./base/shop.json", JSON.stringify(shop, null, "\t"));
+	fs.writeFileSync(`${client.config.jsonPath}shop.json`, JSON.stringify(shop, null, "\t"));
 	client.logger.log(`Магазин обновлён.`, "log");
 }, 86400000);

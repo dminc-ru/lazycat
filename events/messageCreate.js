@@ -1,8 +1,8 @@
-let stats = require(`${client.config.jsonPath}stats.json`);
 const fs = require("fs");
 let cooldown = new Set();
 let cdseconds = 3;
 module.exports = async (client, message) => {
+	let stats = require(`${client.config.jsonPath}stats.json`);
 	if (!message.content.startsWith('/')) return
 	const args = message.content.slice(1).split(" ");
 	if (message.author.id == client.user.id)

@@ -45,7 +45,7 @@ module.exports.run = async (client, interaction) => {
 		}
 		let number = 1;
 		pages = Math.ceil(comlength/15);
-		if(!interaction.data.options){
+		if(!interaction.options.getInteger('страница')){
 			let inventoryss = "";
 			for(i=0; i<15; i++){
 			if(inventory[interaction.member.user.id].items[i]){
@@ -66,7 +66,7 @@ module.exports.run = async (client, interaction) => {
 					.setFooter(`${user.tag} • Страница 1/${pages}`, user.displayAvatarURL({dynamic: true}))
 				return interaction.reply({embeds: [inventoryEmbed]})
 		}
-		let page = interaction.data.options[0].value;
+		let page = interaction.options.getInteger('страница')
 		if ( (!Number(page)) || (page <= 0) || (page > pages) ){
 			return interaction.reply({content: `Некорректная страница.`, ephemeral: true})
 		}

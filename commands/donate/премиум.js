@@ -106,7 +106,7 @@ module.exports.run = async (client, message, args) => {
 			Ваш Премиум-статус: ${premiumStatus}`)
 			.setTimestamp()
 			.setFooter(`${message.author.tag}`, message.author.displayAvatarURL({dynamic: true}));
-		message.channel.send(embed);
+		message.channel.send({embeds: [embed]});
 }
 
 module.exports.data = {

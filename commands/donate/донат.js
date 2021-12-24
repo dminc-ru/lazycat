@@ -1,6 +1,15 @@
 const { MessageEmbed } = require('discord.js')
 module.exports.run = async (client, interaction) => {
-		let user = await client.users.fetch(interaction.member.user.id);
+	try {
+		let noUser = new MessageEmbed()
+			.setColor(client.config.embedColor)
+			.setTitle('Ошибка')
+			.setDescription('Пользователь не найден в базе данных.')
+		try {
+			var user = await client.users.fetch(interaction.member.user.id);
+		} catch (error) {
+			return interaction.reply({embeds: [noUser], ephemeral: true})
+		}
 		let donateEmbed = new MessageEmbed()
 			.setColor(client.config.embedColor)
 			.setTitle(`${client.emoji.heart} Донат`)
@@ -9,6 +18,10 @@ module.exports.run = async (client, interaction) => {
 			.setTimestamp()
 			.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
 		interaction.reply({embeds: [donateEmbed]})
+	} catch (error) {
+		client.logger.log(error, 'err')
+		console.error(error)
+	}
 }
 
 module.exports.data = {

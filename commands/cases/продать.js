@@ -2,9 +2,17 @@ const { MessageEmbed } = require('discord.js')
 module.exports.run = async (client, interaction) => {
 	let inventory = require(`${client.config.jsonPath}inventory.json`);
 	let cases = require(`${client.config.jsonPath}cases.json`);
+	let noUser = new MessageEmbed()
+		.setColor(client.config.embedColor)
+		.setTitle('Ошибка')
+		.setDescription('Пользователь не найден в базе данных.')
+	try {
+		var user = await client.users.fetch(interaction.member.user.id);
+	} catch (error) {
+		return interaction.reply({embeds: [noUser], ephemeral: true})
+	}
 	let userdb = await client.db.getUser(interaction.member.user.id)
-	var whattoDo = interaction.data.options[0].name;
-	let user = await client.users.fetch(interaction.member.user.id);
+	var whattoDo = interaction.options.getSubcommand()
 	let comlength = Object.keys(inventory[interaction.member.user.id].items).length;
 	let fishsell = 0;
 	var totalsum = 0;
@@ -12,7 +20,7 @@ module.exports.run = async (client, interaction) => {
 	if(comlength < 1)
 		return interaction.reply({content: `Ваш инвентарь пуст.`, ephemeral: true})
 	if(whattoDo == "класс"){
-		let classs = interaction.data.options[0].options[0].value;
+		let classs = interaction.options.getString('класс');
 		if(classs == 'Обычный'){
 			for(var i = 0; i<comlength; i++){
 				if(!inventory[interaction.member.user.id].items[i]) break;
@@ -216,7 +224,7 @@ module.exports.run = async (client, interaction) => {
 		return fs.writeFileSync(`${client.config.jsonPath}inventory.json`, JSON.stringify(inventory, null, "\t"));
 	}
 	if(whattoDo == 'номер'){
-		let uid = interaction.data.options[0].options[0].value;
+		let uid = interaction.options.getInteger('номер');
 		uid -= 1;
 		if(uid < 0)
 			return interaction.reply({content: `Укажите корректный номер предмета.`, ephemeral: true})

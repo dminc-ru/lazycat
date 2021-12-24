@@ -2,6 +2,10 @@ const { MessageEmbed } = require('discord.js')
 module.exports.run = async (client, interaction) => {
 	let cases = require(`${client.config.jsonPath}cases.json`);
 	let inventory = require(`${client.config.jsonPath}inventory.json`);
+	let noUser = new MessageEmbed()
+		.setColor(client.config.embedColor)
+		.setTitle('Ошибка')
+		.setDescription('Пользователь не найден в базе данных.')
 	try {
 		var user = await client.users.fetch(interaction.member.user.id);
 	} catch (error) {

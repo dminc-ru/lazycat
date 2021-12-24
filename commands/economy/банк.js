@@ -1,11 +1,23 @@
 const { MessageEmbed } = require('discord.js')
 module.exports.run = async (client, interaction) => {
 		let userdb = await client.db.getUser(interaction.member.user.id)
-		let user = await client.users.fetch(interaction.member.user.id);
-		let channel = await client.channels.fetch(interaction.channel_id);
-		var whattoDo = interaction.data.options[0].name;	
+		let noUser = new MessageEmbed()
+			.setColor(client.config.embedColor)
+			.setTitle('Ошибка')
+			.setDescription('Пользователь не найден в базе данных.')
+		try {
+			var user = await client.users.fetch(interaction.member.user.id);
+		} catch (error) {
+			return interaction.reply({embeds: [noUser], ephemeral: true})
+		}
+		try {
+			var channel = await client.channels.fetch(interaction.channel_id);
+		} catch (error) {
+			return interaction.reply({content: 'Не могу получить доступ к текстовому каналу.', ephemeral: true})
+		}
+		var whattoDo = interaction.options.getSubcommand();	
 		if(whattoDo == "положить"){
-			var money = interaction.data.options[0].options[0].value;
+			var money = interaction.options.getString('сумма')
 			if(money < 1)
 				return interaction.reply({content: `Укажите корректное количество ${client.emoji.fish}`, ephemeral: true})
 			if(userdb.balance_fish < money)
@@ -24,7 +36,7 @@ module.exports.run = async (client, interaction) => {
 		
 		
 		if(whattoDo == "снять"){
-			var money = interaction.data.options[0].options[0].value;
+			var money = interaction.options.getString('сумма');
 			if(money < 1)
 				return interaction.reply({content: `Укажите корректное количество ${client.emoji.fish}`, ephemeral: true})
 			if(userdb.balance_bank < money)
@@ -91,7 +103,7 @@ module.exports.run = async (client, interaction) => {
 					.setDescription(`Сработала сигнализация! Вы смогли убежать от охраны этого банка.`)
 					.setTimestamp()
 					.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
-				return interaction.reply({embeds: [failEmbed]})
+				return interaction.editReply({embeds: [failEmbed]})
 			}
 			if(response.first().content == 1 || response.first().content == 2 || response.first().content == 3 || response.first().content == 4 || response.first().content == 5){
 				if (response.first().content === `${guessNumber}`) {

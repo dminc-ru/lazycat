@@ -10,7 +10,7 @@ module.exports.run = async (client, interaction) => {
 		try {
 			var user = await client.users.fetch(interaction.member.user.id);
 		} catch (error) {
-			return interaction.reply({embeds: [noUser]})
+			return interaction.reply({embeds: [noUser], ephemeral: true})
 		}
 		if(!inventory[interaction.member.user.id]){
 			inventory[interaction.member.user.id] = {

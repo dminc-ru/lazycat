@@ -10,11 +10,9 @@ module.exports.run = async (client, interaction) => {
 		try {
 			var user = await client.users.fetch(interaction.member.user.id);
 		} catch (error) {
-			return interaction.reply({embeds: [noUser]})
+			return interaction.reply({embeds: [noUser], ephemeral: true})
 		}
-		var IDcase;
-		if(interaction.data.options) 
-			IDcase = interaction.options.getInteger('номер');
+		var IDcase = interaction.options.getInteger('номер');
 		let memIndex1 = inventory[interaction.member.user.id].cases.findIndex((obj => obj.caseID == "1"));
 		let memIndex2 = inventory[interaction.member.user.id].cases.findIndex((obj => obj.caseID == "2"));
 		let numberOfCase1 = inventory[interaction.member.user.id].cases[memIndex1].count;
@@ -47,7 +45,7 @@ module.exports.run = async (client, interaction) => {
 			let fs = require('fs');
 			fs.writeFileSync(`${client.config.jsonPath}inventory.json`, JSON.stringify(inventory, null, "\t"));
 		}else{
-			return interaction.reply({content: "У вас нет этого кейса."})
+			return interaction.reply({content: "У вас нет этого кейса.", ephemeral: true})
 		}
 
 		function random(min, max) {

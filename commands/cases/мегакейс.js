@@ -2,10 +2,16 @@ const { MessageEmbed } = require("discord.js");
 module.exports.run = async (client, interaction) => {
 	let cases = require(`${client.config.jsonPath}cases.json`);
 	let inventory = require(`${client.config.jsonPath}inventory.json`);
-	let user = await client.users.fetch(interaction.member.user.id);
-	var IDcase;
-	if(interaction.data.options) 
-		IDcase = interaction.data.options[0].value;
+	let noUser = new MessageEmbed()
+		.setColor(client.config.embedColor)
+		.setTitle('Ошибка')
+		.setDescription('Пользователь не найден в базе данных.')
+	try {
+		var user = await client.users.fetch(interaction.member.user.id);
+	} catch (error) {
+		return interaction.reply({embeds: [noUser], ephemeral: true})
+	}
+	var IDcase = interaction.options.getInteger('номер');
 	let memIndex1 = inventory[interaction.member.user.id].cases.findIndex((obj => obj.caseID == "1"));
 	let memIndex2 = inventory[interaction.member.user.id].cases.findIndex((obj => obj.caseID == "2"));
 	let numberOfCase1 = inventory[interaction.member.user.id].cases[memIndex1].megaCount;

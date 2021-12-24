@@ -5,11 +5,17 @@ module.exports.run = async (client, interaction) => {
 	let inventory = require(`${client.config.jsonPath}inventory.json`);
 	let shop = require(`${client.config.jsonPath}shop.json`);
 	let cases = require(`${client.config.jsonPath}cases.json`);
-	var whattoDo = interaction.data.options[0].name;
-	let user = await client.users.fetch(interaction.member.user.id);
-
+	var whattoDo = interaction.options.getSubcommand();
+	let noUser = new MessageEmbed()
+		.setColor(client.config.embedColor)
+		.setTitle('Ошибка')
+		.setDescription('Пользователь не найден в базе данных.')
+	try {
+		var user = await client.users.fetch(interaction.member.user.id);
+	} catch (error) {
+		return interaction.reply({embeds: [noUser], ephemeral: true})
+	}
 	let userdb = await client.db.getUser(interaction.member.user.id)
-
 	if(Date.now() > Number(userdb.reward_daily)){
 		var dailyStatus = `доступна!`;
 	}else{
@@ -235,11 +241,11 @@ module.exports.run = async (client, interaction) => {
 	}
 
 	if(whattoDo == "кейс"){
-		var IDcase = Number(interaction.data.options[0].options[0].value);
+		var IDcase = interaction.options.getInteger('номер') - 1;
 		if(interaction.data.options[0].options.length < 2)
 			var count = 1;
 		else
-			var count = interaction.data.options[0].options[1].value;
+			var count = interaction.options.getInteger('количество');
 		if(IDcase < 1)
 			return interaction.reply({content: 'Укажите корректный номер кейса.', ephemeral: true})
 		if(count < 1)
@@ -273,7 +279,7 @@ module.exports.run = async (client, interaction) => {
 	}
 
 	if(whattoDo == "витрина"){
-			let itemID = interaction.data.options[0].options[0].value - 1;
+			let itemID = interaction.options.getInteger('номер') - 1;
 			if(itemID < 0 || itemID > 1){
 				return interaction.reply({content: 'Укажите корректный номер предмета на витрине.', ephemeral: true})
 			}

@@ -1,6 +1,7 @@
 const { MessageEmbed } = require('discord.js')
 module.exports.run = async (client, interaction) => {
 	try {
+		console.log(interaction)
 		let cases = require(`${client.config.jsonPath}cases.json`);
 		let inventory = require(`${client.config.jsonPath}inventory.json`);
 		let noUser = new MessageEmbed()
@@ -8,9 +9,9 @@ module.exports.run = async (client, interaction) => {
 			.setTitle('Ошибка')
 			.setDescription('Пользователь не найден в базе данных.')
 		try {
-			var user = await client.users.fetch((message.mentions.users.first() || args[0]));
+			var user = await client.users.fetch(interaction.member.user.id);
 		} catch (error) {
-			return message.channel.send({embeds: [noUser]})
+			return interaction.reply({embeds: [noUser]})
 		}
 		var IDcase;
 		if(interaction.data.options) 

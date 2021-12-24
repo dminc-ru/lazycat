@@ -17,7 +17,7 @@ module.exports.run = async (client, interaction) => {
 		}
 		var whattoDo = interaction.options.getSubcommand();	
 		if(whattoDo == "положить"){
-			var money = interaction.options.getString('сумма')
+			var money = interaction.options.getInteger('сумма')
 			if(money < 1)
 				return interaction.reply({content: `Укажите корректное количество ${client.emoji.fish}`, ephemeral: true})
 			if(userdb.balance_fish < money)
@@ -36,7 +36,7 @@ module.exports.run = async (client, interaction) => {
 		
 		
 		if(whattoDo == "снять"){
-			var money = interaction.options.getString('сумма');
+			var money = interaction.options.getInteger('сумма');
 			if(money < 1)
 				return interaction.reply({content: `Укажите корректное количество ${client.emoji.fish}`, ephemeral: true})
 			if(userdb.balance_bank < money)

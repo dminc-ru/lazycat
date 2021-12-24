@@ -6,7 +6,7 @@ module.exports.run = async (client, message, args) => {
 			.setColor(client.config.embedColor)
 			.setTitle('Ошибка')
 			.setDescription('Пользователь не найден в базе данных.')
-		try{
+		try {
 			var user = await client.users.fetch((message.mentions.users.first() || args[0]));
 		} catch (error) {
 			return message.channel.send({embeds: [noUser]})

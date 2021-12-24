@@ -1,41 +1,34 @@
 const { MessageEmbed, WebhookClient } = require("discord.js");
+const discord = require('discord.js')
 module.exports.run = async (client, message, args) => {
-	const webhookBan = new WebhookClient(client.config.webhookBan.id, client.config.webhookBan.token);
-try{
-	var user = await client.users.fetch(message.mentions.users.first());
+//try{
+	const webhookBan = new WebhookClient({id: client.config.webhookBan.id, token: client.config.webhookBan.token})
 	let noUser = new MessageEmbed()
 		.setColor(client.config.embedColor)
 		.setTitle('Ошибка')
-		.setDescription('Не смог получить ID пользователя.')
-	if (!user) {
-		try {
-		  user = await client.users.fetch(args[0])
-		  if (!user) return message.channel.send({embeds: [noUser]});
-		}
-		catch (error) {
-		  return message.channel.send({embeds: [noUser]});
-		}
+		.setDescription('Пользователь не найден в базе данных.')
+	try{
+		var user = await client.users.fetch((message.mentions.users.first() || args[0]));
+	} catch (error) {
+		return message.channel.send({embeds: [noUser]})
 	}
-
 	var userdb = await client.db.getUser(user.id);
-	noUser = new MessageEmbed()
+	var bannedAlready = new MessageEmbed()
 		.setColor(client.config.embedColor)
 		.setTitle('Ошибка')
-		.setDescripiton('Пользователь не найден в базе данных.')
+		.setDescription('Пользователь уже заблокирован.')
 	if (!userdb) return message.channel.send({embeds: [noUser]});
-	if(member.permissions_lia == true) return;
-	if(member.permissions_member == false) return;
-	let reasonBan = args[1];
+	if (userdb.banned == true) {
+		return message.channel.send({embeds: [bannedAlready]})
+	}
+	let reasonBan = message.content.split(' ').slice(2).join(' ');
 	if(!reasonBan)
 		reasonBan = `Нарушение Пользовательского соглашения`;
-	await client.db.changeUser(user.id, 'permissions_member', 0);
-	await client.db.changeUser(user.id, 'permissions_tester', 0);
-	await client.db.changeUser(user.id, 'permissions_lia', 0);
-	await client.db.changeUser(user.id, 'permissions_developer', 0);
+	await client.db.changeUser(user.id, 'banned', 1);
 	let lazyBan = new MessageEmbed()
 		.setColor(client.config.embedColor)
 		.setTitle(`Глобальная блокировка`)
-		.setDescription(`Пользователь ${membermention.user.tag} успешно заблокирован в системе Lazy Cat.`)
+		.setDescription(`Пользователь ${user.tag} успешно заблокирован в системе Lazy Cat.`)
    	message.channel.send({embeds: [lazyBan]});
 	let newBan = new MessageEmbed()
 		.setColor(client.config.embedColor)
@@ -45,7 +38,7 @@ try{
 		.addField(`Срок`, `навсегда`, false)
 		.addField(`Пользователь`, `${user.tag}`, true)
 		.addField(`Модератор`, `${message.author.tag}`, true)
-		.setFooter(`Moderator ID: ${message.author.id} • User ID: ${user.id}`);
+		.setFooter(`User ID: ${user.id} • Moderator ID: ${message.author.id}`);
 	webhookBan.send({embeds: [newBan]});
 	let lazyBanUser = new MessageEmbed()
 		.setColor(client.config.embedColor)
@@ -59,9 +52,10 @@ try{
 	} catch(error) {
 		return;
 	};
-}catch(error){
-			client.logger.log(`${error}`, "err")
-		}
+//}catch(error){
+//			client.logger.log(`${error}`, "err")
+//			console.error(error)
+//		}
 }
 
 module.exports.data = {

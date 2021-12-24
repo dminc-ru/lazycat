@@ -1,6 +1,7 @@
 const fs = require("fs");
 const { MessageEmbed } = require('discord.js')
 module.exports.run = async (client, interaction) => {
+	try {
 		let exchange = require(`${client.config.jsonPath}exchange.json`);
 		let noUser = new MessageEmbed()
 			.setColor(client.config.embedColor)
@@ -70,6 +71,10 @@ module.exports.run = async (client, interaction) => {
 				.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
 			return interaction.reply({embeds: [exchangeEmbed]})
 		}
+	} catch(error) {
+		client.logger.log(error, 'err')
+		console.error(error)
+	}
 }
 
 module.exports.data = {

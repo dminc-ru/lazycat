@@ -1,5 +1,6 @@
 const { MessageEmbed } = require('discord.js')
 module.exports.run = async (client, interaction) => {
+	try {
 		let userdb = await client.db.getUser(interaction.member.user.id)
 		let noUser = new MessageEmbed()
 			.setColor(client.config.embedColor)
@@ -128,6 +129,10 @@ module.exports.run = async (client, interaction) => {
 				}
 			}				
 		}
+	} catch (error) {
+		client.logger.log(error, 'err')
+		console.error(error)
+	}
 }
 module.exports.data = {
 	name: "банк",

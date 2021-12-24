@@ -45,7 +45,6 @@ let stats = require(`${client.config.jsonPath}stats.json`); // статисти�
 let exchange = require(`${client.config.jsonPath}exchange.json`); // курс обмена жучков
 let shop = require(`${client.config.jsonPath}shop.json`); // текущая витрина в магазине
 client.on("interactionCreate", async interaction => {
-	console.log(interaction)
 	if (!interaction.guildId)
 		return interaction.reply({ content: "На данный момент команды можно использовать только на сервере.", ephemeral: true });
 	var user = await client.db.getUser(interaction.member.user.id);

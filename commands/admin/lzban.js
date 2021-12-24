@@ -1,7 +1,5 @@
 const { MessageEmbed, WebhookClient } = require("discord.js");
-const discord = require('discord.js')
 module.exports.run = async (client, message, args) => {
-//try{
 	const webhookBan = new WebhookClient({id: client.config.webhookBan.id, token: client.config.webhookBan.token})
 	let noUser = new MessageEmbed()
 		.setColor(client.config.embedColor)
@@ -52,10 +50,6 @@ module.exports.run = async (client, message, args) => {
 	} catch(error) {
 		return;
 	};
-//}catch(error){
-//			client.logger.log(`${error}`, "err")
-//			console.error(error)
-//		}
 }
 
 module.exports.data = {

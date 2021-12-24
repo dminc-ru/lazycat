@@ -2,9 +2,17 @@ const fs = require("fs");
 const { MessageEmbed } = require('discord.js')
 module.exports.run = async (client, interaction) => {
 		let exchange = require(`${client.config.jsonPath}exchange.json`);
-		let user = await client.users.fetch(interaction.member.user.id);
+		let noUser = new MessageEmbed()
+			.setColor(client.config.embedColor)
+			.setTitle('Ошибка')
+			.setDescription('Пользователь не найден в базе данных.')
+		try {
+			var user = await client.users.fetch(interaction.member.user.id);
+		} catch (error) {
+			return interaction.reply({embeds: [noUser], ephemeral: true})
+		}
 		let userdb = await client.db.getUser(interaction.member.user.id);
-		var whattoDo = interaction.data.options[0].name;
+		var whattoDo = interaction.options.getSubcommand();
 		if(bugs < 1)
 			return interaction.reply({content: `Укажите корректное количество ${client.emoji.bug}`, ephemeral: true})
 		if(userdb.balance_fish < count)
@@ -13,7 +21,7 @@ module.exports.run = async (client, interaction) => {
 			userdb = await client.db.getUser(interaction.member.user.id)	
 			let clientdb = await client.db.getUser(client.user.id)
 
-			var bugs = interaction.data.options[0].options[0].value;
+			var bugs = interaction.options.getInteger('количество');
 			var count = bugs * exchange.currentBugPrice; 
 
 			client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_fish - count))
@@ -33,7 +41,7 @@ module.exports.run = async (client, interaction) => {
 			userdb = await client.db.getUser(interaction.member.user.id)
 			let clientdb = await client.db.getUser(client.user.id)
 
-			var bugs = interaction.data.options[0].options[0].value;
+			var bugs = interaction.options.getInteger('количество');
 			var count = bugs * exchange.currentBugPrice; 
 
 			client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_bugs - bugs))

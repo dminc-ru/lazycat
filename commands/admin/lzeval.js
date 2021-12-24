@@ -9,16 +9,14 @@ module.exports.run = async (client, message, args) => {
 		if (typeof output !== "string") {
 			output = require('util').inspect(output, { depth: 0 });
 		}
-		if (output.includes(client.config.token)) {
-			output.replace(client.config.token, "[REDACTED]")
+		output.replace(client.config.token, "[REDACTED]")
+		output.replace(client.config.webhookBan.id, "[REDACTED]")
+		output.replace(client.config.webhookBan.token, "[REDACTED]")
+		output.replace(client.config.secretKey, "[REDACTED]")
+		if (output.length > (1024 - (message.content.length))) {
+			client.logger.log(`Evaluated code via /lzeval`, 'debug')
+			return console.log(output)
 		}
-		if (output.includes(client.config.webhookBanToken)) {
-			output.replace(client.config.webhookBanToken, "[REDACTED]")
-		}
-		if (output.includes(client.config.secretKey)) {
-			output.replace(client.config.secretKey, "[REDACTED]")
-		}
-		if (output.length > (1024 - (message.content.length))) return
 		let embedEval = new MessageEmbed()
 			.setColor(client.config.embedColor)
 			.addField(':inbox_tray: Input:', `\`\`\`js\n${beautify(code)}\n\`\`\``, false)
@@ -36,7 +34,11 @@ module.exports.run = async (client, message, args) => {
 		if (err.includes(client.config.secretKey)) {
 			err.replace(client.config.secretKey, "[REDACTED]")
 		}
-		if (output.length > (1024 - (message.content.length))) return
+		if (output.length > (1024 - (message.content.length))) {
+			client.logger.log(`Evaluated code via /lzeval`, 'debug')
+			client.logger.log(`Error!`, 'err')
+			return console.error(output)
+		}
 		let embedEvalErr = new MessageEmbed()
 			.setColor(client.config.embedColor)
 			.addField(':inbox_tray: Input:', `\`\`\`js\n${beautify(code)}\n\`\`\``, false)

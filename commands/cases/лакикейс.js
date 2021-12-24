@@ -2,10 +2,12 @@ const { MessageEmbed } = require('discord.js')
 module.exports.run = async (client, interaction) => {
 	let cases = require(`${client.config.jsonPath}cases.json`);
 	let inventory = require(`${client.config.jsonPath}inventory.json`);
-	let user = await client.users.fetch(interaction.member.user.id);
-	var IDcase;
-	if(interaction.data.options) 
-		IDcase = interaction.data.options[0].value;
+	try {
+		var user = await client.users.fetch(interaction.member.user.id);
+	} catch (error) {
+		return interaction.reply({embeds: [noUser], ephemeral: true})
+	}
+	var IDcase = interaction.options.getInteger('номер');
 	let memIndex1 = inventory[interaction.member.user.id].cases.findIndex((obj => obj.caseID == "1"));
 	let memIndex2 = inventory[interaction.member.user.id].cases.findIndex((obj => obj.caseID == "2"));
 	let numberOfCase1 = inventory[interaction.member.user.id].cases[memIndex1].luckyCount;
@@ -37,7 +39,7 @@ module.exports.run = async (client, interaction) => {
 		let fs = require('fs');
 		fs.writeFileSync(`${client.config.jsonPath}inventory.json`, JSON.stringify(inventory, null, "\t"));
 	}else{
-		return interaction.reply({content: "У вас недостаточно средств.", ephemeral: true})
+		return interaction.reply({content: "У вас нет этого кейса.", ephemeral: true})
 	}
 	function random(min, max) {
 		let rand = min - 0.5 + Math.random() * (max - min + 1);

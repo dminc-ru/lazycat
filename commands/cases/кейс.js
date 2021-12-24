@@ -1,7 +1,6 @@
 const { MessageEmbed } = require('discord.js')
 module.exports.run = async (client, interaction) => {
 	try {
-		console.log(interaction)
 		let cases = require(`${client.config.jsonPath}cases.json`);
 		let inventory = require(`${client.config.jsonPath}inventory.json`);
 		let noUser = new MessageEmbed()
@@ -15,7 +14,7 @@ module.exports.run = async (client, interaction) => {
 		}
 		var IDcase;
 		if(interaction.data.options) 
-			IDcase = interaction.data.options[0].value;
+			IDcase = interaction.options.getInteger('номер');
 		let memIndex1 = inventory[interaction.member.user.id].cases.findIndex((obj => obj.caseID == "1"));
 		let memIndex2 = inventory[interaction.member.user.id].cases.findIndex((obj => obj.caseID == "2"));
 		let numberOfCase1 = inventory[interaction.member.user.id].cases[memIndex1].count;

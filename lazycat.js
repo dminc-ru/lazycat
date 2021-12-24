@@ -11,6 +11,7 @@ client.permissions = new Collection(); // коллекция прав юзеро
 client.logger = require('./utils/logger'); // утилита для логов
 client.db = require('./utils/db') // утилита для базы данных
 client.emoji = require('./emojis') //кастом эмодзи
+client.messages = require('./messages')
 
 function LazyLoader() {
 	const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js')); // чтение папки events
@@ -57,6 +58,7 @@ client.on("interactionCreate", async interaction => {
 		client.logger.log(`Ошибка получения данных. User ID: ${interaction.member.user.id}`, 'err');
 		return interaction.reply({ content: `Произошла ошибка. Попробуйте ещё раз или обратитесь на наш сервер поддержки.\nКод ошибки: LZE-179`, ephemeral: true})
 	}
+	if (user.banned == true) return;
 	var guild = await client.db.getGuild(interaction.guildId);
 	if(!guild){
 		await client.db.addGuild(interaction.guildId)

@@ -13,7 +13,7 @@ module.exports.run = async (client, interaction) => {
 		}
 		let userdb = await client.db.getUser(interaction.member.user.id)
 		try {
-			var channel = await client.channels.fetch(interaction.channel_id);
+			var channel = await client.channels.fetch(interaction.channelId);
 		} catch (error) {
 			return interaction.reply({content: 'Не могу получить доступ к текстовому каналу.', ephemeral: true})
 		}

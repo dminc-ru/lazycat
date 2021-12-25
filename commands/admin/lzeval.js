@@ -34,7 +34,7 @@ module.exports.run = async (client, message, args) => {
 		if (err.includes(client.config.secretKey)) {
 			err.replace(client.config.secretKey, "[REDACTED]")
 		}
-		if (output.length > (1024 - (message.content.length))) {
+		if (err.length > (1024 - (message.content.length))) {
 			client.logger.log(`Evaluated code via /lzeval`, 'debug')
 			client.logger.log(`Error!`, 'err')
 			return console.error(output)
@@ -42,7 +42,7 @@ module.exports.run = async (client, message, args) => {
 		let embedEvalErr = new MessageEmbed()
 			.setColor(client.config.embedColor)
 			.addField(':inbox_tray: Input:', `\`\`\`js\n${beautify(code)}\n\`\`\``, false)
-			.addField(':outbox_tray: Output:', `\`\`\`js\n${output}\n\`\`\``, false)
+			.addField(':outbox_tray: Output:', `\`\`\`js\n${err}\n\`\`\``, false)
 			.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
       	message.channel.send({embeds: [embedEvalErr]});
 	})

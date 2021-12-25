@@ -1,7 +1,16 @@
 const { MessageEmbed } = require('discord.js')
 const weather = require('openweather-apis');
 module.exports.run = async (client, interaction) => {
-		let user = client.users.cache.get(interaction.member.user.id);
+	try {
+		let noUser = new MessageEmbed()
+		.setColor(client.config.embedColor)
+		.setTitle('Ошибка')
+		.setDescription('Пользователь не найден в базе данных.')
+		try {
+			var user = await client.users.fetch(interaction.member.user.id);
+		} catch (error) {
+			return message.channel.send({embeds: [noUser]})
+		}
 		weather.setAPPID(client.config.weatherID);
 		weather.setLang('ru');
 		weather.setUnits('metric');		
@@ -33,6 +42,10 @@ module.exports.run = async (client, interaction) => {
 				.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
 			return interaction.reply({embeds: [weatherEmbed]})
 		});
+	} catch (error) {
+		client.logger.log(error, 'err')
+		console.error(error)
+	}
 }
 
 module.exports.data = {

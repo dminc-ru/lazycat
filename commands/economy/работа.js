@@ -1,10 +1,24 @@
-const { MessageEmbed } = require('discord.js')
+const { MessageEmbed } = require('discord.js');
+const { max } = require('moment');
 module.exports.run = async (client, interaction) => {
+    try {
         let works = require(`${client.config.jsonPath}works.json`);
-	    let user = await client.users.fetch(interaction.member.user.id);
+	    let noUser = new MessageEmbed()
+		    .setColor(client.config.embedColor)
+		    .setTitle('Ошибка')
+            .setDescription('Пользователь не найден в базе данных.')
+	    try {
+		    var user = await client.users.fetch(interaction.member.user.id);
+	    } catch (error) {
+		    return interaction.reply({embeds: [noUser], ephemeral: true})
+	    }
         let userdb = await client.db.getUser(interaction.member.user.id)
-        let channel = await client.channels.fetch(interaction.channel_id);
-	    var whattoDo = interaction.data.options[0].name;
+        try {
+			var channel = await client.channels.fetch(interaction.channel_id);
+		} catch (error) {
+			return interaction.reply({content: 'Не могу получить доступ к текстовому каналу.', ephemeral: true})
+		}
+	    var whattoDo = interaction.options.getSubcommand();
         if(whattoDo == "список"){
             let workList = new MessageEmbed()
                 .setColor(client.config.embedColor)
@@ -41,11 +55,11 @@ module.exports.run = async (client, interaction) => {
             return interaction.reply({embeds: [rankList]})
         }
         if(whattoDo == "устроиться"){
-            if(interaction.data.options[0].options[0].value < 1 || interaction.data.options[0].options[0].value > 3)
+            let workID = interaction.options.getInteger('номер') - 1
+            if(workID < 1 || workID > 3)
                 return interaction.reply({content: "Укажите корректный номер работы.", ephemeral: true})
             if(userdb.work_current != '')
                 return interaction.reply({content: "Сначала увольтесь с текущей работы — /работа уволиться.", ephemeral: true})
-            let workID = interaction.data.options[0].options[0].value - 1;
             var prevWork = "";
             if(workID != 0){
                 var razn = workID - 1;
@@ -215,19 +229,7 @@ module.exports.run = async (client, interaction) => {
                         .setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
                     return interaction.editReply({embeds: [timeOut]})
                 }
-                if(Number(response.first().content) == firstNum){
-                    var checkNum1 = secondNum;
-                    var checkNum2 = thirdNum;
-                }
-                if(Number(response.first().content) == secondNum){
-                    var checkNum1 = firstNum;
-                    var checkNum2 = thirdNum;
-                }
-                if(Number(response.first().content) == thirdNum){
-                    var checkNum1 = firstNum;
-                    var checkNum2 = secondNum;
-                }
-                if (Number(response.first().content) > checkNum1 && Number(response.first().content) > checkNum2) {
+                if (Number(response.first().content) == Math.max(firstNum, secondNum, thirdNum)) {
 		            let wonXP = randomInt(1, 2);
                     client.db.changeUser(interaction.member.user.id, 'work_currentXP', (userdb.work_currentXP + wonXP))
                     client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_fish + curWork.ranks[curRank].income))
@@ -266,6 +268,10 @@ module.exports.run = async (client, interaction) => {
                 }
             }
         }
+    } catch (error) {
+        client.logger.log(error, 'err')
+        console.error(error)
+    }
 };
 
 module.exports.data = {

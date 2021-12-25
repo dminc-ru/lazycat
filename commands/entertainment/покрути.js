@@ -1,9 +1,17 @@
 const { MessageEmbed } = require('discord.js')
 module.exports.run = async (client, interaction) => {
-	let user = await client.users.fetch(interaction.member.user.id);
+	try {
+	let noUser = new MessageEmbed()
+		.setColor(client.config.embedColor)
+		.setTitle('Ошибка')
+		.setDescription('Пользователь не найден в базе данных.')
+	try {
+		var user = await client.users.fetch(interaction.member.user.id);
+	} catch (error) {
+		return message.channel.send({embeds: [noUser]})
+	}
 	let userdb = await client.db.getUser(interaction.member.user.id)
-	let money = interaction.data.options[0].value;
-	money = Number(interaction.data.options[0].value);
+	let money = interaction.options.getInteger('ставка');
 	if(money < 1)
 		return interaction.reply({content: "Укажите корректное количество жучков.", ephemeral: true})
 	if(money > userdb.balance_bugs)
@@ -40,6 +48,10 @@ module.exports.run = async (client, interaction) => {
 		.setTimestamp()
 		.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
 	return interaction.reply({embeds: [loseEmbed]})
+	} catch (error) {
+		client.logger.log(error)
+		console.error(error)
+	}
 }
 
 module.exports.data = {

@@ -17,249 +17,132 @@ module.exports.run = async (client, interaction) => {
 	let fishsell = 0;
 	var totalsum = 0;
 	let bugsell = 0;
-	if(comlength < 1)
+	if(comlength < 1) {
 		return interaction.reply({content: `Ваш инвентарь пуст.`, ephemeral: true})
-	if(whattoDo == "класс"){
-		let classs = interaction.options.getString('класс');
-		if(classs == 'Обычный'){
+	}
+	switch (whattoDo) {
+		case 'класс': {
+			let classs = interaction.options.getString('класс');
 			for(var i = 0; i<comlength; i++){
 				if(!inventory[interaction.member.user.id].items[i]) break;
-				if(inventory[interaction.member.user.id].items[i].itemclass == interaction.data.options[0].options[0].value){
-					fishsell += inventory[interaction.member.user.id].items[i].cost * inventory[interaction.member.user.id].items[i].county;
-					totalsum+=1*inventory[interaction.member.user.id].items[i].county;
-				}
-			}
-			if(totalsum == 0)
-				return interaction.reply({content: `Предметов с такой редкостью не найдено.`, ephemeral: true})
-			for(var i = 0; i<comlength; i++){
-				if(!inventory[interaction.member.user.id].items[i]) break;
-				if(inventory[interaction.member.user.id].items[i].itemclass == interaction.data.options[0].options[0].value){
+				if(inventory[interaction.member.user.id].items[i].itemclass == classs){
+					let price = inventory[interaction.member.user.id].items[i].cost * inventory[interaction.member.user.id].items[i].county;
+					if (inventory[interaction.member.user.id].items[i].currency == client.emoji.fish) {
+						fishsell += price
+					} else {
+						bugsell += price
+					}
+					totalsum += inventory[interaction.member.user.id].items[i].county;
 					inventory[interaction.member.user.id].items.splice(i, 1);
 				}
 			}
-			await client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_fish + fishsell))
+			if (totalsum == 0) {
+				interaction.reply({content: `Предметов с такой редкостью не найдено.`, ephemeral: true})
+				break;
+			}
+			client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_fish + fishsell))
+			let successEmbed = new MessageEmbed()
+				.setColor('Успешно')
+				.addField(`Продано предметов:`, totalsum, false)
+				.addField(`Заработано рыбок:`, `${fishsell} ${client.emoji.fish}`, true)
+				.setTimestamp()
+				.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+			if (fishsell > 0) {
+				successEmbed.addField(`Заработано рыбок:`, `${fishsell} ${client.emoji.fish}`, true)
+				client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_fish + fishsell))
+			}
+			if (bugsell > 0) {
+				successEmbed.addField(`Заработано жучков:`, `${bugsell} ${client.emoji.bug}`, true)
+				client.db.changeUser(interaction.member.user.id, 'balance_bugs', (userdb.balance_bugs + bugsell))
+			}
+			interaction.reply({embeds: [successEmbed]})
+			let fs = require("fs");
+			fs.writeFileSync(`${process.env.PATHTOBASE}inventory.json`, JSON.stringify(inventory, null, "\t"));
+			break;
+		}
+		case 'всё': {
+			for(var i = 0; i<comlength; i++){
+				let price = inventory[interaction.member.user.id].items[i].cost * inventory[interaction.member.user.id].items[i].county;
+				if (inventory[interaction.member.user.id].items[i].currency == client.emoji.fish) {
+					fishsell += price
+				} else {
+					bugsell += price
+				}
+				totalsum += inventory[interaction.member.user.id].items[i].county;
+			}
+			let tosell = comlength + 1;
+			inventory[interaction.member.user.id].items.splice(0, tosell);
 			let successEmbed = new MessageEmbed()
 				.setColor(client.config.embedColor)
-				.setTitle(`Успешно`)
+				.setTitle('Успешно')
 				.addField(`Продано предметов:`, totalsum, false)
-				.addField(`Заработано рыбок:`, `${fishsell} ${client.emoji.fish}`, true)
 				.setTimestamp()
 				.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+			let factfish = 0
+			if (fishsell > 0) {
+				client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_fish + fishsell))
+				factfish += fishsell
+				successEmbed.addField(`Заработано рыбок:`, `${fishsell} ${client.emoji.fish}`, true)
+			}
+			if (bugsell > 0) {
+				client.db.changeUser(interaction.member.user.id, 'balance_bugs', (userdb.balance_bugs + bugsell))
+				factfish += bugsell * 100
+				successEmbed.addField(`Заработано жучков:`, `${bugsell} ${client.emoji.bug}`, true)
+			}
+			let factzar = factfish - userdb.case_open;
+			successEmbed.addField(`Фактический заработок:`, `${factzar} ${client.emoji.fish}`, false)
+			client.db.changeUser(interaction.member.user.id, 'case_open', 0)
 			await interaction.reply({embeds: [successEmbed]})
 			let fs = require("fs");
-			return fs.writeFileSync(`${client.config.jsonPath}inventory.json`, JSON.stringify(inventory, null, "\t"));
+			fs.writeFileSync(`${client.config.jsonPath}inventory.json`, JSON.stringify(inventory, null, "\t"));
+			break;
 		}
-
-		if(classs == 'Стандартный'){
-			for(var i = 0; i<comlength; i++){
-				if(!inventory[interaction.member.user.id].items[i]) break;
-				if(inventory[interaction.member.user.id].items[i].itemclass == interaction.data.options[0].options[0].value){
-					fishsell += inventory[interaction.member.user.id].items[i].cost * inventory[interaction.member.user.id].items[i].county;
-					totalsum+=1*inventory[interaction.member.user.id].items[i].county;
-				}
+		case 'номер': {
+			let uid = interaction.options.getInteger('номер') - 1;
+			if (uid < 0) {
+				interaction.reply({content: `Укажите корректный номер предмета.`, ephemeral: true})
+				break
 			}
-			if(totalsum == 0)
-				return interaction.reply({content: `Предметов с такой редкостью не найдено.`, ephemeral: true})
-			for(var i = 0; i<comlength; i++){
-				if(!inventory[interaction.member.user.id].items[i]) break;
-				if(inventory[interaction.member.user.id].items[i].itemclass == interaction.data.options[0].options[0].value){
-					inventory[interaction.member.user.id].items.splice(i, 1);
-				}
+			if (!inventory[interaction.member.user.id].items[uid]) {
+				interaction.reply({content: `Предмет с этим номером не найден.`, ephemeral: true})
+				break
 			}
-			await client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_fish + fishsell))
-			let successEmbed = new MessageEmbed()
+			if(inventory[interaction.member.user.id].items[uid].currency == client.emoji.fish){
+				client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_fish + inventory[interaction.member.user.id].items[uid].cost))
+				if(inventory[interaction.member.user.id].items[uid].county > 1){
+					inventory[interaction.member.user.id].items[uid].county -= 1;
+					let caseIDcase = inventory[interaction.member.user.id].items[uid].IDcase;
+					client.db.changeUser(interaction.member.user.id, 'case_open', (userdb.case_open - cases[caseIDcase].cost * 120))
+				}else{
+					let caseIDcase = inventory[interaction.member.user.id].items[uid].IDcase;
+					inventory[interaction.member.user.id].items.splice(uid, 1);
+					client.db.changeUser(interaction.member.user.id, 'case_open', (userdb.case_open - cases[caseIDcase].cost * 120))
+				}
+			}else{
+			if(inventory[interaction.member.user.id].items[uid].currency == client.emoji.bug){
+				client.db.changeUser(interaction.member.user.id, 'balance_bugs', (userdb.balance_bugs + inventory[interaction.member.user.id].items[uid].cost))
+				if(inventory[interaction.member.user.id].items[uid].county > 1){
+					inventory[interaction.member.user.id].items[uid].county -= 1;
+				}else{
+					inventory[interaction.member.user.id].items.splice(uid, 1);
+				}
+			};
+			}
+			let fs = require("fs");
+			let selledEmbed = new MessageEmbed()
 				.setColor(client.config.embedColor)
-				.setTitle(`Успешно`)
-				.addField(`Продано предметов:`, totalsum, false)
-				.addField(`Заработано рыбок:`, `${fishsell} ${client.emoji.fish}`, true)
+				.setTitle('Продано!')
+				.setDescription(`Вы продали ${inventory[interaction.member.user.id].items[uid].itemname} за ${inventory[interaction.member.user.id].items[uid].cost} ${inventory[interaction.member.user.id].items[uid].currency}`)
 				.setTimestamp()
-				.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
-			await interaction.reply({embeds: [successEmbed]})
-			let fs = require("fs");
-			return fs.writeFileSync(`${client.config.jsonPath}inventory.json`, JSON.stringify(inventory, null, "\t"));
+				.setFooter(user.tag, user.displayAvatarURL({dynamic: true}));
+			await interaction.reply({embeds: [selledEmbed]})
+			fs.writeFileSync(`${client.config.jsonPath}inventory.json`, JSON.stringify(inventory, null, "\t"));
+			break
 		}
-
-		if(classs == 'Особый'){
-			for(var i = 0; i<comlength; i++){
-				if(!inventory[interaction.member.user.id].items[i]) break;
-				if(inventory[interaction.member.user.id].items[i].itemclass == interaction.data.options[0].options[0].value){
-					fishsell += inventory[interaction.member.user.id].items[i].cost * inventory[interaction.member.user.id].items[i].county;
-					totalsum+=1*inventory[interaction.member.user.id].items[i].county;
-				}
-			}
-			if(totalsum == 0){
-				return interaction.reply({content: `Предметов с такой редкостью не найдено.`, ephemeral: true})
-			}
-			for(var i = 0; i<comlength; i++){
-				if(!inventory[interaction.member.user.id].items[i]) break;
-				if(inventory[interaction.member.user.id].items[i].itemclass == interaction.data.options[0].options[0].value){
-					inventory[interaction.member.user.id].items.splice(i, 1);
-				}
-			}
-			await client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_fish + fishsell))
-			let successEmbed = new MessageEmbed()
-				.setColor('Успешно')
-				.addField(`Продано предметов:`, totalsum, false)
-				.addField(`Заработано рыбок:`, `${fishsell} ${client.emoji.fish}`, true)
-				.setTimestamp()
-				.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
-			interaction.reply({embeds: [successEmbed]})
-			let fs = require("fs");
-			return fs.writeFileSync(`${client.config.jsonPath}inventory.json`, JSON.stringify(inventory, null, "\t"));
+		default: {
+			interaction.reply({content: `Произошла ошибка при выполнении команды: некорректный запрос.`, ephemeral: true})
+			break
 		}
-
-		if(classs == 'Редкий'){
-			for(var i = 0; i<comlength; i++){
-				if(!inventory[interaction.member.user.id].items[i]) break;
-				if(inventory[interaction.member.user.id].items[i].itemclass == interaction.data.options[0].options[0].value){
-					fishsell += inventory[interaction.member.user.id].items[i].cost * inventory[interaction.member.user.id].items[i].county;
-					totalsum+=1*inventory[interaction.member.user.id].items[i].county;
-				}
-			}
-			if(totalsum == 0)
-				return interaction.reply({content: `Предметов с такой редкостью не найдено.`, ephemeral: true})
-			for(var i = 0; i<comlength; i++){
-				if(!inventory[interaction.member.user.id].items[i]) break;
-				if(inventory[interaction.member.user.id].items[i].itemclass == interaction.data.options[0].options[0].value){
-					inventory[interaction.member.user.id].items.splice(i, 1);
-				}
-			}
-			client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_fish + fishsell))
-			let successEmbed = new MessageEmbed()
-				.setColor('Успешно')
-				.addField(`Продано предметов:`, totalsum, false)
-				.addField(`Заработано рыбок:`, `${fishsell} ${client.emoji.fish}`, true)
-				.setTimestamp()
-				.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
-			interaction.reply({embeds: [successEmbed]})
-			let fs = require("fs");
-			return fs.writeFileSync(`${process.env.PATHTOBASE}/inventory.json`, JSON.stringify(inventory, null, "\t"));
-		}
-
-		if(classs == 'Тайный'){
-			for(var i = 0; i<comlength; i++){
-				if(!inventory[interaction.member.user.id].items[i]) break;
-				if(inventory[interaction.member.user.id].items[i].itemclass == interaction.data.options[0].options[0].value){
-					fishsell += inventory[interaction.member.user.id].items[i].cost * inventory[interaction.member.user.id].items[i].county;
-					totalsum+=1*inventory[interaction.member.user.id].items[i].county;
-				}
-			}
-			if(totalsum == 0)
-				return interaction.reply({content: `Предметов с такой редкостью не найдено.`, ephemeral: true})
-			
-			for(var i = 0; i<comlength; i++){
-				if(!inventory[interaction.member.user.id].items[i]) break;
-				if(inventory[interaction.member.user.id].items[i].itemclass == interaction.data.options[0].options[0].value){
-					inventory[interaction.member.user.id].items.splice(i, 1);
-				}
-			}
-			client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_fish + fishsell))
-			let successEmbed = new MessageEmbed()
-				.setColor('Успешно')
-				.addField(`Продано предметов:`, totalsum, false)
-				.addField(`Заработано рыбок:`, `${fishsell} ${client.emoji.fish}`, true)
-				.setTimestamp()
-				.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
-			interaction.reply({embeds: [successEmbed]})
-			let fs = require("fs");
-			return fs.writeFileSync(`${client.config.jsonPath}inventory.json`, JSON.stringify(inventory, null, "\t"));
-		}
-
-		if(classs == 'Легендарный'){
-			for(var i = 0; i<comlength; i++){
-				if(!inventory[interaction.member.user.id].items[i]) break;
-				if(inventory[interaction.member.user.id].items[i].itemclass == interaction.data.options[0].options[0].value){
-					fishsell += inventory[interaction.member.user.id].items[i].cost * inventory[interaction.member.user.id].items[i].county;
-					totalsum+=1*inventory[interaction.member.user.id].items[i].county;
-				}
-			}
-			if(totalsum == 0)
-				return interaction.reply({content: `Предметов с такой редкостью не найдено.`, ephemeral: true})
-			
-			for(var i = 0; i<comlength; i++){
-				if(!inventory[interaction.member.user.id].items[i]) break;
-				if(inventory[interaction.member.user.id].items[i].itemclass == interaction.data.options[0].options[0].value){
-					inventory[interaction.member.user.id].items.splice(i, 1);
-				}
-			}
-			client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_fish + fishsell))
-			let successEmbed = new MessageEmbed()
-				.setColor('Успешно')
-				.addField(`Продано предметов:`, totalsum, false)
-				.addField(`Заработано рыбок:`, `${fishsell} ${client.emoji.fish}`, true)
-				.setTimestamp()
-				.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
-			interaction.reply({embeds: [successEmbed]})
-			let fs = require("fs");
-			return fs.writeFileSync(`${process.env.PATHTOBASE}/inventory.json`, JSON.stringify(inventory, null, "\t"));
-		}
-	}
-	if(whattoDo == 'всё'){
-		for(var i = 0; i<comlength; i++){
-			if(inventory[interaction.member.user.id].items[i].currency == client.emoji.fish)
-				fishsell += inventory[interaction.member.user.id].items[i].cost * inventory[interaction.member.user.id].items[i].county;
-			if(inventory[interaction.member.user.id].items[i].currency == client.emoji.bug)
-				bugsell += inventory[interaction.member.user.id].items[i].cost * inventory[interaction.member.user.id].items[i].county;
-			totalsum+=1*inventory[interaction.member.user.id].items[i].county;
-		}
-		let tosell = comlength + 1;
-		inventory[interaction.member.user.id].items.splice(0, tosell);
-		client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_fish + fishsell))
-		client.db.changeUser(interaction.member.user.id, 'balance_bugs', (userdb.balance_bugs + bugsell))
-		let factfish = bugsell * 100;
-		factfish += fishsell;
-		let factzar = factfish - userdb.case_open;
-		client.db.changeUser(interaction.member.user.id, 'case_open', 0)
-		let successEmbed = new MessageEmbed()
-			.setColor(client.config.embedColor)
-			.setTitle('Успешно')
-			.addField(`Продано предметов:`, totalsum, false)
-			.addField(`Заработано рыбок:`, `${fishsell} ${client.emoji.fish}`, true)
-			.addField(`Заработано жучков:`, `${bugsell} ${client.emoji.bug}`, true)
-			.addField(`Фактический заработок:`, `${factzar} ${client.emoji.fish}`, false)
-			.setTimestamp()
-			.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
-		await interaction.reply({embeds: [successEmbed]})
-		let fs = require("fs");
-		return fs.writeFileSync(`${client.config.jsonPath}inventory.json`, JSON.stringify(inventory, null, "\t"));
-	}
-	if(whattoDo == 'номер'){
-		let uid = interaction.options.getInteger('номер');
-		uid -= 1;
-		if(uid < 0)
-			return interaction.reply({content: `Укажите корректный номер предмета.`, ephemeral: true})
-		if(!inventory[interaction.member.user.id].items[uid])
-			return interaction.reply({content: `Предмет с этим номером не найден.`, ephemeral: true})
-		if(inventory[interaction.member.user.id].items[uid].currency == client.emoji.fish){
-			client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_fish + inventory[interaction.member.user.id].items[uid].cost))
-			if(inventory[interaction.member.user.id].items[uid].county > 1){
-				inventory[interaction.member.user.id].items[uid].county -= 1;
-				let caseIDcase = inventory[interaction.member.user.id].items[uid].IDcase;
-				client.db.changeUser(interaction.member.user.id, 'case_open', (userdb.case_open - cases[caseIDcase].cost * 120))
-			}else{
-				let caseIDcase = inventory[interaction.member.user.id].items[uid].IDcase;
-				inventory[interaction.member.user.id].items.splice(uid, 1);
-				client.db.changeUser(interaction.member.user.id, 'case_open', (userdb.case_open - cases[caseIDcase].cost * 120))
-			}
-		}else{
-		if(inventory[interaction.member.user.id].items[uid].currency == client.emoji.bug){
-			client.db.changeUser(interaction.member.user.id, 'balance_bugs', (userdb.balance_bugs + inventory[interaction.member.user.id].items[uid].cost))
-			if(inventory[interaction.member.user.id].items[uid].county > 1){
-				inventory[interaction.member.user.id].items[uid].county -= 1;
-			}else{
-				inventory[interaction.member.user.id].items.splice(uid, 1);
-			}
-		};
-		}
-		let fs = require("fs");
-		let selledEmbed = new MessageEmbed()
-			.setColor(client.config.embedColor)
-			.setTitle('Продано!')
-			.setDescription(`Вы продали ${inventory[interaction.member.user.id].items[uid].itemname} за ${inventory[interaction.member.user.id].items[uid].cost} ${inventory[interaction.member.user.id].items[uid].currency}`)
-			.setTimestamp()
-			.setFooter(user.tag, user.displayAvatarURL({dynamic: true}));
-		await interaction.reply({embeds: [selledEmbed]})
-		return fs.writeFileSync(`${client.config.jsonPath}inventory.json`, JSON.stringify(inventory, null, "\t"));
 	}
 }
 

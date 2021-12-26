@@ -93,35 +93,42 @@ module.exports.run = async (client, interaction) => {
 			items: []
 		};
 	}
-	let resheart = "";
-	let resclass = "";
-	if(cases[IDcase].items[result].class == 'Обычный'){
-		resheart = client.emoji.ph;
-		resclass = `${cases[IDcase].items[result].class}`;
-	}
-	if(cases[IDcase].items[result].class == 'Стандартный'){
-		resheart = client.emoji.bh;
-		resclass = `${cases[IDcase].items[result].class}`;
-	}
-	if(cases[IDcase].items[result].class == 'Особый'){
-		resheart = client.emoji.gh;
-		resclass = `__${cases[IDcase].items[result].class}__`;
-	}
-	if(cases[IDcase].items[result].class == 'Редкий'){
-		resheart = client.emoji.yh;
-		resclass = `*${cases[IDcase].items[result].class}*`;
-	}
-	if(cases[IDcase].items[result].class == 'Тайный'){
-		resheart = client.emoji.oh;
-		resclass = `**${cases[IDcase].items[result].class}**`;
-	}
-	if(cases[IDcase].items[result].class == 'Легендарный'){
-		resheart = client.emoji.rh;
-		resclass = `***${cases[IDcase].items[result].class}***`;
-	}
-	if(cases[IDcase].items[result].class == 'ОфИгЕнНоЕ'){
-				resheart = `${client.emoji.wh}${client.emoji.wh}${client.emoji.wh}${client.emoji.wh}${client.emoji.wh}`;
-				resclass = `__***~~ОфИгЕнНоЕ~~***__`;
+	switch(cases[IDcase].items[result].class) {
+		case 'Обычный': {
+			var resheart = client.emoji.ph;
+			var resclass = cases[IDcase].items[result].class;
+			break;
+		}
+		case 'Стандартный': {
+			var resheart = client.emoji.bh;
+			var resclass = cases[IDcase].items[result].class;
+			break;
+		}
+		case 'Особый': {
+			var resheart = client.emoji.gh;
+			var resclass = `__${cases[IDcase].items[result].class}__`;
+			break;
+		}
+		case 'Редкий': {
+			var resheart = client.emoji.yh;
+			var resclass = `*${cases[IDcase].items[result].class}*`;
+			break;
+		}
+		case 'Тайный': {
+			var resheart = client.emoji.oh;
+			var resclass = `**${cases[IDcase].items[result].class}**`;
+			break;
+		}
+		case 'Легендарный': {
+			var resheart = client.emoji.rh;
+			var resclass = `***${cases[IDcase].items[result].class}***`;
+			break;
+		}
+		case 'ОфИгЕнНоЕ': {
+			var resheart = client.emoji.wh.repeat(5);
+			var resclass = `__***~~${cases[IDcase].items[result].class}~~***__`;
+			break;
+		}
 	}
 	let comlength = Object.keys(inventory[interaction.member.user.id].items).length;
 	var checks;

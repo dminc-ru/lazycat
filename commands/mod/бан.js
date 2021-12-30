@@ -2,7 +2,6 @@ const { MessageEmbed } = require("discord.js");
 const fs = require("fs");
 module.exports.run = async (client, interaction) => {
 	try {
-		let bans = require(`${client.config.jsonPath}bans.json`);
 		try {
 			var user = await client.users.fetch(interaction.member.user.id);
 			var guild = await client.guilds.fetch(interaction.guildId);
@@ -51,18 +50,6 @@ module.exports.run = async (client, interaction) => {
 		} catch (error) {
 			return interaction.reply({content: `Произошла ошибка при попытке бана. Возможно, у меня недостаточно прав для выполнения этого действия.`})
 		}
-		if (!bans[interaction.guildId]) {
-			bans[interaction.guildId] = [];
-		}
-		bans[interaction.guildId].push({
-			discordserverid: interaction.guildId,
-			moderatorid: interaction.member.user.id,
-			moderatortag: user.tag,
-			memberid: banUser,
-			membertag: banUserResolve.tag,
-			reason: reason,
-			banCreatedAt: Date.now()
-		});
 		fs.writeFileSync(`${client.config.jsonPath}bans.json`, JSON.stringify(bans, null, "\t"));
 		let banMessage = new MessageEmbed()
 			.setColor(client.config.embedColor)

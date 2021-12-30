@@ -1,11 +1,7 @@
 const { MessageEmbed } = require("discord.js");
-const fs = require("fs");
 const ms = require("ms");
 module.exports.run = async (client, interaction) => {
 	try {
-		let mutes = require(`${client.config.jsonPath}mutes.json`);
-		if(!mutes[interaction.guildId])
-			mutes[interaction.guildId] = [];
 		try {
 			var user = await client.users.fetch(interaction.member.user.id)
 			var guild = await client.guilds.fetch(interaction.guildId)
@@ -17,10 +13,10 @@ module.exports.run = async (client, interaction) => {
 			interaction.reply({content: `Произошла ошибка при получении данных.`, ephemeral: true})
 		}
 		let guilddb = await client.db.getGuild(interaction.guildId)
-		if ( !member.hasPermission('MANAGE_MESSAGES') ) {
+		if ( !member.hasPermission('MODERATE_MEMBERS') ) {
 			return interaction.reply({content: `У вас недостаточно прав для выполнения этой команды.`, ephemeral: true})
 		}
-		if (guilddb.muteRole == '') {
+		if (muteUserResolve.communicationDisabledUntilTimestamp == null) {
 			return interaction.reply({content: `На этом сервере не установлена роль для мута. Обратитесь к администратору сервера.`, ephemeral: true})
 		}
 		let usernames = muteUserClientResolve.tag;
@@ -44,37 +40,15 @@ module.exports.run = async (client, interaction) => {
 		} else {
 			var reason = `не указана`;
 		}
-		const role = guilddb.muteRole;
 		const mutetime = ms(interaction.options.getString('время'));
-		if (mutetime < 60000) {
-			return interaction.reply({content: `Минимальное время мута — 1 минута.`, ephemeral: true})
-		}
-		if (mutetime > 1209600000) {
-			return interaction.reply({content: `Максимальное время мута — 14 дней.`, ephemeral: true})
-		}
 		if (typeof mutetime === 'undefined') {
 			return interaction.reply({content: `Неправильный формат времени.`, ephemeral: true})
 		}
-		if ( mutes[interaction.guildId].find(us => us.memberid == muteUser) ) {
-			return interaction.reply({content: `Пользователь уже замьючен.`, ephemeral: true})
-		}
 		try {
-			muteUserResolve.roles.add(role, {reason});
+			muteUserResolve.communicationDisabledUntilTimestamp = Date.now() + mutetime
 		} catch (error) {
-			return interaction.reply({content: `Произошла ошибка при попытке мута. Возможно, у меня недостаточно прав для выполнения этого действия.`, ephemeral: true})
+			return interaction.reply({content: `Произошла ошибка. Обратитесь на сервер поддержки.`, ephemeral: true})
 		}
-		mutes[interaction.guildId].push({
-			discordserverid: interaction.guildId,
-			moderatorid: interaction.member.user.id,
-			moderatortag: user.tag,
-			memberid: muteUser,
-			membertag: muteUserClientResolve.tag,
-			reason: reason,
-			roleid: role.id,
-			muteCreatedAt: Date.now(),
-			muteEndDate: Date.now() + mutetime
-		});
-		fs.writeFileSync(`${client.config.jsonPath}mutes.json`, JSON.stringify(mutes, null, "\t"));
 		let muteSuccess = new MessageEmbed()
 			.setColor(client.config.embedColor)
 			.setTitle('Мут: успешно')

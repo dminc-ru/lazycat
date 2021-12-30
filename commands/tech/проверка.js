@@ -10,7 +10,7 @@ module.exports.run = async (client, interaction) => {
 		}
 		let tick = client.emoji.tick
 		let cross = client.emoji.cross
-		if ( !member.hasPermission("ADMINISTRATOR") ) {
+		if ( !member.permissions.has("ADMINISTRATOR") ) {
 			return interaction.reply({content: `Недостаточно прав для выполнения этой команды.`, ephemeral: true})
 		}
 		let checkEmbed = new MessageEmbed()

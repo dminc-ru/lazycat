@@ -10,7 +10,7 @@ module.exports.run = async (client, interaction) => {
 		}
 		let guilddb = await client.db.getGuild(interaction.guildId)
 		var typeLog = interaction.options.getSubcommandGroup();
-		if ( !member.hasPermission('ADMINISTRATOR') ) {
+		if ( !member.permissions.has('ADMINISTRATOR') ) {
 			return interaction.reply({content: `У вас недостаточно прав для выполнения этой команды.`, ephemeral: true})
 		}
 		if (typeLog == "чат") {

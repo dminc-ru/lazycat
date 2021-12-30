@@ -13,7 +13,7 @@ module.exports.run = async (client, interaction) => {
 		if (interaction.options.getUser('участник').length > 1) {
 			var memberClear = interaction.options.getUser('участник');
 		}
-		if( !member.hasPermission('MANAGE_MESSAGES') ) {
+		if( !member.permissions.has('MANAGE_MESSAGES') ) {
 			return interaction.reply({content: `У вас недостаточно прав для выполнения этой команды.`, ephemeral: true})
 		}
 		if (!memberClear) {

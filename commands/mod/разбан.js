@@ -11,7 +11,7 @@ module.exports.run = async (client, interaction) => {
 			return interaction.reply({content: `Произошла ошибка при получении данных.`, ephemeral: true})
 		}
 		let guilddb = await client.db.getGuild(interaction.guildId)
-		if( !member.hasPermission('BAN_MEMBERS') ) {
+		if( !member.permissions.has('BAN_MEMBERS') ) {
 			return interaction.reply({content: `У вас недостаточно прав для выполнения этой команды.`, ephemeral: true})
 		}
 		const banList = await guild.fetchBans();
@@ -22,21 +22,20 @@ module.exports.run = async (client, interaction) => {
 				return interaction.reply({content: `Пользователь не найден.`, ephemeral: true})
 			}
 		}
-		try {
-			guild.members.unban(bannedUser.user.id, {reason});
-		} catch (error) {
-			return interaction.reply({content: `Произошла ошибка при попытке разбана. Возможно, у меня недостаточно прав для выполнения этого действия.`, ephemeral: true})
-		}
-		if (interaction.options.getString('причина').length > 1) {
-			var reason = interaction.options.getString('причина')
-		} else {
-			var reason = `не указана`;
-		}
 		if (toUnban == interaction.member.user.id) {
 			return interaction.reply({content: `Вы не можете разбанить себя.`, ephemeral: true})
 		}
 		if (toUnban == client.user.id) {
 			return interaction.reply({content: `У вас недостаточно прав для выполнения данного действия.`, ephemeral: true})
+		}
+		try {
+			guild.bans.remove(bannedUser.user.id, `[ ${user.tag} ]: «${reason}»`);
+		} catch (error) {
+			return interaction.reply({content: `Произошла ошибка при попытке разбана. Возможно, у меня недостаточно прав для выполнения этого действия.`, ephemeral: true})
+		}
+		var reason = interaction.options.getString('причина')
+		if (!reason) {
+			var reason = `не указана`;
 		}
 		let usernames = toUnbanClientResolve.tag;
 		let unbanSuccess = new MessageEmbed()
@@ -53,11 +52,11 @@ module.exports.run = async (client, interaction) => {
 				let banMessage = new MessageEmbed()
 					.setColor(client.config.embedColor)
 					.setTitle(`Разбан: успешно`)
-					.addField(`Модератор:`, `${user.tag}`, true)
-					.addField(`Пользователь:`, `${usernames}`, true)
-					.addField(`Причина:`, `${reason}`, false)
+					.addField(`Модератор:`, user.tag, true)
+					.addField(`Пользователь:`, usernames, true)
+					.addField(`Причина:`, reason, false)
 					.setTimestamp()
-					.setFooter(`${user.tag}`, user.displayAvatarURL({dynamic: true}))
+					.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
 				const channel = await guild.channels.fetch(guilddb.logmsg_channel);
 				channel.send(banMessage);
 			}catch(error){

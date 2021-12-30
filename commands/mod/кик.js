@@ -12,7 +12,7 @@ module.exports.run = async (client, interaction) => {
 			return interaction.reply({content: `Произошла ошибка при получении данных.`, ephemeral: true})
 		}
 		let guilddb = await client.db.getGuild(interaction.guildId)
-		if ( !member.hasPermission('KICK_MEMBERS') ) {
+		if ( !member.permissions.has('KICK_MEMBERS') ) {
 			return interaction.reply({content: `У вас недостаточно прав для выполнения этой команды.`, ephemeral: true})
 		}
 		if(toKickResolve){
@@ -30,13 +30,12 @@ module.exports.run = async (client, interaction) => {
 		if (toKick == client.user.id) {
 			return interaction.reply({content: `У вас недостаточно прав для выполнения данного действия.`, ephemeral: true})
 		}
-		if (interaction.options.getString('причина').length > 1) {
-			var reason = interaction.options.getString('причина')
-		} else {
+		var reason = interaction.options.getString('причина')
+		if (!reason) {
 			var reason = `не указана`;
 		}
 		try{
-			guild.members.kick(toKick, {reason});
+			toKickResolve.kick(`[ ${user.tag} ]: «${reason}»`);
 		} catch(error) {
 			console.log(error)
 			return interaction.reply({content: `Произошла ошибка при попытке кика. Возможно, у меня недостаточно прав для выполнения этого действия.`, ephemeral: true})
@@ -57,11 +56,11 @@ module.exports.run = async (client, interaction) => {
 				let muteMessage = new MessageEmbed()
 				.setColor(`#b88fff`)
 				.setTitle("Кик: успешно")
-				.addField('Модератор:', `${user.tag}`, true)
-				.addField('Пользователь:', `${usernames}`, true)
-				.addField('Причина:', `${reason}`, false)
+				.addField('Модератор:', user.tag, true)
+				.addField('Пользователь:', usernames, true)
+				.addField('Причина:', reason, false)
 				.setTimestamp()
-				.setFooter(`${user.tag}`, user.displayAvatarURL({dynamic: true}));
+				.setFooter(user.tag, user.displayAvatarURL({dynamic: true}));
 				return channel.send(muteMessage);
 			} catch(error) {
 				client.db.changeGuild(interaction.guildId, 'logmsg_channel', '');

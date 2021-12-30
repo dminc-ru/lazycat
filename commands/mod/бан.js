@@ -1,5 +1,4 @@
 const { MessageEmbed } = require("discord.js");
-const fs = require("fs");
 module.exports.run = async (client, interaction) => {
 	try {
 		try {
@@ -10,7 +9,7 @@ module.exports.run = async (client, interaction) => {
 			return interaction.reply({content: `Произошла ошибка при получении данных.`, ephemeral: true})
 		}
 		let guilddb = await client.db.getGuild(interaction.guildId)
-		if (!member.hasPermission('BAN_MEMBERS')) {
+		if (!member.permissions.has('BAN_MEMBERS')) {
 			return interaction.reply({content: `У вас недостаточно прав для выполнения этой команды.`, ephemeral: true})
 		}
 		var banUser = interaction.options.getUser('участник');
@@ -33,24 +32,21 @@ module.exports.run = async (client, interaction) => {
 			if (banned.some((m) => m.user.id === banUser)) {
 				return interaction.reply({content: `Пользователь уже забанен.`, ephemeral: true})
 			}
-		if (interaction.options.getString('причина').length > 1) {
-			var reason = interaction.options.getString('причина')
-		} else {
+		var reason = interaction.options.getString('причина')
+		if (!reason) {
 			var reason = `не указана`
 		}
 		if (reason.length > 500) {
 			return interaction.reply({content: `Максимальное количество символов для причины — 500.`, ephemeral: true})
 		}
-		let usernames = banUserResolve.tag;
 		if (banUser == client.user.id) {
 			return interaction.reply({content: `У вас недостаточно прав для выполнения данного действия.`, ephemeral: true})
 		}
 		try {
-			banUserResolve.ban(reason);
+			banUserResolve.ban({reason: `[ ${user.tag} ]: «${reason}»`});
 		} catch (error) {
 			return interaction.reply({content: `Произошла ошибка при попытке бана. Возможно, у меня недостаточно прав для выполнения этого действия.`})
 		}
-		fs.writeFileSync(`${client.config.jsonPath}bans.json`, JSON.stringify(bans, null, "\t"));
 		let banMessage = new MessageEmbed()
 			.setColor(client.config.embedColor)
 			.setTitle('Бан: успешно')
@@ -65,11 +61,11 @@ module.exports.run = async (client, interaction) => {
 				let banMessage = new MessageEmbed()
 					.setColor("#b88fff")
 					.setTitle(`Бан: успешно`)
-					.addField(`Модератор:`, `${user.tag}`, true)
-					.addField(`Пользователь:`, `${banUserResolve.tag}`, true)
-					.addField(`Причина:`, `${reason}`, false)
+					.addField(`Модератор:`, user.tag, true)
+					.addField(`Пользователь:`, banUserResolve.tag, true)
+					.addField(`Причина:`, reason, false)
 					.setTimestamp()
-					.setFooter(`${user.tag}`, user.avatarURL())
+					.setFooter(user.tag, user.avatarURL())
 				const channel = guild.channels.fetch(guilddb.logmsg_channel);
 				channel.send(banMessage);
 			}catch(error){

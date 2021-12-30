@@ -8,7 +8,7 @@ module.exports = async (client, member) => {
 		const role = member.guild.roles.cache.find(role => role.id === guilddb.welcomeRole);
 		let reason = `Выдача приветственной роли (/стартроль)`
 		try{
-			member.roles.add(role, {reason});
+			member.roles.add(role, reason);
 		} catch(error) {
 			return;
 		}

@@ -13,11 +13,8 @@ module.exports.run = async (client, interaction) => {
 			interaction.reply({content: `Произошла ошибка при получении данных.`, ephemeral: true})
 		}
 		let guilddb = await client.db.getGuild(interaction.guildId)
-		if ( !member.hasPermission('MODERATE_MEMBERS') ) {
+		if ( !member.permissions.has('MODERATE_MEMBERS') ) {
 			return interaction.reply({content: `У вас недостаточно прав для выполнения этой команды.`, ephemeral: true})
-		}
-		if (muteUserResolve.communicationDisabledUntilTimestamp == null) {
-			return interaction.reply({content: `На этом сервере не установлена роль для мута. Обратитесь к администратору сервера.`, ephemeral: true})
 		}
 		let usernames = muteUserClientResolve.tag;
 		if (muteUserResolve) {
@@ -35,17 +32,16 @@ module.exports.run = async (client, interaction) => {
 		if (muteUser == client.user.id) {
 			return interaction.reply({content: `У вас недостаточно прав для выполнения этой команды.`, ephemeral: true})
 		}
-		if (interaction.options.getString('причина').length > 2) {
-			var reason = interaction.options.getString('причина')
-		} else {
-			var reason = `не указана`;
+		var reason = interaction.options.getString('причина')
+		if (!reason) {
+			reason = `не указана`
 		}
 		const mutetime = ms(interaction.options.getString('время'));
 		if (typeof mutetime === 'undefined') {
 			return interaction.reply({content: `Неправильный формат времени.`, ephemeral: true})
 		}
 		try {
-			muteUserResolve.communicationDisabledUntilTimestamp = Date.now() + mutetime
+			muteUserResolve.edit({ communicationDisabledUntil: Date.now() + mutetime }, `[ ${user.tag} ]: «${reason}»`)
 		} catch (error) {
 			return interaction.reply({content: `Произошла ошибка. Обратитесь на сервер поддержки.`, ephemeral: true})
 		}
@@ -64,10 +60,10 @@ module.exports.run = async (client, interaction) => {
 				let muteMessage = new MessageEmbed()
 					.setColor(`#b88fff`)
 					.setTitle("Мут: успешно")
-					.addField('Модератор:', `${user.tag}`, true)
-					.addField('Пользователь:', `${muteUserClientResolve.tag}`, true)
+					.addField('Модератор:', user.tag, true)
+					.addField('Пользователь:', muteUserClientResolve.tag, true)
 					.addField('Длительность:', `${ms(mutetime, {long: true})}`, false)
-					.addField('Причина:', `${reason}`, false)
+					.addField('Причина:', reason, false)
 					.setTimestamp()
 					.setFooter(`${user.tag}`, user.displayAvatarURL({dynamic: true}));
 				const channel = await guild.channels.fetch(guilddb.logmsg_channel);

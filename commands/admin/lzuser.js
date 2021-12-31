@@ -9,7 +9,7 @@ module.exports.run = async (client, message, args) => {
             .setTitle(`Ошибка`)
             .setDescription(`Пользователь не найден.`)
             .setTimestamp()
-            .setFooter(`${stats.version}`, client.user.avatarURL()) 
+            .setFooter({ text: `${stats.version}`, iconURL: client.user.avatarURL() }) 
         if (!args[0]) {
             return message.channel.send({embeds: [noInfo]})
         }
@@ -23,9 +23,10 @@ module.exports.run = async (client, message, args) => {
             return message.channel.send({embeds: [noInfo]});
         }
         var work = works.find(wrk => wrk.codename === userdb.work_current)
+        console.log(work)
         let userInfo = new MessageEmbed()
             .setColor(client.config.embedColor)
-            .setAuthor(user.tag, user.displayAvatarURL({dynamic: true}))
+            .setAuthor({ name: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
             .setTitle(`Информация о пользователе`)
             .addField(`Рыбок:`, `\`${userdb.balance_fish}\` ${client.emoji.fish}`, true)
             .addField(`Жучков:`, `\`${userdb.balance_bugs}\` ${client.emoji.bug}`, true)
@@ -37,9 +38,9 @@ module.exports.run = async (client, message, args) => {
             .addField(`Премиум:`, `\`${(userdb.premium_has == 0) ? `не активен` : `активен`}\``, true)
             .addField(`Действует до:`, `\`${(userdb.premium_until == '') ? `-` : moment(new Date(Number(userdb.premium_until))).locale('ru').endOf('day').fromNow()}\``, true)
             .addField(`Работа:`, `\`${(userdb.work_current == '') ? `не работает` : work.name}\``, false)
-            .addField(`Текущий ранг:`, `\`${work.ranks[userdb.work_rank].name} (${userdb.work_rank}/${work.ranks.length})\``, true)
-            .addField(`Количество XP:`, `\`${userdb.work_currentXP}/${work.ranks[userdb.work_rank + 1].requiredXP}\``, true)
-            .setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }))
+            .addField(`Текущий ранг:`, (work) ? `\`${work.ranks[userdb.work_rank].name} (${userdb.work_rank}/${work.ranks.length})\`` : `\`-\``, true)
+            .addField(`Количество XP:`, (work) ? `\`${userdb.work_currentXP}/${work.ranks[userdb.work_rank + 1].requiredXP}\`` : `\`-\``, true)
+            .setFooter({ text: message.author.tag, iconURL: message.author.displayAvatarURL({ dynamic: true }) })
             message.channel.send({embeds: [userInfo]});
     } catch (error) {
         client.logger.log(error, 'err')

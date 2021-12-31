@@ -33,7 +33,7 @@ module.exports.run = async (client, interaction) => {
 				.addField(`Команды`, `Открыть: /кейс <номер_кейса>
 				Купить кейсы: /магазин кейс <номер_кейса> <кол-во>`, true)
 				.setTimestamp()
-				.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+				.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 			return interaction.reply({embeds: [availableCases]})
 		}
 		if( (IDcase < 1) || (!cases[IDcase]) )
@@ -174,11 +174,12 @@ module.exports.run = async (client, interaction) => {
 			.addField(`Кейс`, cases[IDcase].name)
 			.setThumbnail(cases[IDcase].items[result].image)
 			.setTimestamp()
-			.setFooter(`${user.tag} • /инвентарь`, user.displayAvatarURL({dynamic: true}))
+			.setFooter({text: `${user.tag} • /инвентарь`, iconURL: user.displayAvatarURL({dynamic: true}) })
 		return interaction.reply({embeds: [newItem]})
 	} catch (error) {
 		client.logger.log(error, 'err')
 		console.error(error)
+		interaction.reply({content: `Произошла ошибка при выполнении команды.`, ephemeral: true})
 	}
 }
 module.exports.data = {

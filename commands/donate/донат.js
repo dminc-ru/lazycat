@@ -16,11 +16,12 @@ module.exports.run = async (client, interaction) => {
 			.setDescription(`Здесь вы можете материально поддержать разработку Lazy Cat. Спасибо!`)
 			.addField(`${client.emoji.da} Donation Alerts`, `[клик](${client.config.daLink})`)
 			.setTimestamp()
-			.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+			.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 		interaction.reply({embeds: [donateEmbed]})
 	} catch (error) {
 		client.logger.log(error, 'err')
 		console.error(error)
+		interaction.reply({content: `Произошла ошибка при выполнении команды.`, ephemeral: true})
 	}
 }
 

@@ -14,16 +14,17 @@ module.exports.run = async (client, interaction) => {
 		let userProfile = new MessageEmbed()
 			.setColor(client.config.embedColor)
 			.setTitle('Баланс')
-			.setAuthor(user.tag, user.displayAvatarURL({dynamic: true}))
+			.setAuthor({name: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 			.addField(`Рыбки:`, `${userdb.balance_fish} ${client.emoji.fish}`, true)
 			.addField(`Жучки:`, `${userdb.balance_bugs} ${client.emoji.bug}`, true)
 			.addField(`В банке:`, `${userdb.balance_bank} ${client.emoji.fish}`, false)
 			.setTimestamp()
-			.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+			.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 		interaction.reply({embeds: [userProfile]})
 	} catch(error) {
 		client.logger.log(error, 'err')
 		console.error(error)
+		interaction.reply({content: `Произошла ошибка при выполнении команды.`, ephemeral: true})
 	}
 }
 

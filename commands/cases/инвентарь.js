@@ -40,7 +40,7 @@ module.exports.run = async (client, interaction) => {
 				.setTitle(`Инвентарь ${user.tag}`)
 				.setDescription(inventorys)
 				.setTimestamp()
-				.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+				.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 			return interaction.reply({embeds: [inventoryEmbed]});
 		}
 		let number = 1;
@@ -63,7 +63,7 @@ module.exports.run = async (client, interaction) => {
 					.setTitle(`Инвентарь ${user.tag}`)
 					.setDescription(inventoryss)
 					.setTimestamp()
-					.setFooter(`${user.tag} • Страница 1/${pages}`, user.displayAvatarURL({dynamic: true}))
+					.setFooter({ text: `${user.tag} • Страница 1/${pages}`, iconURL: user.displayAvatarURL({dynamic: true}) })
 				return interaction.reply({embeds: [inventoryEmbed]})
 		}
 		let page = interaction.options.getInteger('страница')
@@ -88,7 +88,7 @@ module.exports.run = async (client, interaction) => {
 					.setTitle(`Инвентарь ${user.tag}`)
 					.setDescription(inventoryss)
 					.setTimestamp()
-					.setFooter(`${user.tag} • Страница ${page}/${pages}`, user.displayAvatarURL({dynamic: true}))
+					.setFooter({ text: `${user.tag} • Страница ${page}/${pages}`, iconURL: user.displayAvatarURL({dynamic: true}) })
 				return interaction.reply({embeds: [inventoryEmbed]})
 				}
 				i = 0;
@@ -107,12 +107,13 @@ module.exports.run = async (client, interaction) => {
 					.setTitle(`Инвентарь ${user.tag}`)
 					.setDescription(inventoryss)
 					.setTimestamp()
-					.setFooter(`${user.tag} • Страница ${page}/${pages}`, user.displayAvatarURL({dynamic: true}))
+					.setFooter({ text: `${user.tag} • Страница ${page}/${pages}`, iconURL: user.displayAvatarURL({dynamic: true}) })
 				return interaction.reply({embeds: [inventoryEmbed]})
 			}
 	} catch(error) {
 		client.logger.log(error, 'err')
 		console.error(error)
+		interaction.reply({content: `Произошла ошибка при выполнении команды.`, ephemeral: true})
 	}
 }
 

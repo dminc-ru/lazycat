@@ -1,5 +1,6 @@
 const { MessageEmbed } = require("discord.js"); 
 module.exports.run = async (client, interaction) => {
+	try {
 	let cases = require(`${client.config.jsonPath}cases.json`);
 	let inventory = require(`${client.config.jsonPath}inventory.json`);
 	let noUser = new MessageEmbed()
@@ -32,7 +33,7 @@ module.exports.run = async (client, interaction) => {
 			.addField(`Команды:`, `Открыть: /мегакейс <номер_кейса>
 			Инвентарь: /инвентарь`, true)
 			.setTimestamp()
-			.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+			.setFooter({text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 		return interaction.reply({embeds: [caseInfo]})
 	}
 	if( (IDcase < 1) || (!cases[IDcase]) ) 
@@ -173,7 +174,7 @@ module.exports.run = async (client, interaction) => {
 				.addField(`Кейс`, `${cases[IDcase].name}`)
 				.setThumbnail(`${cases[IDcase].items[result].image}`)
 				.setTimestamp()
-				.setFooter(`${user.tag} • /инвентарь`, user.displayAvatarURL({dynamic: true}));
+				.setFooter({ text: `${user.tag} • /инвентарь`, iconURL: user.displayAvatarURL({dynamic: true}) });
 				
 				setTimeout(() => {
 					interaction.followUp({embeds: [embedResult], ephemeral: true});
@@ -183,6 +184,11 @@ module.exports.run = async (client, interaction) => {
 		}
 		let fs = require("fs");
 		fs.writeFileSync(`${client.config.jsonPath}inventory.json`, JSON.stringify(inventory, null, "\t"));
+	} catch (error) {
+		client.logger.log(error, 'err')
+		console.error(error)
+		interaction.reply({content: `Произошла ошибка при выполнении команды.`, ephemeral: true})
+	}
 }
 module.exports.data = {
 	name: "мегакейс",

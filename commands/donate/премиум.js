@@ -1,6 +1,7 @@
-const { MessageEmbed } = require("discord.js"); 
+const { MessageEmbed, CommandInteractionOptionResolver } = require("discord.js"); 
 const QiwiBillPaymentsAPI = require('@qiwi/bill-payments-node-js-sdk');
 module.exports.run = async (client, message, args) => {
+	try {
 	/*
 	const qiwiApi = new QiwiBillPaymentsAPI(client.config.qiwiSecretKey);
 	if(args[0] == "купить"){
@@ -105,8 +106,13 @@ module.exports.run = async (client, message, args) => {
 			На данный момент покупка Премиум временно недоступна.\n
 			Ваш Премиум-статус: ${premiumStatus}`)
 			.setTimestamp()
-			.setFooter(`${message.author.tag}`, message.author.displayAvatarURL({dynamic: true}));
+			.setFooter({ text: `${message.author.tag}`, iconURL: message.author.displayAvatarURL({dynamic: true}) });
 		message.channel.send({embeds: [embed]});
+	} catch (error) {
+		client.logger.log(error, 'err')
+		console.error(error)
+		message.channel.send({ content: `Произошла ошибка при выполнении команды.`})
+	}
 }
 
 module.exports.data = {

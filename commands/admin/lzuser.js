@@ -45,6 +45,7 @@ module.exports.run = async (client, message, args) => {
     } catch (error) {
         client.logger.log(error, 'err')
         console.error(error)
+        message.channel.send(`Произошла ошибка при выполнении команды.`)
     }
 }
 

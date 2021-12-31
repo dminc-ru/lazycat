@@ -72,6 +72,7 @@ module.exports.run = async (client, interaction) => {
 	} catch (error) {
 		client.logger.log(error, 'err')
 		console.error(error)
+		interaction.reply({content: `Произошла ошибка при выполнении команды.`, ephemeral: true})
 	}
 }
 

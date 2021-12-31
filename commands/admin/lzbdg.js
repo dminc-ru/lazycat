@@ -14,7 +14,7 @@ module.exports.run = async (client, message, args) => {
 						.setTitle(`Значки: синтаксис`)
 						.setDescription(`\`/lzbdg create <код> <эмодзи> <название>|<описание>\``)
 						.setTimestamp()
-						.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
+						.setFooter({ text: message.author.tag, iconURL: message.author.displayAvatarURL({ dynamic: true }) });
 					message.channel.send({embeds: [noCodename]});
 					break;
 				}
@@ -34,7 +34,7 @@ module.exports.run = async (client, message, args) => {
 					.addField(`Значок`, `${args[2]} ${strings[0]}`, false)
 					.addField(`Описание`, `${strings[1]}`, false)
 					.setTimestamp()
-					.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
+					.setFooter({ text: message.author.tag, iconURL: message.author.displayAvatarURL({ dynamic: true }) });
 				message.channel.send({embeds: [createdBadge]});
 				break;
 			}
@@ -46,7 +46,7 @@ module.exports.run = async (client, message, args) => {
 						.setTitle(`Значки: синтаксис`)
 						.setDescription(`\`/lzbdg delete <код>\``)
 						.setTimestamp()
-						.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
+						.setFooter({ text: message.author.tag, iconURL: message.author.displayAvatarURL({ dynamic: true }) });
 					message.channel.send({embeds: [noCodename]});
 					break;
 				}
@@ -58,7 +58,7 @@ module.exports.run = async (client, message, args) => {
 							.setTitle(`Ошибка`)
 							.setDescription(`Этот значок не может быть удалён`)
 							.setTimestamp()
-							.setFooter(message.author.tag, message.author.displayAvatarURL({dynamic: true}))
+							.setFooter({ text: message.author.tag, iconURL: message.author.displayAvatarURL({dynamic: true}) })
 						message.channel.send({embeds: [manualErr]})
 						break
 					} 
@@ -68,7 +68,7 @@ module.exports.run = async (client, message, args) => {
 						.setColor(client.config.embedColor)
 						.setTitle(`Значок успешно удалён.`)
 						.setTimestamp()
-						.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
+						.setFooter({ text: message.author.tag, iconURL: message.author.displayAvatarURL({ dynamic: true }) });
 					message.channel.send({embeds: [deletedBadge]});
 					break;
 				}else{
@@ -76,7 +76,7 @@ module.exports.run = async (client, message, args) => {
 						.setColor(client.config.embedColor)
 						.setTitle(`Значка не существует.`)
 						.setTimestamp()
-						.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
+						.setFooter({ text: message.author.tag, iconURL: message.author.displayAvatarURL({ dynamic: true }) });
 					message.channel.send({embeds: [deletedBadge]});
 					break;
 				}
@@ -89,7 +89,7 @@ module.exports.run = async (client, message, args) => {
 						.setTitle(`Значки: синтаксис`)
 						.setDescription(`\`/lzbdg info <код>\``)
 						.setTimestamp()
-						.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
+						.setFooter({ text: message.author.tag, iconURL: message.author.displayAvatarURL({ dynamic: true }) });
 					message.channel.send({embeds: [noCodename]});
 					break;
 				};
@@ -103,7 +103,7 @@ module.exports.run = async (client, message, args) => {
 						.addField(`Доступен?`, `${(bdg.manualGiveaway) ? `да` : `нет`}`, true)
 						.addField(`Описание`, `${bdg.description}`, false)
 						.setTimestamp()
-						.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
+						.setFooter({ text: message.author.tag, iconURL: message.author.displayAvatarURL({ dynamic: true }) });
 					message.channel.send({embeds: [fetchedBadge]});
 					break;
 				}catch(error){
@@ -121,7 +121,7 @@ module.exports.run = async (client, message, args) => {
 					.addField(`Значок`, `${args[2]} ${strings[0]}`, false)
 					.addField(`Описание`, `${strings[1]}`, false)
 					.setTimestamp()
-					.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
+					.setFooter({ text: message.author.tag, iconURL: message.author.displayAvatarURL({ dynamic: true }) });
 				message.channel.send({embeds: [testBadge]});
 				break;
 			}
@@ -140,7 +140,7 @@ module.exports.run = async (client, message, args) => {
 					.setTitle(`Значки: список`)
 					.setDescription(`${list.join(`\n`)}`)
 					.setTimestamp()
-					.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
+					.setFooter({ text: message.author.tag, iconURL: message.author.displayAvatarURL({ dynamic: true }) });
 				message.channel.send({embeds: [noCodename]});
 				break;
 			}
@@ -151,7 +151,7 @@ module.exports.run = async (client, message, args) => {
 					.setTitle("Ошибка")
 					.setDescription(`Пользователь не найден.`)
 					.setTimestamp()
-					.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
+					.setFooter({ text: message.author.tag, iconURL: message.author.displayAvatarURL({ dynamic: true }) });
 				let user = message.mentions.users.first();
 				let membermention;
 				if (user) {
@@ -162,7 +162,7 @@ module.exports.run = async (client, message, args) => {
 						.setTitle(`Ошибка`)
 						.setDescription(`Значок не зарегистрирован.`)
 						.setTimestamp()
-						.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
+						.setFooter({ text: message.author.tag, iconURL: message.author.displayAvatarURL({ dynamic: true }) });
 					if(typeof found === 'undefined') {
 						message.channel.send({embeds: [noBadge]});
 						break;
@@ -177,7 +177,7 @@ module.exports.run = async (client, message, args) => {
 						.setTitle(`Ошибка`)
 						.setDescription(`Этот значок не доступен для выдачи.`)
 						.setTimestamp()
-						.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
+						.setFooter({ text: message.author.tag, iconURL: message.author.displayAvatarURL({ dynamic: true }) });
 					if (found.manualGiveaway == false) {
 						message.channel.send({embeds: [notAvailable]})
 						break;
@@ -197,7 +197,7 @@ module.exports.run = async (client, message, args) => {
 								.setTitle(`Успешно`)
 								.setDescription(`Значок \`${args[2]}\` добавлен пользователю.`)
 								.setTimestamp()
-								.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
+								.setFooter({ text: message.author.tag, iconURL: message.author.displayAvatarURL({ dynamic: true }) });
 						message.channel.send({embeds: [Success]});
 						break;
 					}else{
@@ -206,7 +206,7 @@ module.exports.run = async (client, message, args) => {
 							.setTitle(`Ошибка`)
 							.setDescription(`Пользователь уже имеет значок.`)
 							.setTimestamp()
-							.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
+							.setFooter({ text: message.author.tag, iconURL: message.author.displayAvatarURL({ dynamic: true }) });
 						message.channel.send({embeds: [alreadyHas]});
 						break;
 					}
@@ -224,7 +224,7 @@ module.exports.run = async (client, message, args) => {
 							.setTitle(`Ошибка`)
 							.setDescription(`Значок не зарегистрирован.`)
 							.setTimestamp()
-							.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
+							.setFooter({ text: message.author.tag, iconURL: message.author.displayAvatarURL({ dynamic: true }) });
 						if(typeof found === 'undefined') {
 							message.channel.send(noBadge);
 							break;
@@ -232,9 +232,9 @@ module.exports.run = async (client, message, args) => {
 						let notAvailable = new MessageEmbed()
 							.setColor(client.config.embedColor)
 							.setTitle(`Ошибка`)
-							.setDescription(`Этот значок не доступен для удаления.`)
+							.setDescription(`Этот значок не доступен для выдачи.`)
 							.setTimestamp()
-							.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
+							.setFooter({ text: message.author.tag, iconURL: message.author.displayAvatarURL({ dynamic: true }) });
 						if (found.manualGiveaway == false) {
 							message.channel.send({embeds: [notAvailable]})
 							break
@@ -243,18 +243,18 @@ module.exports.run = async (client, message, args) => {
 							let currentBadges = member.badges;
 							if(currentBadges.length == 0) {
 								let stroka = `${args[2]},`
-								client.db.changeUser(membermention.id, 'badges', stroka)
+								client.db.changeUser(member.discord_id, 'badges', stroka)
 							}
 							else {
 								let stroka = `${currentBadges}${args[2]},`
-								client.db.changeUser(membermention.id, 'badges', stroka);
+								client.db.changeUser(member.discord_id, 'badges', stroka);
 							}
 							let Success = new MessageEmbed()
 								.setColor(client.config.embedColor)
 								.setTitle(`Успешно`)
 								.setDescription(`Значок \`${args[2]}\` добавлен пользователю.`)
 								.setTimestamp()
-								.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
+								.setFooter({ text: message.author.tag, iconURL: message.author.displayAvatarURL({ dynamic: true }) });
 							message.channel.send({embeds: [Success]});
 							break;
 						}else{
@@ -263,12 +263,14 @@ module.exports.run = async (client, message, args) => {
 								.setTitle(`Ошибка`)
 								.setDescription(`Пользователь уже имеет значок.`)
 								.setTimestamp()
-								.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
+								.setFooter({ text: message.author.tag, iconURL: message.author.displayAvatarURL({ dynamic: true }) });
 							message.channel.send({embeds: [alreadyHas]});
 							break;
 						}
 					}catch (error) {
-						return message.channel.send({embeds: [noUser]});
+						client.logger.log(error, 'err')
+						console.error(error)
+						return message.channel.send({content: `Произошла ошибка при выполнении команды.`, ephemeral: true});
 					}
 				}
 			}
@@ -278,7 +280,7 @@ module.exports.run = async (client, message, args) => {
 					.setTitle("Ошибка")
 					.setDescription(`Пользователь не найден.`)
 					.setTimestamp()
-					.setFooter(`${stats.version}`, client.user.avatarURL());
+					.setFooter({ text: `${stats.version}`, iconURL: client.user.avatarURL() });
 				let user = message.mentions.users.first();
 				let membermention;
 				if (user) {
@@ -289,7 +291,7 @@ module.exports.run = async (client, message, args) => {
 						.setTitle(`Ошибка`)
 						.setDescription(`Значок не зарегистрирован.`)
 						.setTimestamp()
-						.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
+						.setFooter({ text: message.author.tag, iconURL: message.author.displayAvatarURL({ dynamic: true }) });
 					if(typeof found === 'undefined'){ 
 						message.channel.send(noBadge);
 						break;
@@ -304,7 +306,7 @@ module.exports.run = async (client, message, args) => {
 						.setTitle(`Ошибка`)
 						.setDescription(`Этот значок не доступен для удаления.`)
 						.setTimestamp()
-						.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
+						.setFooter({ text: message.author.tag, iconURL: message.author.displayAvatarURL({ dynamic: true }) });
 					if (found.manualGiveaway == false) {
 						message.channel.send({embeds: [notAvailable]})
 						break
@@ -318,7 +320,7 @@ module.exports.run = async (client, message, args) => {
 							.setTitle(`Успешно`)
 							.setDescription(`Значок \`${args[2]}\` удалён у пользователя.`)
 							.setTimestamp()
-							.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
+							.setFooter({ text: message.author.tag, iconURL: message.author.displayAvatarURL({ dynamic: true }) });
 						message.channel.send({embeds: [Success]});
 						break;
 					}else{
@@ -327,7 +329,7 @@ module.exports.run = async (client, message, args) => {
 							.setTitle(`Ошибка`)
 							.setDescription(`Пользователь не обладает этим значком.`)
 							.setTimestamp()
-							.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
+							.setFooter({ text: message.author.tag, iconURL: message.author.displayAvatarURL({ dynamic: true }) });
 						message.channel.send({embeds: [alreadyHas]});
 						break;
 					}
@@ -345,7 +347,7 @@ module.exports.run = async (client, message, args) => {
 							.setTitle(`Ошибка`)
 							.setDescription(`Значок не зарегистрирован.`)
 							.setTimestamp()
-							.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
+							.setFooter({ text: message.author.tag, iconURL: message.author.displayAvatarURL({ dynamic: true }) });
 						if(typeof found === 'undefined') {
 							message.channel.send({embeds: [noBadge]});
 							break;
@@ -355,7 +357,7 @@ module.exports.run = async (client, message, args) => {
 							.setTitle(`Ошибка`)
 							.setDescription(`Этот значок не доступен для удаления.`)
 							.setTimestamp()
-							.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
+							.setFooter({ text: message.author.tag, iconURL: message.author.displayAvatarURL({ dynamic: true }) });
 						if (found.manualGiveaway == false) {
 							message.channel.send({embeds: [notAvailable]})
 							break
@@ -363,13 +365,13 @@ module.exports.run = async (client, message, args) => {
 						if(member.badges.includes(args[2])){
 							let currentBadges = member.badges;
 							let newBadges = currentBadges.replace(`${args[2]},`, '');
-							client.db.changeUser(membermention.id, 'badges', newBadges);
+							client.db.changeUser(member.discord_id, 'badges', newBadges);
 							let Success = new MessageEmbed()
 								.setColor(client.config.embedColor)
 								.setTitle(`Успешно`)
 								.setDescription(`Значок \`${args[2]}\` удалён у пользователя.`)
 								.setTimestamp()
-								.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
+								.setFooter({ text: message.author.tag, iconURL: message.author.displayAvatarURL({ dynamic: true }) });
 							message.channel.send({embeds: [Success]});
 							break;
 						}else{
@@ -378,7 +380,7 @@ module.exports.run = async (client, message, args) => {
 								.setTitle(`Ошибка`)
 								.setDescription(`Пользователь не обладает этим значком.`)
 								.setTimestamp()
-								.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
+								.setFooter({ text: message.author.tag, iconURL: message.author.displayAvatarURL({ dynamic: true }) });
 							message.channel.send({embeds: [alreadyHas]});
 							break;
 						}
@@ -399,7 +401,7 @@ module.exports.run = async (client, message, args) => {
 						\`add <@User> <код>\` — добавить значок пользователю 
 						\`remove <@User> <код>\` — удалить значок у пользователя`, false)
 					.setTimestamp()
-					.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
+					.setFooter({ text: message.author.tag, iconURL: message.author.displayAvatarURL({ dynamic: true }) });
 				message.channel.send({embeds: [Syntax]});
 				break;
 			}

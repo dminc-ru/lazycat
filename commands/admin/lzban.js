@@ -37,7 +37,7 @@ module.exports.run = async (client, message, args) => {
 			.addField(`Срок`, `навсегда`, false)
 			.addField(`Пользователь`, `${user.tag}`, true)
 			.addField(`Модератор`, `${message.author.tag}`, true)
-			.setFooter(`User ID: ${user.id} • Moderator ID: ${message.author.id}`);
+			.setFooter({ text: `User ID: ${user.id} • Moderator ID: ${message.author.id}` });
 		webhookBan.send({embeds: [newBan]});
 		let lazyBanUser = new MessageEmbed()
 			.setColor(client.config.embedColor)

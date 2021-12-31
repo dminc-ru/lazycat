@@ -15,7 +15,7 @@ module.exports.run = async (client, message, args) => {
 		.addField(`Скорость CPU`, `\`\`\`${(os.cpus()[0].speed / 1000).toFixed(2)} GHz\`\`\``, true)
 		.addField(`Модель CPU:`, `\`\`\`${os.cpus()[0].model}\`\`\``, false)
 		.setTimestamp()
-		.setFooter(`${stats.version}`, client.user.avatarURL());
+		.setFooter({ text: `${stats.version}`, iconURL: client.user.avatarURL() });
     message.channel.send({embeds: [pongEmbed]});
 }
 module.exports.data = {

@@ -35,7 +35,7 @@ module.exports.run = async (client, message, args) => {
 		.addField(`Причина`, `${reasonUnban}`, false)
 		.addField(`Пользователь`, `${user.tag}`, true)
 		.addField(`Модератор`, `${message.author.tag}`, true)
-		.setFooter(`User ID: ${user.id} • Moderator ID: ${message.author.id}`)
+		.setFooter({ text: `User ID: ${user.id} • Moderator ID: ${message.author.id}` })
 	webhookBan.send({embeds: [newUnban]});
 	let lazyUnbanUser = new MessageEmbed()
 		.setColor(client.config.embedColor)

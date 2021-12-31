@@ -44,7 +44,7 @@ module.exports.run = async (client, interaction) => {
 	if(balances > 0){
 		inventory[interaction.member.user.id].cases[memIndex].megaCount = balances - 1;
 		let fs = require('fs');
-		fs.writeFileSync(`${process.env.PATHTOBASE}/inventory.json`, JSON.stringify(inventory, null, "\t"));
+		fs.writeFileSync(`${client.config.jsonPath}/inventory.json`, JSON.stringify(inventory, null, "\t"));
 	}else{
 		return interaction.reply({content: "У вас нет мегакейсов.", ephemeral: true})
 	}

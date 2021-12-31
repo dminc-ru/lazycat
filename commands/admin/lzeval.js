@@ -21,7 +21,7 @@ module.exports.run = async (client, message, args) => {
 			.setColor(client.config.embedColor)
 			.addField(':inbox_tray: Input:', `\`\`\`js\n${beautify(code)}\n\`\`\``, false)
 			.addField(':outbox_tray: Output:', `\`\`\`js\n${output}\n\`\`\``, false)
-			.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
+			.setFooter({ text: message.author.tag, iconURL: message.author.displayAvatarURL({ dynamic: true }) });
       	message.channel.send({embeds: [embedEval]});
 	}).catch((err) => {
 		err = err.toString()
@@ -43,7 +43,7 @@ module.exports.run = async (client, message, args) => {
 			.setColor(client.config.embedColor)
 			.addField(':inbox_tray: Input:', `\`\`\`js\n${beautify(code)}\n\`\`\``, false)
 			.addField(':outbox_tray: Output:', `\`\`\`js\n${err}\n\`\`\``, false)
-			.setFooter(message.author.tag, message.author.displayAvatarURL({ dynamic: true }));
+			.setFooter({ text: message.author.tag, iconURL: message.author.displayAvatarURL({ dynamic: true }) });
       	message.channel.send({embeds: [embedEvalErr]});
 	})
 }

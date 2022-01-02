@@ -12,11 +12,6 @@ module.exports.run = async (client, interaction) => {
 			return message.channel.send({embeds: [noUser]})
 		}
 		let userdb = await client.db.getUser(interaction.member.user.id)
-		try {
-			var channel = await client.channels.fetch(interaction.channelId);
-		} catch (error) {
-			return interaction.reply({content: 'Не могу получить доступ к текстовому каналу.', ephemeral: true})
-		}
 		let firstNumber;
 		let secondNumber;
 		firstNumber = Math.floor(Math.random() * 10);
@@ -32,55 +27,62 @@ module.exports.run = async (client, interaction) => {
 			.setTitle('Пример')
 			.setDescription(`**${Number(firstNumber) < 0 ? `(${firstNumber})` : firstNumber} ${signs[sign]} ${Number(secondNumber) < 0 ? `(${secondNumber})` : secondNumber}**`)
 			.setTimestamp()
-			.setFooter(`${user.tag} • На размышление 1 минута. Отправьте сообщение только с числом.`, user.displayAvatarURL({dynamic: true}))
+			.setFooter({ text: `${user.tag} • На размышление 1 минута. Отправьте сообщение только с числом.`, iconURL: user.displayAvatarURL({dynamic: true}) })
 		await interaction.reply({embeds: [problemEmbed]})
 		let response;
-		try {
-			response = await channel.awaitMessages((message2) => interaction.member.user.id === message2.author.id, {
-				max: 1,
-				time: 60000,
-				errors: ['time']
-			});
-		} catch (error){
-			client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_fish - 30))
-			let timeOut = new MessageEmbed()
-				.setColor(client.config.embedColor)
-				.setTitle('Пример: ошибка')
-				.setDescription(`Время истекло. Списано 30 ${client.emoji.fish}. Новый пример: /пример`)
-				.setTimestamp()
-				.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
-			return interaction.editReply({embeds: [timeOut]})
-		}
+		const filter = message => message.author.id === interaction.member.user.id;
+		const collector = interaction.channel.createMessageCollector({ filter, max: 1, time: 60000 });
+		var answered = false;
 		const mathCalculation = await math.eval(`${firstNumber} ${signs[sign]} ${secondNumber}`);
 		function randomMath(min, max) {
 			let rand = min - 0.5 + Math.random() * (max - min + 1);
 			return Math.round(rand);
 		}
-		if (mathCalculation === Number(response.first().content)) {
-			let wonPrize = randomMath(25, 50);
-			if(userdb.math_level < 250000)
-				client.db.changeUser(interaction.member.user.id, 'math_level', (userdb.mathlevel + 1))
-			client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_fish + wonPrize))
-			let winEmbed = new MessageEmbed()
-				.setColor(client.config.embedColor)
-				.setTitle('Пример: успешно')
-				.setDescription(`Правильное решение! Ты заработал ${wonPrize} ${client.emoji.fish}`)
-				.setTimestamp()
-				.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
-			return interaction.editReply({embeds: [winEmbed]})
-		}
-		else{
-			if(userdb.balance_fish > 30){
-				client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_fish - 30))
+		collector.on('collect', async m => {
+			if (mathCalculation === Number(m.content)) {
+				let wonPrize = randomMath(25, 50);
+				if(userdb.math_level < 250000)
+					client.db.changeUser(interaction.member.user.id, 'math_level', (userdb.math_level + 1))
+				client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_fish + wonPrize))
+				let winEmbed = new MessageEmbed()
+					.setColor(client.config.embedColor)
+					.setTitle('Пример: успешно')
+					.setDescription(`Правильное решение! Ты заработал ${wonPrize} ${client.emoji.fish}`)
+					.setTimestamp()
+					.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+				interaction.editReply({embeds: [winEmbed]})
 			}
-			let errorEmbed = new MessageEmbed()
-				.setColor(client.config.embedColor)
-				.setTitle('Пример: ошибка')
-				.setDescription(`Неправильное решение. Списано 30 ${client.emoji.fish}. Новый пример: /пример`)
-				.setTimestamp()
-				.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
-			return interaction.editReply({embeds: [errorEmbed]})
-		}
+			else{
+				if(userdb.balance_fish > 30){
+					client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_fish - 30))
+				}
+				let errorEmbed = new MessageEmbed()
+					.setColor(client.config.embedColor)
+					.setTitle('Пример: ошибка')
+					.setDescription(`Неправильное решение. Списано 30 ${client.emoji.fish}. Новый пример: /пример`)
+					.setTimestamp()
+					.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+				interaction.editReply({embeds: [errorEmbed]})
+			}
+			answered = true
+			return collector.stop()
+		})
+		collector.on('end', collected => {
+			if (!answered) {
+				client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_fish - 30))
+				client.db.changeUser(interaction.member.user.id, 'math_level', (userdb.math_level - 1))
+				let timeOut = new MessageEmbed()
+					.setColor(client.config.embedColor)
+					.setTitle('Пример: ошибка')
+					.setDescription(`Время истекло. Списано 30 ${client.emoji.fish}. Новый пример: /пример`)
+					.setTimestamp()
+					.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+				return interaction.editReply({embeds: [timeOut]})
+			} else {
+				return
+			}
+		})
+		
 	} catch (error) {
 		client.logger.log(error)
 		console.error(error)

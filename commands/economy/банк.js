@@ -30,7 +30,7 @@ module.exports.run = async (client, interaction) => {
 				.setTitle('Транзакция')
 				.setDescription(`Успешно! На ваш счёт зачислено ${money} ${client.emoji.fish}`)
 				.setTimestamp()
-				.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+				.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 			return interaction.reply({embeds: [successEmbed]})
 		}
 		
@@ -49,7 +49,7 @@ module.exports.run = async (client, interaction) => {
 				.setTitle('Транзакция')
 				.setDescription(`Успешно! Вы сняли ${money} ${client.emoji.fish} с вашего счёта.`)
 				.setTimestamp()
-				.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+				.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 			return interaction.reply({embeds: [successEmbed]})
 		}
 		
@@ -67,17 +67,8 @@ module.exports.run = async (client, interaction) => {
 			generatedCode += secondNumber;
 			let thirdNumber = randomBank(1, 9);
 			generatedCode += thirdNumber;
-			let fourthNumber = randomBank(1, 5);
-			if(fourthNumber == 1)
-				var guessNumber = "1"
-			else if(fourthNumber == 2)
-				var guessNumber = "2"
-			else if(fourthNumber == 3)
-				var guessNumber = "3"
-			else if(fourthNumber == 4)
-				var guessNumber = "4"
-			else if(fourthNumber == 5)
-				var guessNumber = "5"
+			let fourthNumber = randomBank(1, 9);
+			var guessNumber = String(fourthNumber)
 			generatedCode += "[]"
 			let fiveNumber = randomBank(1, 9);
 			generatedCode += fiveNumber;
@@ -88,26 +79,13 @@ module.exports.run = async (client, interaction) => {
 				\`${generatedCode}\`
 				Угадайте цифру кода.`)
 				.setTimestamp()
-				.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+				.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 			interaction.reply({embeds: [robberyEmbed]})
-			let response;
-			try {
-				response = await channel.awaitMessages((message2) => interaction.member.user.id === message2.author.id, {
-					max: 1,
-					time: 60000,
-					errors: ['time']
-				});
-			}catch(error){
-				let failEmbed = new MessageEmbed()
-					.setColor(client.config.embedColor)
-					.setTitle('Банк: ограбление')
-					.setDescription(`Сработала сигнализация! Вы смогли убежать от охраны этого банка.`)
-					.setTimestamp()
-					.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
-				return interaction.editReply({embeds: [failEmbed]})
-			}
-			if(response.first().content == 1 || response.first().content == 2 || response.first().content == 3 || response.first().content == 4 || response.first().content == 5){
-				if (response.first().content === `${guessNumber}`) {
+			const filter = message => message.author.id === interaction.member.user.id;
+			const collector = interaction.channel.createMessageCollector({ filter, max: 1, time: 10000 });
+			var answered = false;
+			collector.on('collect', async m => {
+				if (m.content == guessNumber) {
 					let reward = randomBank(150, 200);
 					userdb = await client.db.getUser(interaction.member.user.id)
 					client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_fish + reward))
@@ -116,18 +94,34 @@ module.exports.run = async (client, interaction) => {
 						.setTitle(`Банк: ограбление`)
 						.setDescription(`Код введён. Хранилище открылось! Вы забрали ${reward} ${client.emoji.fish}`)
 						.setTimestamp()
-						.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
-					return interaction.editReply({embeds: [successEmbed]})
+						.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+					interaction.editReply({embeds: [successEmbed]})
+					answered = true
+					return collector.stop()
 				} else {
 					let failEmbed = new MessageEmbed()
 						.setColor(client.config.embedColor)
 						.setTitle('Банк: ограбление')
 						.setDescription(`Код введён. Сработала сигнализация! Вы смогли убежать от охраны этого банка.`)
 						.setTimestamp()
-						.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
-					return interaction.editReply({embeds: [failEmbed]})
+						.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+					interaction.editReply({embeds: [failEmbed]})
+					answered = true
+					return collector.stop()
 				}
-			}				
+			});
+
+			collector.on('end', collected => {
+				if (!answered) {
+					let failEmbed = new MessageEmbed()
+						.setColor(client.config.embedColor)
+						.setTitle('Банк: ограбление')
+						.setDescription(`Пока вы думали, вас заметила охрана этого банка. Вы смогли убежать.`)
+						.setTimestamp()
+						.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+					return interaction.editReply({embeds: [failEmbed]})
+				} else return
+			});	
 		}
 	} catch (error) {
 		client.logger.log(error, 'err')

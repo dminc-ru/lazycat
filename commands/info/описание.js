@@ -38,7 +38,7 @@ module.exports.run = async (client, interaction) => {
 			.setTitle('Успешно')
 			.setDescription('Описание изменено.')
 			.setTimestamp()
-			.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+			.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 		return interaction.reply({embeds: [successEmbed]})
 	} catch (error) {
 		client.logger.log(error, 'err')

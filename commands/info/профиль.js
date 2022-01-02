@@ -31,14 +31,14 @@ module.exports.run = async (client, interaction) => {
 			let profileEmbed = new MessageEmbed()
 				.setColor(client.config.embedColor)
 				.setTitle('Профиль')
-				.setAuthor(user.tag, user.displayAvatarURL({dynamic: true}))
+				.setAuthor({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 				.setDescription(`**Описание:** ${userdb.description}`)
 				.addField('Баланс', `${userdb.balance_fish} ${client.emoji.fish}`, true)
 				.addField('В банке:', `${userdb.balance_bank} ${client.emoji.fish}`, true)
 				.addField('Жучков:', `${userdb.balance_bugs} ${client.emoji.bug}`, true)
 				.addField('Значки:', `${badgess.join('\n')}`, false)
 				.setTimestamp()
-				.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+				.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 			return interaction.reply({embeds: [profileEmbed]})
 		}
 		else {
@@ -57,14 +57,14 @@ module.exports.run = async (client, interaction) => {
 			let profileEmbed = new MessageEmbed()
 				.setColor(client.config.embedColor)
 				.setTitle('Профиль')
-				.setAuthor(memberProfile.tag, memberProfile.displayAvatarURL({dynamic: true}))
+				.setAuthor({ name: memberProfile.tag, iconURL: memberProfile.displayAvatarURL({dynamic: true}) })
 				.setDescription(`**Описание:** ${memberdb.description}`)
 				.addField('Баланс', `${memberdb.balance_fish} ${client.emoji.fish}`, true)
 				.addField('В банке:', `${memberdb.balance_bank} ${client.emoji.fish}`, true)
 				.addField('Жучков:', `${memberdb.balance_bugs} ${client.emoji.bug}`, true)
 				.addField('Значки:', `${badgess.join('\n')}`, false)
 				.setTimestamp()
-				.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+				.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 			return interaction.reply({embeds: [profileEmbed]})
 		}
 	} catch (error) {

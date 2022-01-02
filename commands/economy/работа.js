@@ -13,11 +13,6 @@ module.exports.run = async (client, interaction) => {
 		    return interaction.reply({embeds: [noUser], ephemeral: true})
 	    }
         let userdb = await client.db.getUser(interaction.member.user.id)
-        try {
-			var channel = await client.channels.fetch(interaction.channelId);
-		} catch (error) {
-			return interaction.reply({content: 'Не могу получить доступ к текстовому каналу.', ephemeral: true})
-		}
 	    var whattoDo = interaction.options.getSubcommand();
         switch (whattoDo) {
             case 'список': {

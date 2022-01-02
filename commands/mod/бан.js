@@ -13,13 +13,13 @@ module.exports.run = async (client, interaction) => {
 			return interaction.reply({content: `У вас недостаточно прав для выполнения этой команды.`, ephemeral: true})
 		}
 		var banUser = interaction.options.getUser('участник');
-		var banUserResolve = guild.members.fetch(banUser);
+		var banUserResolve = await guild.members.fetch(banUser);
 		if (!banUserResolve) {
 			return interaction.reply({content: `Пользователь не найден.`, ephemeral: true})
 		}
-		const memberPosition = banUserResolve.roles.highest.position;
-		const moderationPosition = member.roles.highest.position;
-		if (guild.owner.user.id != banUser && moderationPosition < memberPosition) {
+		const memberPosition = banUserResolve.guild.roles.highest.position;
+		const moderationPosition = member.guild.roles.highest.position;
+		if (guild.ownerId != banUser && moderationPosition < memberPosition) {
 			return interaction.reply({content: `У вас недостаточно прав для выполнения этой команды.`, ephemeral: true})
 		}
 		if (!banUserResolve.bannable) {
@@ -28,7 +28,7 @@ module.exports.run = async (client, interaction) => {
 		if (banUser == interaction.member.user.id) {
 			return interaction.reply({content: `Вы не можете забанить себя.`, ephemeral: true})
 		}
-		const banned = await guild.fetchBans();
+		const banned = await guild.bans.fetch();
 			if (banned.some((m) => m.user.id === banUser)) {
 				return interaction.reply({content: `Пользователь уже забанен.`, ephemeral: true})
 			}
@@ -50,22 +50,22 @@ module.exports.run = async (client, interaction) => {
 		let banMessage = new MessageEmbed()
 			.setColor(client.config.embedColor)
 			.setTitle('Бан: успешно')
-			.addField(`Модератор:`, user.tag, true)
-			.addField(`Пользователь:`, banUserResolve.tag, true)
+			.addField(`Модератор:`, `${user.tag}`, true)
+			.addField(`Пользователь:`, `${banUserResolve.user.tag}`, true)
 			.addField(`Причина:`, reason, false)
 			.setTimestamp()
-			.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+			.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 		interaction.reply({embeds: [banMessage]})
 		if(guilddb.logmsg_channel != ""){
 			try{
 				let banMessage = new MessageEmbed()
 					.setColor("#b88fff")
 					.setTitle(`Бан: успешно`)
-					.addField(`Модератор:`, user.tag, true)
-					.addField(`Пользователь:`, banUserResolve.tag, true)
-					.addField(`Причина:`, reason, false)
+					.addField(`Модератор:`, `${user.tag}`, true)
+					.addField(`Пользователь:`, `${banUserResolve.user.tag}`, true)
+					.addField(`Причина:`, `${reason}`, false)
 					.setTimestamp()
-					.setFooter(user.tag, user.avatarURL())
+					.setFooter({ text: user.tag, iconURL: user.avatarURL() })
 				const channel = guild.channels.fetch(guilddb.logmsg_channel);
 				channel.send(banMessage);
 			}catch(error){

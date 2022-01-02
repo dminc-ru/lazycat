@@ -26,7 +26,7 @@ module.exports.run = async (client, interaction) => {
 				[Условия использования](${client.config.termsLink})
 				[Политика конфиденциальности](${client.config.privacyLink})`)
 			.setTimestamp()
-			.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+			.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 		interaction.reply({embeds: [infoEmbed]})
 	} catch (error) {
 		client.logger.log(error, 'err')

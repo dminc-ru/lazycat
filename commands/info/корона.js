@@ -22,7 +22,7 @@ module.exports.run = async (client, interaction) => {
 				.addField('Сегодня заразилось:', coronavirus.todayCases.toLocaleString(), true)
 				.addField('Сегодня умерло:', coronavirus.todayDeaths.toLocaleString(), true)
 				.setTimestamp()
-				.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+				.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 			interaction.reply({embeds: [coronaEmbed]})
 		});
 	} catch (error) {

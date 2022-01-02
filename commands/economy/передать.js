@@ -11,7 +11,7 @@ module.exports.run = async (client, interaction) => {
 			return interaction.reply({embeds: [noUser], ephemeral: true})
 		}
 		let userdb = await client.db.getUser(interaction.member.user.id)
-		let memberdb = await client.db.getUser(interaction.options.getUser('участник'));
+		let memberdb = await client.db.getUser(interaction.options.getUser('участник').id);
 		var money = interaction.options.getInteger('количество');
 		if(interaction.member.user.id == memberdb.discord_id)
 			return interaction.reply({content: "Вы не можете передать рыбки самому себе.", ephemeral: true})

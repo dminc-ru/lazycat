@@ -23,7 +23,6 @@ module.exports.run = async (client, message, args) => {
             return message.channel.send({embeds: [noInfo]});
         }
         var work = works.find(wrk => wrk.codename === userdb.work_current)
-        console.log(work)
         let userInfo = new MessageEmbed()
             .setColor(client.config.embedColor)
             .setAuthor({ name: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })

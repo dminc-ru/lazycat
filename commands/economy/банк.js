@@ -42,8 +42,8 @@ module.exports.run = async (client, interaction) => {
 				return interaction.reply({content: `Укажите корректное количество ${client.emoji.fish}`, ephemeral: true})
 			if(userdb.balance_bank < money)
 				return interaction.reply({content: `У вас недостаточно средств.`, ephemeral: true})
-			client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_bank - money))
-			client.db.changeUser(interaction.member.user.id, 'balance_bank', (userdb.balance_fish + money))
+			client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_fish + money))
+			client.db.changeUser(interaction.member.user.id, 'balance_bank', (userdb.balance_bank - money))
 			let successEmbed = new MessageEmbed()
 				.setColor(client.config.embedColor)
 				.setTitle('Транзакция')
@@ -120,7 +120,9 @@ module.exports.run = async (client, interaction) => {
 						.setTimestamp()
 						.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 					return interaction.editReply({embeds: [failEmbed]})
-				} else return
+				} else { 
+					return
+				}
 			});	
 		}
 	} catch (error) {

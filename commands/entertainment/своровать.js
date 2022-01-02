@@ -43,7 +43,7 @@ module.exports.run = async (client, interaction) => {
 			let successEmbed = new MessageEmbed()
 				.setColor(client.config.embedColor)
 				.setTitle('Воровство: успешно')
-				.setDescription(`${client.emoji.fish} Шалость удалась! Вам зачислено ${stFish} ${client.emoji.fish}`)
+				.setDescription(`Шалость удалась! Вам зачислено ${stFish} ${client.emoji.fish}`)
 				.setTimestamp()
 				.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 			return interaction.reply({embeds: [successEmbed]})

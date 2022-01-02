@@ -19,7 +19,7 @@ module.exports.run = async (client, interaction) => {
 					.setColor(client.config.embedColor)
 					.setImage(catURL)
 					.setTimestamp()
-					.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+					.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 				interaction.reply({embeds: [catEmbed]})          
 		});
 	} catch (error) {

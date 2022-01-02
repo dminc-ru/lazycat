@@ -16,7 +16,7 @@ module.exports.run = async (client, interaction) => {
 			.setColor(client.config.embedColor)
 			.setImage(body.image)
 			.setTimestamp()
-			.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+			.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 		interaction.reply({embeds: [foxEmbed]})
 	} catch(error) {
 		client.logger.log(error, 'err')

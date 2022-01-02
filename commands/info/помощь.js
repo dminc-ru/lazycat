@@ -21,7 +21,7 @@ module.exports.run = async (client, interaction) => {
 				.setTitle('Команды Lazy Cat:')
 				.setImage('https://thumbs.gfycat.com/SoftFlimsyBufeo-size_restricted.gif')
 				.setTimestamp()
-				.setFooter(`${user.tag} • Команды: /помощь`, user.displayAvatarURL({dynamic: true}))
+				.setFooter({ text: `${user.tag} • Команды: /помощь`, iconURL: user.displayAvatarURL({dynamic: true}) })
 			interaction.reply({embeds: [eggEmbed]})
 		}
 		let prefix = '/';
@@ -38,7 +38,7 @@ module.exports.run = async (client, interaction) => {
 			.addField('Экономика:', `\`${prefix}передать\` \`${prefix}магазин\` \`${prefix}жучки\` \`${prefix}баланс\` \`${prefix}банк\` \`${prefix}работа\``, false)
 			.addField('Радио:', `\`${prefix}плей\` \`${prefix}пауза\` \`${prefix}скип\` \`${prefix}стоп\` \`${prefix}повтор\` \`${prefix}поиск\` \`${prefix}сейчас\`  \`${prefix}фильтр\` \`${prefix}очередь\` \`${prefix}очистить\` \`${prefix}громкость\` \`${prefix}дисконнект\` \`${prefix}увед\` \`${prefix}плейлист\` \`${prefix}перемешать\``, false)
 			.setTimestamp()
-			.setFooter(`${user.tag} • Команды: /помощь`, user.displayAvatarURL({dynamic: true}))
+			.setFooter({ text: `${user.tag} • Команды: /помощь`, iconURL: user.displayAvatarURL({dynamic: true}) })
 		interaction.reply({embeds: [helpEmbed]})
 	} catch (error) {
 		client.logger.log(error, 'err')

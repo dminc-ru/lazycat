@@ -33,7 +33,7 @@ module.exports.run = async (client, interaction) => {
 				.setTitle('Воровство: неудача')
 				.setDescription(`${client.emoji.fish} Неудача! Вас заметили, и вы пытаетесь скрыться.`)
 				.setTimestamp()
-				.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+				.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 			return interaction.reply({embeds: [failEmbed]})
 		}
 		else{
@@ -45,7 +45,7 @@ module.exports.run = async (client, interaction) => {
 				.setTitle('Воровство: успешно')
 				.setDescription(`${client.emoji.fish} Шалость удалась! Вам зачислено ${stFish} ${client.emoji.fish}`)
 				.setTimestamp()
-				.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+				.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 			return interaction.reply({embeds: [successEmbed]})
 		};
 	} catch (error) {

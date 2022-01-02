@@ -109,8 +109,11 @@ setInterval(() =>{
 	let transactions = exchange.boughtBugs + exchange.sellBugs;
 	if(transactions > 9)
 		exchange.currentBugPrice += randInt(1, 3);
-	else
-		exchange.currentBugPrice -= randInt(1, 3);
+	else {
+		if (exchange.currentBugPrice > 30) {
+			exchange.currentBugPrice -= randInt(1, 3);
+		}
+	}
 	exchange.boughtBugs = 0;
 	exchange.sellBugs = 0;
 	fs.writeFileSync(`${client.config.jsonPath}exchange.json`, JSON.stringify(exchange, null, "\t"));

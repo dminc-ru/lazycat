@@ -30,7 +30,7 @@ module.exports.run = async (client, interaction) => {
 			.setTitle('Транзакция')
 			.setDescription(`Успешно! Переведено ${money} ${client.emoji.fish}`)
 			.setTimestamp()
-			.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+			.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 		return interaction.reply({embeds: [successTransaction]})
 	} catch (error) {
 		client.logger.log(error, 'err')

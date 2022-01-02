@@ -82,7 +82,7 @@ module.exports.run = async (client, interaction) => {
 				.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 			interaction.reply({embeds: [robberyEmbed]})
 			const filter = message => message.author.id === interaction.member.user.id;
-			const collector = interaction.channel.createMessageCollector({ filter, max: 1, time: 10000 });
+			const collector = interaction.channel.createMessageCollector({ filter, max: 1, time: 30000 });
 			var answered = false;
 			collector.on('collect', async m => {
 				if (m.content == guessNumber) {
@@ -119,9 +119,10 @@ module.exports.run = async (client, interaction) => {
 						.setDescription(`Пока вы думали, вас заметила охрана этого банка. Вы смогли убежать.`)
 						.setTimestamp()
 						.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
-					return interaction.editReply({embeds: [failEmbed]})
+					interaction.editReply({embeds: [failEmbed]})
+					break
 				} else { 
-					return
+					break
 				}
 			});	
 		}

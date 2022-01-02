@@ -27,7 +27,7 @@ module.exports.run = async (client, interaction) => {
 
 			client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_fish - count))
 			client.db.changeUser(client.user.id, 'balance_fish', (clientdb.balance_fish + count))
-			client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_bugs + bugs))
+			client.db.changeUser(interaction.member.user.id, 'balance_bugs', (userdb.balance_bugs + bugs))
 			exchange.boughtBugs += bugs;
 			fs.writeFileSync(`${client.config.jsonPath}exchange.json`, JSON.stringify(exchange, null, "\t"));
 			let successEmbed = new MessageEmbed()
@@ -35,7 +35,7 @@ module.exports.run = async (client, interaction) => {
 				.setTitle(`Транзакция`)
 				.setDescription(`Успешно! Куплено ${bugs} ${client.emoji.bug} за ${count} ${client.emoji.fish}`)
 				.setTimestamp()
-				.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+				.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 			return interaction.reply({embeds: [successEmbed]})
 		}
 		if(whattoDo == "продать"){
@@ -45,8 +45,8 @@ module.exports.run = async (client, interaction) => {
 			var bugs = interaction.options.getInteger('количество');
 			var count = bugs * exchange.currentBugPrice; 
 
-			client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_bugs - bugs))
-			client.db.changeUser(client.user.id, 'balance_fish', (clientdb.balance_bugs + bugs))
+			client.db.changeUser(interaction.member.user.id, 'balance_bugs', (userdb.balance_bugs - bugs))
+			client.db.changeUser(client.user.id, 'balance_bugs', (clientdb.balance_bugs + bugs))
 			client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_fish + count))
 			exchange.sellBugs += bugs;
 			fs.writeFileSync(`${client.config.jsonPath}exchange.json`, JSON.stringify(exchange, null, "\t"));
@@ -55,7 +55,7 @@ module.exports.run = async (client, interaction) => {
 				.setTitle(`Транзакция`)
 				.setDescription(`Успешно! Продано ${bugs} ${client.emoji.bug} за ${count} ${client.emoji.fish}`)
 				.setTimestamp()
-				.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+				.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 			return interaction.reply({embeds: [successEmbed]})
 		}
 		if(whattoDo == "курс"){
@@ -68,7 +68,7 @@ module.exports.run = async (client, interaction) => {
 					/жучки купить <кол-во>
 					/жучки продать <кол-во>`)
 				.setTimestamp()
-				.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+				.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 			return interaction.reply({embeds: [exchangeEmbed]})
 		}
 	} catch(error) {

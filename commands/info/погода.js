@@ -14,7 +14,7 @@ module.exports.run = async (client, interaction) => {
 		weather.setAPPID(client.config.weatherID);
 		weather.setLang('ru');
 		weather.setUnits('metric');		
-		weather.setCity(interaction.data.options[0].value);
+		weather.setCity(interaction.options.getString('местоположение'));
 		weather.getAllWeather(function(err, response){
 			if(err)
 				return interaction.reply({content: "Укажите корректное местоположение.", ephemeral: true})
@@ -39,7 +39,7 @@ module.exports.run = async (client, interaction) => {
 				.addField('Влажность:', `${response.main.humidity}%`, true)
 				.addField('Облачность:', `${response.clouds.all}%`, true)
 				.setTimestamp()
-				.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+				.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 			return interaction.reply({embeds: [weatherEmbed]})
 		});
 	} catch (error) {

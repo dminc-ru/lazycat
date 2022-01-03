@@ -14,7 +14,7 @@ module.exports.run = async (client, interaction) => {
 		if( !member.permissions.has('BAN_MEMBERS') ) {
 			return interaction.reply({content: `У вас недостаточно прав для выполнения этой команды.`, ephemeral: true})
 		}
-		const banList = await guild.fetchBans();
+		const banList = await guild.bans.fetch();
 		var bannedUser = banList.find(us => us.user.id === toUnban);
 		if (!bannedUser) {
 			bannedUser = banList.find(us => us.user.tag === toUnban);

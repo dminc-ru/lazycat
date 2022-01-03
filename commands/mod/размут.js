@@ -38,7 +38,7 @@ module.exports.run = async (client, interaction) => {
 			.setTitle('Размут: успешно')
 			.addField('Модератор:', `<@${user.id}>`, true)
 			.addField('Пользователь:', `<@${unMuteUserResolve.id}>`, true)
-			.addField('Причина размута:', `${reason}`, true)
+			.addField('Причина размута:', `${reason}`, false)
 			.setTimestamp()
 			.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 		interaction.reply({embeds: [unmuteSuccess]})
@@ -47,7 +47,7 @@ module.exports.run = async (client, interaction) => {
 			.setTitle("Размут: успешно")
 			.addField(`Модератор:`,	`<@${user.id}>`, true)
 			.addField('Пользователь:', `<@${unMuteUserResolve.id}>`, true)
-			.addField(`Причина размута:`, `${reason}`, true)
+			.addField(`Причина размута:`, `${reason}`, false)
 			.setTimestamp()
 			.setFooter({ text: `Lazy Cat`, iconURL: client.user.displayAvatarURL({dynamic: true}) });
 		if(guilddb.logmsg_channel != ""){

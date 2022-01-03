@@ -26,7 +26,7 @@ module.exports.run = async (client, interaction) => {
 				.setTitle('Успешно')
 				.setDescription('Автоматическая выдача роли новым участникам отключена. Включить снова — /стартроль вкл')
 				.setTimestamp()
-				.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+				.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 			return interaction.reply({embeds: [autoRoleDisabled]})
 		}
 		if (whattoDo == 'вкл') {
@@ -42,7 +42,7 @@ module.exports.run = async (client, interaction) => {
 				.setTitle('Успешно')
 				.setDescription('Автоматическая выдача роли новым участникам включена. Отключить — /стартроль выкл')
 				.setTimestamp()
-				.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+				.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 			return interaction.reply({embeds: [autoRoleEnabled]})
 		}
 		startRole = interaction.options.getRole('роль');
@@ -52,7 +52,7 @@ module.exports.run = async (client, interaction) => {
 			.setTitle('Успешно')
 			.setDescription('Теперь эта роль будет выдаваться всем участникам. Выдачу роли можно отключить командой /стартроль выкл')
 			.setTimestamp()
-			.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+			.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 		return interaction.reply({embeds: [successEmbed]})
 	} catch(error) {
 		client.logger.log(error, 'err')

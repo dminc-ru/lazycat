@@ -9,25 +9,29 @@ module.exports.run = async (client, interaction) => {
 			return interaction.reply({content: `Произошла ошибка при получении данных.`, ephemeral: true})
 		}
 		let guilddb = await client.db.getGuild(interaction.guildId)
-		var typeLog = interaction.options.getSubcommandGroup();
+		try {
+			var typeLog = interaction.options.getSubcommandGroup() 
+		} catch (error) {
+			var typeLog = interaction.options.getSubcommand();
+		}
 		if ( !member.permissions.has('ADMINISTRATOR') ) {
 			return interaction.reply({content: `У вас недостаточно прав для выполнения этой команды.`, ephemeral: true})
 		}
 		if (typeLog == "чат") {
-			client.db.changeGuild(interaction.guildId, 'logmsg_channel', interaction.data.options[0].options[1].value)
+			client.db.changeGuild(interaction.guildId, 'logmsg_channel', interaction.options.getChannel('канал').id)
 			let successEmbed = new MessageEmbed()
 				.setColor(client.config.embedColor)
 				.setTitle('Успешно')
 				.setDescription('Канал для логов установлен. Теперь туда будут отправляться сообщения о действиях модераторов.')
 				.setTimestamp()
-				.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+				.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 			return interaction.reply({embeds: [successEmbed]})
 		}
 		if (typeLog == "мсг") {
 			let typeAction = interaction.options.getSubcommand();
 			if (typeAction == "вкл"){
-				if (guilddb.logmsg_enable == 'false') {
-					return interaction.reply({content: `Аудит сообщений уже включен. Включить — /лог мсг выкл`, ephemeral: true})
+				if (guilddb.logmsg_enable == 'true') {
+					return interaction.reply({content: `Аудит сообщений уже включен. Выключить — /лог мсг выкл`, ephemeral: true})
 				}
 				if (guilddb.logmsg_channel == '') {
 					return interaction.reply({content: `Сначала необходимо установить канал для логов — /лог чат <#канал>`, ephemeral: true})
@@ -40,7 +44,7 @@ module.exports.run = async (client, interaction) => {
 					.setTitle('Успешно')
 					.setDescription(`Аудит сообщений включён. Отключить — /лог мсг выкл`)
 					.setTimestamp()
-					.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+					.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 				return interaction.reply({embeds: [auditEnabled]})
 			}
 			if (typeAction == "выкл"){
@@ -56,7 +60,7 @@ module.exports.run = async (client, interaction) => {
 					.setTitle('Успешно')
 					.setDescription(`Аудит сообщений выключен. Включить снова — /лог мсг вкл`)
 					.setTimestamp()
-					.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+					.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 				return interaction.reply({embeds: [auditDisabled]})
 			}
 			if (typeAction == "удалить"){
@@ -77,7 +81,7 @@ module.exports.run = async (client, interaction) => {
 						.setTitle('Успешно')
 						.setDescription(`Аудит удаления сообщений включен. Выключить — /лог мсг удалить выкл`)
 						.setTimestamp()
-						.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+						.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 					return interaction.reply({embeds: [auditDeleteEnabled]})
 				}
 				if(subTypeAction == "выкл"){
@@ -90,7 +94,7 @@ module.exports.run = async (client, interaction) => {
 						.setTitle('Успешно')
 						.setDescription('Аудит удаления сообщений выключен. Включить — /лог мсг удалить вкл')
 						.setTimestamp()
-						.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+						.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 					return interaction.reply({embeds: [auditDeleteDisabled]})
 				}
 			}
@@ -112,7 +116,7 @@ module.exports.run = async (client, interaction) => {
 						.setTitle('Успешно')
 						.setDescription(`Аудит редактирования сообщений включен. Выключить — /лог мсг эдит выкл`)
 						.setTimestamp()
-						.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+						.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 					return interaction.reply({embeds: [auditEditEnabled]})
 				}
 				if(subTypeAction == "выкл"){
@@ -125,7 +129,7 @@ module.exports.run = async (client, interaction) => {
 						.setTitle('Успешно')
 						.setDescription('Аудит редактирования сообщений выключен. Включить — /лог мсг эдит вкл')
 						.setTimestamp()
-						.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+						.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 					return interaction.reply({embeds: [auditEditDisabled]})
 				}
 			}

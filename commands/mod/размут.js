@@ -36,24 +36,24 @@ module.exports.run = async (client, interaction) => {
 		let unmuteSuccess = new MessageEmbed()
 			.setColor(client.config.embedColor)
 			.setTitle('Размут: успешно')
-			.addField('Модератор:', user.tag, true)
-			.addField('Пользователь:', unMuteUserResolve.tag, true)
-			.addField('Причина размута:', reason, true)
+			.addField('Модератор:', `<@${user.id}>`, true)
+			.addField('Пользователь:', `<@${unMuteUserResolve.id}>`, true)
+			.addField('Причина размута:', `${reason}`, true)
 			.setTimestamp()
-			.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+			.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 		interaction.reply({embeds: [unmuteSuccess]})
 		let muteMessage = new MessageEmbed()
 			.setColor(`#b88fff`)
 			.setTitle("Размут: успешно")
-			.addField(`Модератор:`,	user.tag, true)
-			.addField('Пользователь:', unMuteUserResolve.tag, true)
-			.addField(`Причина размута:`, reason, true)
+			.addField(`Модератор:`,	`<@${user.id}>`, true)
+			.addField('Пользователь:', `<@${unMuteUserResolve.id}>`, true)
+			.addField(`Причина размута:`, `${reason}`, true)
 			.setTimestamp()
-			.setFooter(`Lazy Cat`, client.user.displayAvatarURL({dynamic: true}));
+			.setFooter({ text: `Lazy Cat`, iconURL: client.user.displayAvatarURL({dynamic: true}) });
 		if(guilddb.logmsg_channel != ""){
 			try {
 				const channel = await guild.channels.fetch(guilddb.logmsg_channel);
-				channel.send(muteMessage);
+				channel.send({ embeds: [muteMessage] });
 			} catch(error) {
 				return
 			}

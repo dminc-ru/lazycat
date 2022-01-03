@@ -41,24 +41,24 @@ module.exports.run = async (client, interaction) => {
 		let unbanSuccess = new MessageEmbed()
 			.setColor(client.config.embedColor)
 			.setTitle('Разбан: успешно')
-			.addField('Модератор:', user.tag, true)
-			.addField('Пользователь:', usernames, true)
-			.addField('Причина:', reason, false)
+			.addField('Модератор:', `<@${user.id}>`, true)
+			.addField('Пользователь:', `${usernames}`, true)
+			.addField('Причина:', `${reason}`, false)
 			.setTimestamp()
-			.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+			.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 		interaction.reply({embeds: [unbanSuccess]})
 		if (guilddb.logmsg_channel != "") {
 			try{
 				let banMessage = new MessageEmbed()
 					.setColor(client.config.embedColor)
 					.setTitle(`Разбан: успешно`)
-					.addField(`Модератор:`, user.tag, true)
-					.addField(`Пользователь:`, usernames, true)
-					.addField(`Причина:`, reason, false)
+					.addField(`Модератор:`, `<@${user.id}>`, true)
+					.addField(`Пользователь:`, `${usernames}`, true)
+					.addField(`Причина:`, `${reason}`, false)
 					.setTimestamp()
-					.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+					.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 				const channel = await guild.channels.fetch(guilddb.logmsg_channel);
-				channel.send(banMessage);
+				channel.send({ embeds: [banMessage] });
 			}catch(error){
 				return client.db.changeGuild(interaction.guildId, 'logmsg_channel', '')
 			}

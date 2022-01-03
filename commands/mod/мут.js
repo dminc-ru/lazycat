@@ -36,7 +36,12 @@ module.exports.run = async (client, interaction) => {
 		if (!reason) {
 			reason = `не указана`
 		}
-		const mutetime = ms(interaction.options.getString('время'));
+		var mutetime = ms(interaction.options.getString('время'));
+		more = false;
+		if (mutetime > 2419200000) {
+			more = true
+			mutetime = 2418199000
+		}
 		if (typeof mutetime === 'undefined') {
 			return interaction.reply({content: `Неправильный формат времени.`, ephemeral: true})
 		}
@@ -50,26 +55,29 @@ module.exports.run = async (client, interaction) => {
 		let muteSuccess = new MessageEmbed()
 			.setColor(client.config.embedColor)
 			.setTitle('Мут: успешно')
-			.addField('Модератор', user.tag, true)
-			.addField('Пользователь', usernames, true)
-			.addField('Длительность', ms(mutetime, { long: true }))
-			.addField('Причина:', reason, false)
+			.addField('Модератор', `<@${user.id}>`, true)
+			.addField('Пользователь', `<@${muteUserClientResolve.id}>`, true)
+			.addField('Длительность', `${ms(mutetime, { long: true })}`)
+			.addField('Причина:', `${reason}`, false)
 			.setTimestamp()
 			.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
-		interaction.reply({embeds: [muteSuccess]})
+		await interaction.reply({embeds: [muteSuccess]})
+		if (more) {
+			interaction.followUp({content: `Максимальное время мута — 28 дней.`, ephemeral: true})
+		}
 		if(guilddb.logmsg_channel != ""){
 			try{
 				let muteMessage = new MessageEmbed()
 					.setColor(`#b88fff`)
 					.setTitle("Мут: успешно")
-					.addField('Модератор:', user.tag, true)
-					.addField('Пользователь:', muteUserClientResolve.tag, true)
+					.addField('Модератор:', `<@${user.id}>`, true)
+					.addField('Пользователь:', `<@${muteUserClientResolve.id}>`, true)
 					.addField('Длительность:', `${ms(mutetime, {long: true})}`, false)
-					.addField('Причина:', reason, false)
+					.addField('Причина:', `${reason}`, false)
 					.setTimestamp()
 					.setFooter({ text: `${user.tag}`, iconURL: user.displayAvatarURL({dynamic: true}) });
 				const channel = await guild.channels.fetch(guilddb.logmsg_channel);
-				channel.send(muteMessage);
+				channel.send({ embeds: [muteMessage] });
 			}catch(error){
 				client.db.changeGuild(interaction.guildId, 'logmsg_channel', '')
 			}

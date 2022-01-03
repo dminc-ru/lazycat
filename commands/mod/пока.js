@@ -15,13 +15,13 @@ module.exports.run = async (client, interaction) => {
 		}
 		if(whattoDo == "чат"){
 			let newChannel = interaction.options.getChannel('канал');
-			client.db.changeGuild(interaction.guildId, 'farewellChannel', newChannel)
+			client.db.changeGuild(interaction.guildId, 'farewellChannel', newChannel.id)
 			let successEmbed = new MessageEmbed()
 				.setColor(client.config.embedColor)
 				.setTitle('Успешно')
 				.setDescription(`Канал для оповещений о покинувших сервер участниках установлен.`)
 				.setTimestamp()
-				.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+				.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 			return interaction.reply({embeds: [successEmbed]})
 		}
 		if(whattoDo == "мсг"){
@@ -34,7 +34,7 @@ module.exports.run = async (client, interaction) => {
 				.setTitle('Успешно')
 				.setDescription('Текст оповещения о покинувших сервер участниках установлен.')
 				.setTimestamp()
-				.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+				.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 			return interaction.reply({embeds: [successEmbed]})
 		}
 	} catch(error) {

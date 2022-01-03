@@ -15,7 +15,7 @@ module.exports.run = async (client, interaction) => {
 		}
 		if(whattoDo == "чат"){
 			let newChannel = interaction.options.getChannel('канал');
-			client.db.changeGuild(interaction.guildId, 'welcomeChannel', newChannel)
+			client.db.changeGuild(interaction.guildId, 'welcomeChannel', newChannel.id)
 			let successEmbed = new MessageEmbed()
 				.setColor(client.config.embedColor)
 				.setTitle('Успешно')

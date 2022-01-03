@@ -25,11 +25,11 @@ module.exports = async (client, message, channel) => {
 	let embed = new MessageEmbed()
 		.setColor("b88fff")
 		.setTitle("Сообщение удалено")
-		.addField(`Сообщение:`, `${message.content}`, false)
-		.addField(`Канал:`, `${message.channel.name}`, true)
-		.addField(`Автор:`, `${message.author.tag}`, true)
+		.addField(`Сообщение:`, `\`\`\`${message.content}\`\`\``, false)
+		.addField(`Канал:`, `<#${message.channel.id}>`, true)
+		.addField(`Автор:`, `<@${message.author.id}>`, true)
 		.setTimestamp()
-		.setFooter(`Lazy Cat`, client.user.displayAvatarURL({dynamic: true}));
+		.setFooter({ text: `Lazy Cat`, iconURL: client.user.displayAvatarURL({dynamic: true}) });
 	let logChan = await message.guild.channels.fetch(guilddb.logmsg_channel);
-	logChan.send(embed);
+	logChan.send({ embeds: [embed] });
 }

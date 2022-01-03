@@ -16,12 +16,12 @@ module.exports = async (client, oldMessage, newMessage) => {
 	let embed = new MessageEmbed()
 		.setColor("b88fff")
 		.setTitle("Сообщение отредактировано")
-		.addField(`Старое сообщение:`, `${oldMessage.content}`, false)
-		.addField(`Новое сообщение:`, `${newMessage.content}`, false)
-		.addField(`Канал:`, `${oldMessage.channel.name}`, true)
-		.addField(`Автор:`, `${oldMessage.author.tag}`, true)
+		.addField(`Старое сообщение:`, `\`\`\`${oldMessage.content}\`\`\``, false)
+		.addField(`Новое сообщение:`, `\`\`\`${newMessage.content}\`\`\``, false)
+		.addField(`Канал:`, `<#${oldMessage.channel.id}>`, true)
+		.addField(`Автор:`, `<@${oldMessage.author.id}>`, true)
 		.setTimestamp()
-		.setFooter(`Lazy Cat`, client.user.displayAvatarURL({dynamic: true}));
+		.setFooter({ text: `Lazy Cat`, iconURL: client.user.displayAvatarURL({dynamic: true}) });
 	let logChan = await oldMessage.guild.channels.fetch(guilddb.logmsg_channel);
-	logChan.send(embed);
+	logChan.send({ embeds: [embed] });
 };

@@ -6,7 +6,7 @@ module.exports = class db {
             var db = new sqlite3.Database(config.databasePath);
             db.serialize(() => {
                 db.run(`INSERT INTO users (discord_id) VALUES (?)`, [id])
-				db.run(`UPDATE users SET (join_date) = ? WHERE discord_id = ${id}`, [Date.now()]);
+				        db.run(`UPDATE users SET (join_date) = ? WHERE discord_id = ${id}`, [Date.now()]);
             })
             db.close()
             resolve()

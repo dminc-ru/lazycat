@@ -10,7 +10,7 @@ module.exports = (client, guild) => {
         .addField(`Узнать все доступные команды:`, '`/помощь`', false)
         .addField(`Техническая поддержка:`, `||[клик](${client.config.serverLink})||`, false)
         .setTimestamp()
-        .setFooter(`Lazy Cat`, client.user.displayAvatarURL({dynamic: true}));
+        .setFooter({ text: `Lazy Cat`, iconURL: client.user.displayAvatarURL({dynamic: true}) });
     try {
         guild.owner.send(embed);
     } catch(error)

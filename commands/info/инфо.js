@@ -20,6 +20,8 @@ module.exports.run = async (client, interaction) => {
 				${client.emoji.users} Пользователей: **${members}**
 				${client.emoji.cmd} Команд обработано: **${stats.commands}**
 
+				${client.emoji.ph} Версия продукта: **${stats.version}**
+
 				Список доступных команд: **/помощь**
 				[**Добавить на свой сервер**](${client.config.inviteLink})
 

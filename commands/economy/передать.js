@@ -1,117 +1,46 @@
+const { MessageEmbed } = require('discord.js')
 module.exports.run = async (client, interaction) => {
-try{
-	let user = client.users.cache.get(interaction.member.user.id);
-	let userdb = await client.db.get(interaction.member.user.id, 'users')
-	let memberdb = await client.db.get(interaction.data.options[0].value, 'users');
-	var money = interaction.data.options[1].value;
-	money = Number(interaction.data.options[1].value);
-	if(interaction.member.user.id == interaction.data.options[0].value){
-		return client.api.interactions(interaction.id, interaction.token).callback.post({
-			data: {
-				type: 4,
-				data: {
-					flags: 64,
-					content: `Вы не можете передать рыбки самому себе.`
-				}
-			}
-		});
-	}
-	if(!memberdb){
-		return client.api.interactions(interaction.id, interaction.token).callback.post({
-			data: {
-				type: 4,
-				data: {
-					flags: 64,
-					content: `Указанный пользователь не зарегистрирован в системе Lazy Cat.`
-				}
-			}
-		});
-	}
-	if(money > 10000){
-		return client.api.interactions(interaction.id, interaction.token).callback.post({
-			data: {
-				type: 4,
-				data: {
-					flags: 64,
-					content: `Вы можете перевести максимум 10000 <:lz_fish:742459590087803010> за одну транзакцию.`
-				}
-			}
-		});
-	}
-	if(money == 0){
-		return client.api.interactions(interaction.id, interaction.token).callback.post({
-			data: {
-				type: 4,
-				data: {
-					flags: 64,
-					content: `Укажите корректное количество рыбок.`
-				}
-			}
-		});
-	}
-	if(money < 0){
-		return client.api.interactions(interaction.id, interaction.token).callback.post({
-			data: {
-				type: 4,
-				data: {
-					flags: 64,
-					content: `Укажите корректное количество рыбок.`
-				}
-			}
-		});
-	}
-	if(userdb.balance_fish < money){
-		return client.api.interactions(interaction.id, interaction.token).callback.post({
-			data: {
-				type: 4,
-				data: {
-					flags: 64,
-					content: `У вас недостаточно средств.`
-				}
-			}
-		});
-	}
-	let receive = await client.db.get(interaction.data.options[0].value, 'users')
-	if(!receive){
-		return client.api.interactions(interaction.id, interaction.token).callback.post({
-			data: {
-				type: 4,
-				data: {
-					flags: 64,
-					content: `Указанный пользователь не найден в системе Lazy Cat.`
-				}
-			}
-		});
-	}
-	client.db.change(interaction.member.user.id, 'users', 'balance_fish', (userdb.balance_fish - money))
-	client.db.change(interaction.data.options[0].value, 'users', 'balance_fish', (memberdb.balance_fish + money))
-	return client.api.interactions(interaction.id, interaction.token).callback.post({
-		data: {
-			type: 4,
-			data: {
-				embeds: [
-					{
-						color: 0xb88fff,
-						title: 'Транзакция',
-						description: `Успешно! Переведено ${money} <:lz_fish:742459590087803010>.`,
-						timestamp: new Date(),
-						footer: {
-							text: `${user.tag}`,
-							icon_url: `${user.displayAvatarURL()}`,
-						}
-					}
-				]
-			}
+	try {
+		let noUser = new MessageEmbed()
+			.setColor(client.config.embedColor)
+			.setTitle('Ошибка')
+			.setDescription('Пользователь не найден в базе данных.')
+		try {
+			var user = await client.users.fetch(interaction.member.user.id);
+		} catch (error) {
+			return interaction.reply({embeds: [noUser], ephemeral: true})
 		}
-	});
-}catch(error){
-		client.logger.log(`${error}`, "err");
+		let userdb = await client.db.getUser(interaction.member.user.id)
+		let memberdb = await client.db.getUser(interaction.options.getUser('участник').id);
+		var money = interaction.options.getInteger('количество');
+		if(interaction.member.user.id == memberdb.discord_id)
+			return interaction.reply({content: "Вы не можете передать рыбки самому себе.", ephemeral: true})
+		if(!memberdb)
+			return interaction.reply({content: "Указанный пользователь не зарегистрирован в системе Lazy Cat.", ephemeral: true})
+		if(money > 10000)
+			return interaction.reply({content: `Вы можете перевести максимум 10000 ${client.emoji.fish} за одну транзакцию.`})
+		if( (money == 0) || (money < 0) )
+			return interaction.reply({content: "Укажите корректное количество рыбок.", ephemeral: true})
+		if(userdb.balance_fish < money)
+			return interaction.reply({content: "У вас недостаточно средств.", ephemeral: true})
+		await client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_fish - money))
+		await client.db.changeUser(memberdb.discord_id, 'balance_fish', (memberdb.balance_fish + money))
+		let successTransaction = new MessageEmbed()
+			.setColor(client.config.embedColor)
+			.setTitle('Транзакция')
+			.setDescription(`Успешно! Переведено ${money} ${client.emoji.fish}`)
+			.setTimestamp()
+			.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+		return interaction.reply({embeds: [successTransaction]})
+	} catch (error) {
+		client.logger.log(error, 'err')
+		console.error(error)
+		interaction.reply({content: `Произошла ошибка при выполнении команды.`, ephemeral: true})
 	}
 }
 
-module.exports.help = {
+module.exports.data = {
 	name: "передать",
-	aliases: ["перевести", "gthtlfnm", "gthtdtcnb"],
 	permissions: ["member"],
-	modules: ["economy"]
+	type: "interaction"
 }

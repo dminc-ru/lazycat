@@ -1,133 +1,77 @@
 const { MessageEmbed } = require("discord.js");
 module.exports.run = async (client, interaction) => {
-try{
-	let user = client.users.cache.get(interaction.member.user.id);
-	let guild = client.guilds.cache.get(interaction.guild_id);
-	let guilddb = await client.db.get(interaction.guild_id, 'guilds')
-	let member = guild.members.cache.get(interaction.member.user.id);
-	let toUnban = interaction.data.options[0].value;
-	var toUnbanClientResolve = client.users.cache.get(toUnban);
-	if(!member.hasPermission('BAN_MEMBERS'))
-	return client.api.interactions(interaction.id, interaction.token).callback.post({
-		data: {
-			type: 4,
-			data: {
-				flags: 64,
-				content: `У вас недостаточно прав для выполнения этой команды.`
-			}
+	try {
+		try {
+			var user = await client.users.fetch(interaction.member.user.id)
+			var guild = await client.guilds.fetch(interaction.guildId)
+			var member = await guild.members.fetch(interaction.member.user.id)
+			var toUnban = interaction.options.getUser('участник');
+			var toUnbanClientResolve = await client.users.fetch(toUnban);
+		} catch(error) {
+			return interaction.reply({content: `Произошла ошибка при получении данных.`, ephemeral: true})
 		}
-	});
-		const banList = await guild.fetchBans();
+		let guilddb = await client.db.getGuild(interaction.guildId)
+		if( !member.permissions.has('BAN_MEMBERS') ) {
+			return interaction.reply({content: `У вас недостаточно прав для выполнения этой команды.`, ephemeral: true})
+		}
+		const banList = await guild.bans.fetch();
 		var bannedUser = banList.find(us => us.user.id === toUnban);
-		if(!bannedUser){
+		if (!bannedUser) {
 			bannedUser = banList.find(us => us.user.tag === toUnban);
 			if(!bannedUser){
-				return client.api.interactions(interaction.id, interaction.token).callback.post({
-					data: {
-						type: 4,
-						data: {
-							flags: 64,
-							content: `Пользователь не найден.`
-						}
-					}
-				});
+				return interaction.reply({content: `Пользователь не найден.`, ephemeral: true})
 			}
 		}
-		try {guild.members.unban(bannedUser.user.id, {reason});}catch (error) {return client.api.interactions(interaction.id, interaction.token).callback.post({
-			data: {
-				type: 4,
-				data: {
-					flags: 64,
-					content: `Произошла ошибка при попытке разбана. Возможно, у меня недостаточно прав для выполнения этого действия.`
-				}
-			}
-		});}
-	if(interaction.data.options.length > 1)
-		var reason = interaction.data.options[1].value
-	else
-		var reason = `не указана`;
-	if(toUnban == interaction.member.user.id){
-		return client.api.interactions(interaction.id, interaction.token).callback.post({
-			data: {
-				type: 4,
-				data: {
-					flags: 64,
-					content: `Вы не можете разбанить себя.`
-				}
-			}
-		});
-	}
-	if(toUnban == client.user.id)
-	return client.api.interactions(interaction.id, interaction.token).callback.post({
-		data: {
-			type: 4,
-			data: {
-				flags: 64,
-				content: `У вас недостаточно прав для выполнения данного действия.`
+		if (toUnban == interaction.member.user.id) {
+			return interaction.reply({content: `Вы не можете разбанить себя.`, ephemeral: true})
+		}
+		if (toUnban == client.user.id) {
+			return interaction.reply({content: `У вас недостаточно прав для выполнения данного действия.`, ephemeral: true})
+		}
+		try {
+			guild.bans.remove(bannedUser.user.id, `[ ${user.tag} ]: «${reason}»`);
+		} catch (error) {
+			return interaction.reply({content: `Произошла ошибка при попытке разбана. Возможно, у меня недостаточно прав для выполнения этого действия.`, ephemeral: true})
+		}
+		var reason = interaction.options.getString('причина')
+		if (!reason) {
+			var reason = `не указана`;
+		}
+		let usernames = toUnbanClientResolve.tag;
+		let unbanSuccess = new MessageEmbed()
+			.setColor(client.config.embedColor)
+			.setTitle('Разбан: успешно')
+			.addField('Модератор:', `<@${user.id}>`, true)
+			.addField('Пользователь:', `${usernames}`, true)
+			.addField('Причина:', `${reason}`, false)
+			.setTimestamp()
+			.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+		interaction.reply({embeds: [unbanSuccess]})
+		if (guilddb.logmsg_channel != "") {
+			try{
+				let banMessage = new MessageEmbed()
+					.setColor(client.config.embedColor)
+					.setTitle(`Разбан: успешно`)
+					.addField(`Модератор:`, `<@${user.id}>`, true)
+					.addField(`Пользователь:`, `${usernames}`, true)
+					.addField(`Причина:`, `${reason}`, false)
+					.setTimestamp()
+					.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+				const channel = await guild.channels.fetch(guilddb.logmsg_channel);
+				channel.send({ embeds: [banMessage] });
+			}catch(error){
+				return client.db.changeGuild(interaction.guildId, 'logmsg_channel', '')
 			}
 		}
-	});
-	let usernames = toUnbanClientResolve.tag;
-		client.api.interactions(interaction.id, interaction.token).callback.post({
-			data: {
-				type: 4,
-				data: {
-					embeds: [
-						{
-							color: 0xb88fff,
-							title: 'Разбан: успешно',
-							fields: [
-								{
-									name: "Модератор:",
-									value: `${user.tag}`,
-									inline: true
-								},
-								{
-									name: "Пользователь:",
-									value: `${usernames}`,
-									inline: true
-								},
-								{
-									name: "Причина:",
-									value: `${reason}`,
-									inline: false
-								},
-							],
-							timestamp: new Date(),
-							footer: {
-								text: `${user.tag}`,
-								icon_url: `${user.displayAvatarURL()}`,
-							}
-						}
-					]
-				}
-			}
-		});
-	if(guilddb.logmsg_channel != ""){
-		try{
-		let banMessage = new MessageEmbed()
-				.setColor("#b88fff")
-				.setTitle(`Разбан: успешно`)
-				.addField(`Модератор:`, `${user.tag}`, true)
-				.addField(`Пользователь:`, `${usernames}`, true)
-				.addField(`Причина:`, `${reason}`, false)
-				.setTimestamp()
-				.setFooter(`${user.tag}`, user.avatarURL())
-		const channel = guild.channels.cache.get(guilddb.logmsg_channel);
-		channel.send(banMessage);
-		}catch(error){
-			return client.db.change(interaction.guild_id, 'guilds', 'logmsg_channel', '')
-		}
-	}
-
-}catch(error){
-		client.logger.log(`${error}`, "err");
+	} catch(error) {
+		client.logger.log(error, 'err')
+		console.error(error)
+		interaction.reply({content: `Произошла ошибка при выполнении команды.`, ephemeral: true})
 	}
 }
 
-module.exports.help = {
+module.exports.data = {
 	name: "разбан",
-	aliases: ["hfp,fy"],
 	permissions: ["member"],
-	modules: ["mod"]
+	type: "interaction"
 }

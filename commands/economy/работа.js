@@ -1,482 +1,311 @@
-let works = require(`${process.env.PATHTOBASE}/works.json`);
+const { MessageEmbed } = require('discord.js');
+const { max } = require('moment');
 module.exports.run = async (client, interaction) => {
-    try{
-	    let user = client.users.cache.get(interaction.member.user.id);
-        let userdb = await client.db.get(interaction.member.user.id, 'users')
-        let channel = client.channels.cache.get(interaction.channel_id);
-	    var whattoDo = interaction.data.options[0].name;
-        if(whattoDo == "список"){
-            return client.api.interactions(interaction.id, interaction.token).callback.post({
-                data: {
-                    type: 4,
-                    data: {
-                        embeds: [
-                            {
-                                color: 0xb88fff,
-                                title: 'Работа',
-                                fields: [
-                                    {
-                                        name: `1. ${works[0].name}`,
-                                        value: `${works[0].description}`,
-                                        inline: false
-                                    },
-                                    {
-                                        name: `2. ${works[1].name}`,
-                                        value: `${works[1].description}`,
-                                        inline: false
-                                    },
-                                    {
-                                        name: `3. ${works[2].name}`,
-                                        value: `${works[2].description}`,
-                                        inline: false
-                                    }
-                                ],
-                                timestamp: new Date(),
-                                footer: {
-                                    text: `${user.tag}`,
-                                    icon_url: `${user.displayAvatarURL()}`,
-                                }
-                            }
-                        ]
-                    }
+    try {
+        let works = require(`${client.config.jsonPath}works.json`);
+	    let noUser = new MessageEmbed()
+		    .setColor(client.config.embedColor)
+		    .setTitle('Ошибка')
+            .setDescription('Пользователь не найден в базе данных.')
+	    try {
+		    var user = await client.users.fetch(interaction.member.user.id);
+	    } catch (error) {
+		    return interaction.reply({embeds: [noUser], ephemeral: true})
+	    }
+        let userdb = await client.db.getUser(interaction.member.user.id)
+	    var whattoDo = interaction.options.getSubcommand();
+        switch (whattoDo) {
+            case 'список': {
+                let workList = new MessageEmbed()
+                    .setColor(client.config.embedColor)
+                    .setTitle('Работа')
+                    .addField(`1. ${works[0].name}`, works[0].description, false)
+                    .addField(`2. ${works[1].name}`, works[1].description, false)
+                    .addField(`3. ${works[2].name}`, works[2].description, false)
+                    .setTimestamp()
+                    .setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+                interaction.reply({embeds: [workList]})
+                break
+            }
+            case 'ранги': {
+                if(userdb.work_current == '') {
+                    interaction.reply({content: 'У вас нет работы.', ephemeral: true})
+                    break
                 }
-            });
-        }
-        if(whattoDo == "ранги"){
-            if(userdb.work_current == ''){
-                return client.api.interactions(interaction.id, interaction.token).callback.post({
-                    data: {
-                        type: 4,
-                        data: {
-                            flags: 64,
-                            content: `У вас нет работы.`
-                        }
-                    }
-                });
+                let curRank = userdb.work_rank;
+                let curWork = works.find(w => w.codename == userdb.work_current);
+                var nextRank = curRank + 1;
+                if(curRank == 5)
+                    nextRank = 5;
+                let rankList = new MessageEmbed()
+                    .setColor(client.config.embedColor)
+                    .setTitle('Ранги')
+                    .setDescription(`Ваша текущая работа — ${curWork.name}
+                        Ваш ранг — ${curWork.ranks[curRank].name}
+                        Опыт: ${userdb.work_currentXP}/${curWork.ranks[nextRank].requiredXP} XP`)
+                    .addField(`1. ${curWork.ranks[0].name}`, `Доход: ${curWork.ranks[0].income} ${client.emoji.fish}`, false)
+                    .addField(`2. ${curWork.ranks[1].name}`, `Доход: ${curWork.ranks[1].income} ${client.emoji.fish}`, false)
+                    .addField(`3. ${curWork.ranks[2].name}`, `Доход: ${curWork.ranks[2].income} ${client.emoji.fish}`, false)
+                    .addField(`4. ${curWork.ranks[3].name}`, `Доход: ${curWork.ranks[3].income} ${client.emoji.fish}`, false)
+                    .addField(`5. ${curWork.ranks[4].name}`, `Доход: ${curWork.ranks[4].income} ${client.emoji.fish}`, false)
+                    .addField(`6. ${curWork.ranks[5].name}`, `Доход: ${curWork.ranks[5].income} ${client.emoji.fish}`, false)
+                    .setTimestamp()
+                    .setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+                interaction.reply({embeds: [rankList]})
+                break
             }
-            let curRank = userdb.work_rank;
-            let curWork = works.find(w => w.codename == userdb.work_current);
-            var nextRank = curRank + 1;
-            if(curRank == 5)
-                nextRank = 5;
-            return client.api.interactions(interaction.id, interaction.token).callback.post({
-                data: {
-                    type: 4,
-                    data: {
-                        embeds: [
-                            {
-                                color: 0xb88fff,
-                                title: 'Ранги',
-                                description: `Ваша текущая работа — ${curWork.name}\nВаш ранг — ${curWork.ranks[curRank].name}\nОпыт: ${userdb.work_currentXP}/${curWork.ranks[nextRank].requiredXP} XP`,
-                                fields: [
-                                    {
-                                        name: `1. ${curWork.ranks[0].name}`,
-                                        value: `Доход: ${curWork.ranks[0].income} <:lz_fish:742459590087803010>`,
-                                        inline: false
-                                    },
-                                    {
-                                        name: `2. ${curWork.ranks[1].name}`,
-                                        value: `Доход: ${curWork.ranks[1].income} <:lz_fish:742459590087803010>`,
-                                        inline: false
-                                    },
-                                    {
-                                        name: `3. ${curWork.ranks[2].name}`,
-                                        value: `Доход: ${curWork.ranks[2].income} <:lz_fish:742459590087803010>`,
-                                        inline: false
-                                    },
-                                    {
-                                        name: `4. ${curWork.ranks[3].name}`,
-                                        value: `Доход: ${curWork.ranks[3].income} <:lz_fish:742459590087803010>`,
-                                        inline: false
-                                    },
-                                    {
-                                        name: `5. ${curWork.ranks[4].name}`,
-                                        value: `Доход: ${curWork.ranks[4].income} <:lz_fish:742459590087803010>`,
-                                        inline: false
-                                    },
-                                    {
-                                        name: `6. ${curWork.ranks[5].name}`,
-                                        value: `Доход: ${curWork.ranks[5].income} <:lz_fish:742459590087803010>`,
-                                        inline: false
-                                    }
-                                ],
-                                timestamp: new Date(),
-                                footer: {
-                                    text: `${user.tag}`,
-                                    icon_url: `${user.displayAvatarURL()}`,
-                                }
-                            }
-                        ]
-                    }
+            case 'устроиться': {
+                let workID = interaction.options.getInteger('номер') - 1
+                if(workID < 1 || workID > 3) {
+                    interaction.reply({content: "Укажите корректный номер работы.", ephemeral: true})
+                    break
                 }
-            });
-        }
-        if(whattoDo == "устроиться"){
-            if(interaction.data.options[0].options[0].value < 1 || interaction.data.options[0].options[0].value > 3){
-                return client.api.interactions(interaction.id, interaction.token).callback.post({
-                    data: {
-                        type: 4,
-                        data: {
-                            flags: 64,
-                            content: `Укажите корректный номер работы.`
-                        }
-                    }
-                });
-            }
-            if(userdb.work_current != ''){
-                return client.api.interactions(interaction.id, interaction.token).callback.post({
-                    data: {
-                        type: 4,
-                        data: {
-                            flags: 64,
-                            content: `Сначала увольтесь с текущей работы — /работа уволиться.`
-                        }
-                    }
-                });
-            }
-            let workID = interaction.data.options[0].options[0].value - 1;
-            var prevWork = "";
-            if(workID != 0){
-                var razn = workID - 1;
-                prevWork = works[razn].codename;
-            }
-            if(userdb.work_previous != prevWork){
-                return client.api.interactions(interaction.id, interaction.token).callback.post({
-                    data: {
-                        type: 4,
-                        data: {
-                            flags: 64,
-                            content: `Вам необходимо получить все ранги на работе ${works[razn].name}.`
-                        }
-                    }
-                });
-            }
-            client.db.change(interaction.member.user.id, 'users', 'work_current', works[workID].codename)
-            client.db.change(interaction.member.user.id, 'users', 'work_currentXP', 0)
-            client.db.change(interaction.member.user.id, 'users', 'work_rank', 0)
-            return client.api.interactions(interaction.id, interaction.token).callback.post({
-                data: {
-                    type: 4,
-                    data: {
-                        embeds: [
-                            {
-                                color: 0xb88fff,
-                                title: 'Успешно',
-                                description: `Вы устроились на работу — ${works[workID].name}. Ваш текущий ранг: ${works[workID].ranks[0].name}`,
-                                timestamp: new Date(),
-                                footer: {
-                                    text: `${user.tag}`,
-                                    icon_url: `${user.displayAvatarURL()}`,
-                                }
-                            }
-                        ]
-                    }
+                if(userdb.work_current != '') {
+                    interaction.reply({content: "Сначала увольтесь с текущей работы — /работа уволиться.", ephemeral: true})
+                    break
                 }
-            });
-        }
-        if(whattoDo == "уволиться"){
-            if(userdb.work_current == ''){
-                return client.api.interactions(interaction.id, interaction.token).callback.post({
-                    data: {
-                        type: 4,
-                        data: {
-                            flags: 64,
-                            content: `У вас нет работы.`
-                        }
-                    }
-                });
-            }
-            let curRank = userdb.work_rank + 1;
-            let curWork = works.find(w => w.codename == userdb.work_current)
-            let curWorkIndex = works.findIndex(w => w.codename == userdb.work_current)
-            var toAdd = ``;
-            if(curRank == curWork.ranks.length){
-                client.db.change(interaction.member.user.id, 'users', 'work_previous', curWork.codename)
-                if(curWorkIndex < 2)
-                    var abc = curWorkIndex + 1;
-                toAdd = `Теперь вам доступна новая работа — ${works[abc].name}!`
-            }
-            client.db.change(interaction.member.user.id, 'users', 'work_current', "")
-            client.db.change(interaction.member.user.id, 'users', 'work_currentXP', 0)
-            client.db.change(interaction.member.user.id, 'users', 'work_rank', 0)
-            return client.api.interactions(interaction.id, interaction.token).callback.post({
-                data: {
-                    type: 4,
-                    data: {
-                        embeds: [
-                            {
-                                color: 0xb88fff,
-                                title: 'Успешно',
-                                description: `Вы уволились с текущей работы — ${curWork.name}. ${toAdd}`,
-                                timestamp: new Date(),
-                                footer: {
-                                    text: `${user.tag}`,
-                                    icon_url: `${user.displayAvatarURL()}`,
-                                }
-                            }
-                        ]
-                    }
+                var prevWork = "";
+                if(workID != 0){
+                    var razn = workID - 1;
+                    prevWork = works[razn].codename;
                 }
-            });
-        }
-        if(whattoDo == "работать"){
-            function randomInt(min, max) {
-                let rand = min - 0.5 + Math.random() * (max - min + 1);
-                return Math.round(rand);
+                if(userdb.work_previous != prevWork) {
+                    interaction.reply({content: `Вам необходимо получить все ранги на работе ${works[razn].name}.`, ephemeral: true})
+                    break
+                }
+                client.db.changeUser(interaction.member.user.id, 'work_current', works[workID].codename)
+                client.db.changeUser(interaction.member.user.id, 'work_currentXP', 0)
+                client.db.changeUser(interaction.member.user.id, 'work_rank', 0)
+                let successEmbed = new MessageEmbed()
+                    .setColor(client.config.embedColor)
+                    .setTitle('Успешно')
+                    .setDescription(`Вы устроились на работу — ${works[workID].name}. Ваш текущий ранг: ${works[workID].ranks[0].name}`)
+                    .setTimestamp()
+                    .setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+                interaction.reply({embeds: [successEmbed]})
+                break
             }
-            let curRank = userdb.work_rank;
-            let curWork = works.find(w => w.codename == userdb.work_current)
-            let taskType = randomInt(1, 2);
-            if(taskType == 1){
-                let taskChet = randomInt(0, 1);
-                if(taskChet == 1)
-                    var chetType = `нечётное`;
-                else
-                    var chetType = `чётное`;
-                let taskZnak = randomInt(1, 4);
-                client.api.interactions(interaction.id, interaction.token).callback.post({
-                    data: {
-                        type: 4,
-                        data: {
-                            embeds: [
-                                {
-                                    color: 0xb88fff,
-                                    title: 'Работа',
-                                    description: `Напишите любое **${chetType} ${taskZnak}-х значное** число.`,
-                                    timestamp: new Date(),
-                                    footer: {
-                                        text: `${user.tag} • У вас 10 секунд. Отправьте сообщение с числом.`,
-                                        icon_url: `${user.displayAvatarURL()}`,
+            case 'уволиться': {
+                if(userdb.work_current == '') {
+                    interaction.reply({content: "У вас нет работы.", ephemeral: true})
+                    break
+                }
+                let curRank = userdb.work_rank + 1;
+                let curWork = works.find(w => w.codename == userdb.work_current)
+                let curWorkIndex = works.findIndex(w => w.codename == userdb.work_current)
+                var toAdd = ``;
+                if(curRank == curWork.ranks.length){
+                    client.db.changeUser(interaction.member.user.id, 'work_previous', curWork.codename)
+                    if(curWorkIndex < 2)
+                        var abc = curWorkIndex + 1;
+                    toAdd = `Теперь вам доступна новая работа — ${works[abc].name}!`
+                }
+                client.db.changeUser(interaction.member.user.id, 'work_current', "")
+                client.db.changeUser(interaction.member.user.id, 'work_currentXP', 0)
+                client.db.changeUser(interaction.member.user.id, 'work_rank', 0)
+                let successEmbed = new MessageEmbed()
+                    .setColor(client.config.embedColor)
+                    .setTitle('Успешно')
+                    .setDescription(`Вы уволились с текущей работы — ${curWork.name}. ${toAdd}`)
+                    .setTimestamp()
+                    .setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+                interaction.reply({embeds: [successEmbed]})
+                break
+            }
+            case 'работать': {
+                function randomInt(min, max) {
+                    let rand = min - 0.5 + Math.random() * (max - min + 1);
+                    return Math.round(rand);
+                }
+                let curRank = userdb.work_rank;
+                let curWork = works.find(w => w.codename == userdb.work_current)
+                let taskType = randomInt(1, 2);
+                switch (taskType) {
+                    case 1: {
+                        let taskChet = randomInt(0, 1);
+                        if(taskChet == 1)
+                            var chetType = `нечётное`;
+                        else
+                            var chetType = `чётное`;
+                        let taskZnak = randomInt(1, 4);
+                        let workEmbed = new MessageEmbed()
+                            .setColor(client.config.embedColor)
+                            .setTitle('Работа')
+                            .setDescription(`Напишите любое **${chetType} ${taskZnak}-х значное** число.`)
+                            .setTimestamp()
+                            .setFooter({ text: `${user.tag} • У вас 10 секунд. Отправьте сообщение с числом.`, iconURL: user.displayAvatarURL({dynamic: true}) })
+                        interaction.reply({embeds: [workEmbed]})
+                        const filter = message => message.author.id === interaction.member.user.id;
+			            const collector = interaction.channel.createMessageCollector({ filter, max: 1, time: 10000 });
+			            var answered = false;
+                        collector.on('collect', async m => {
+                            let check = Number(m.content) % 2;
+                            if (taskZnak == m.content.toString().length && taskChet == check) {
+                                let wonXP = randomInt(1, 2);
+                                client.db.changeUser(interaction.member.user.id, 'work_currentXP', (userdb.work_currentXP + wonXP))
+                                client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_fish + curWork.ranks[curRank].income))
+                                let checkNextRank = userdb.work_rank + 1;
+                                var toAdd = ``;
+                                if (curWork.ranks[checkNextRank]) {
+                                    if(userdb.work_currentXP > curWork.ranks[checkNextRank].requiredXP){
+                                        client.db.changeUser(interaction.member.user.id, 'work_rank', (userdb.work_rank + 1))
+                                        toAdd = `\n**У вас новый ранг: ${curWork.ranks[checkNextRank].name}**`;
                                     }
                                 }
-                            ]
-                        }
-                    }
-                });
-                try{
-                    response = await channel.awaitMessages((message2) => interaction.member.user.id === message2.author.id, {
-                        max: 1,
-                        time: 10000,
-                        errors: ['time']
-                    });
-                }catch(error){
-                    var toAddErr = ``
-                    if(userdb.work_currentXP != 0){
-                        client.db.change(interaction.member.user.id, 'users', 'work_currentXP', (userdb.work_currentXP - 1))
-                        toAddErr = `Вы потеряли 1 XP.`;
-                    }
-                    return client.api.webhooks(client.user.id, interaction.token).messages('@original').patch({
-                        data: {
-                            type: 4,
-                              embeds: [{
-                                color: 0xb88fff,
-                                title: "Работа: ошибка",
-                                description: `Время истекло. ${toAddErr}`,
-                                timestamp: new Date(),
-                                footer: {
-                                    text: `${user.tag}`,
-                                    icon_url: `${user.displayAvatarURL()}`,
-                                }
-                              }]
-                        }
-                    });
-                }
-                let check = Number(response.first().content) % 2;
-                if (taskZnak == response.first().content.toString().length && taskChet == check) {
-		            let wonXP = randomInt(1, 2);
-                    client.db.change(interaction.member.user.id, 'users', 'work_currentXP', (userdb.work_currentXP + wonXP))
-                    client.db.change(interaction.member.user.id, 'users', 'balance_fish', (userdb.balance_fish + curWork.ranks[curRank].income))
-                    let checkNextRank = userdb.work_rank + 1;
-                    var toAdd = ``;
-                    if (curWork.ranks[checkNextRank]) {
-                    if(userdb.work_currentXP > curWork.ranks[checkNextRank].requiredXP){
-                        client.db.change(interaction.member.user.id, 'users', 'work_rank', (userdb.work_rank + 1))
-                        toAdd = `\n**У вас новый ранг: ${curWork.ranks[checkNextRank].name}**`;
-                    }
-					}
-		            return client.api.webhooks(client.user.id, interaction.token).messages('@original').patch({
-			            data: {
-				            type: 4,
-			  	            embeds: [{
-					            color: 0xb88fff,
-					            title: "Работа: успешно",
-					            description: `Вы выполнили задание.\nПолучено ${wonXP} XP и ${curWork.ranks[curRank].income} <:lz_fish:742459590087803010>.${toAdd}`,
-					            timestamp: new Date(),
-					            footer: {
-						            text: `${user.tag}`,
-						            icon_url: `${user.displayAvatarURL()}`,
-					            }
-			  	            }]
-			            }
-		            });
-                }else{
-                    var toAddErr = ``
-                    if(userdb.work_currentXP != 0){
-                        client.db.change(interaction.member.user.id, 'users', 'work_currentXP', (userdb.work_currentXP - 1))
-                        toAddErr = `Вы потеряли 1 XP.`
-                        if(userdb.balance_fish > curWork.ranks[curRank].income){
-                            client.db.change(interaction.member.user.id, 'users', 'balance_fish', (userdb.balance_fish - curWork.ranks[curRank].income))
-                            toAddErr = `Вы потеряли 1 XP и ${curWork.ranks[curRank].income} <:lz_fish:742459590087803010>.`;
-                        }
-                        
-                    }
-                    return client.api.webhooks(client.user.id, interaction.token).messages('@original').patch({
-                        data: {
-                            type: 4,
-                              embeds: [{
-                                color: 0xb88fff,
-                                title: "Работа: ошибка",
-                                description: `Допущена ошибка. ${toAddErr}`,
-                                timestamp: new Date(),
-                                footer: {
-                                    text: `${user.tag}`,
-                                    icon_url: `${user.displayAvatarURL()}`,
-                                }
-                              }]
-                        }
-                    });
-                }
-            }
-            if(taskType == 2){
-                let random1 = randomInt(1, 3);
-                if(random1 == 1){
-                    var firstNum = randomInt(10, 25);
-                    var secondNum = randomInt(26, 40);
-                    var thirdNum = randomInt(41, 100);
-                }
-                if(random1 == 2){
-                    var firstNum = randomInt(35, 76);
-                    var secondNum = randomInt(12, 34);
-                    var thirdNum = randomInt(77, 256);
-                }
-                if(random1 == 3){
-                    var firstNum = randomInt(64, 96);
-                    var secondNum = randomInt(34, 63);
-                    var thirdNum = randomInt(5, 33);
-                }
-                
-                client.api.interactions(interaction.id, interaction.token).callback.post({
-                    data: {
-                        type: 4,
-                        data: {
-                            embeds: [
-                                {
-                                    color: 0xb88fff,
-                                    title: 'Работа',
-                                    description: `Напишите наибольшее число: **${firstNum}**, **${secondNum}**, **${thirdNum}**.`,
-                                    timestamp: new Date(),
-                                    footer: {
-                                        text: `${user.tag} • У вас 10 секунд. Отправьте сообщение с числом.`,
-                                        icon_url: `${user.displayAvatarURL()}`,
+                                let successEmbed = new MessageEmbed()
+                                    .setColor(client.config.embedColor)
+                                    .setTitle("Работа: успешно")
+                                    .setDescription(`Вы выполнили задание.
+                                        Получено ${wonXP} XP и ${curWork.ranks[curRank].income} ${client.emoji.fish}. ${toAdd}`)
+                                    .setTimestamp()
+                                    .setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+                                interaction.editReply({embeds: [successEmbed]})
+                                answered = true
+                                return collector.stop()
+                            }else{
+                                var toAddErr = ``
+                                if(userdb.work_currentXP != 0){
+                                    client.db.changeUser(interaction.member.user.id, 'work_currentXP', (userdb.work_currentXP - 1))
+                                    toAddErr = `Вы потеряли 1 XP.`
+                                    if(userdb.balance_fish > curWork.ranks[curRank].income){
+                                        client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_fish - curWork.ranks[curRank].income))
+                                        toAddErr = `Вы потеряли 1 XP и ${curWork.ranks[curRank].income} ${client.emoji.fish}.`;
                                     }
                                 }
-                            ]
-                        }
-                    }
-                });
-                try{
-                    response = await channel.awaitMessages((message2) => interaction.member.user.id === message2.author.id, {
-                        max: 1,
-                        time: 10000,
-                        errors: ['time']
-                    });
-                }catch(error){
-                    var toAddErr = ``
-                    if(userdb.work_currentXP != 0){
-                        client.db.change(interaction.member.user.id, 'users', 'work_currentXP', (userdb.work_currentXP - 1))
-                        toAddErr = `Вы потеряли 1 XP.`;
-                    }
-                    return client.api.webhooks(client.user.id, interaction.token).messages('@original').patch({
-                        data: {
-                            type: 4,
-                              embeds: [{
-                                color: 0xb88fff,
-                                title: "Работа: ошибка",
-                                description: `Время истекло. ${toAddErr}`,
-                                timestamp: new Date(),
-                                footer: {
-                                    text: `${user.tag}`,
-                                    icon_url: `${user.displayAvatarURL()}`,
+                                let letError = new MessageEmbed()
+                                    .setColor(client.config.embedColor)
+                                    .setTitle("Работа: ошибка")
+                                    .setDescription(`Допущена ошибка. ${toAddErr}`)
+                                    .setTimestamp()
+                                    .setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+                                interaction.editReply({embeds: [letError]})
+                                answered = true
+                                return collector.stop()
+                            }
+                        })
+                        collector.on('end', collected => {
+                            if (!answered) {
+                                var toAddErr = ``
+                                if(userdb.work_currentXP != 0){
+                                    client.db.changeUser(interaction.member.user.id, 'work_currentXP', (userdb.work_currentXP - 1))
+                                    toAddErr = `Вы потеряли 1 XP.`;
                                 }
-                              }]
-                        }
-                    });
-                }
-                if(Number(response.first().content) == firstNum){
-                    var checkNum1 = secondNum;
-                    var checkNum2 = thirdNum;
-                }
-                if(Number(response.first().content) == secondNum){
-                    var checkNum1 = firstNum;
-                    var checkNum2 = thirdNum;
-                }
-                if(Number(response.first().content) == thirdNum){
-                    var checkNum1 = firstNum;
-                    var checkNum2 = secondNum;
-                }
-                if (Number(response.first().content) > checkNum1 && Number(response.first().content) > checkNum2) {
-		            let wonXP = randomInt(1, 2);
-                    client.db.change(interaction.member.user.id, 'users', 'work_currentXP', (userdb.work_currentXP + wonXP))
-                    client.db.change(interaction.member.user.id, 'users', 'balance_fish', (userdb.balance_fish + curWork.ranks[curRank].income))
-                    let checkNextRank = userdb.work_rank + 1;
-                    var toAdd = ``;
-                    if(userdb.work_currentXP > curWork.ranks[checkNextRank].requiredXP){
-                        client.db.change(interaction.member.user.id, 'users', 'work_rank', (userdb.work_rank + 1))
-                        toAdd = `\n**У вас новый ранг: ${curWork.ranks[checkNextRank].name}**`;
+                                let timeOut = new MessageEmbed()
+                                    .setColor(client.config.embedColor)
+                                    .setTitle('Работа: ошибка')
+                                    .setDescription(`Время истекло. ${toAddErr}`)
+                                    .setTimestamp()
+                                    .setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+                                return interaction.editReply({embeds: [timeOut]})
+                            } else {
+                                return 
+                            }
+                        })
+                        break
                     }
-		            return client.api.webhooks(client.user.id, interaction.token).messages('@original').patch({
-			            data: {
-				            type: 4,
-			  	            embeds: [{
-					            color: 0xb88fff,
-					            title: "Работа: успешно",
-					            description: `Вы выполнили задание.\nПолучено ${wonXP} XP и ${curWork.ranks[curRank].income} <:lz_fish:742459590087803010>.${toAdd}`,
-					            timestamp: new Date(),
-					            footer: {
-						            text: `${user.tag}`,
-						            icon_url: `${user.displayAvatarURL()}`,
-					            }
-			  	            }]
-			            }
-		            });
-                }else{
-                    var toAddErr = ``
-                    if(userdb.work_currentXP != 0){
-                        client.db.change(interaction.member.user.id, 'users', 'work_currentXP', (userdb.work_currentXP - 1))
-                        toAddErr = `Вы потеряли 1 XP.`
-                        if(userdb.balance_fish > curWork.ranks[curRank].income){
-                            client.db.change(interaction.member.user.id, 'users', 'balance_fish', (userdb.balance_fish - curWork.ranks[curRank].income))
-                            toAddErr = `Вы потеряли 1 XP и ${curWork.ranks[curRank].income} <:lz_fish:742459590087803010>.`;
+                    case 2: {
+                        let random1 = randomInt(1, 3);
+                        if(random1 == 1){
+                            var firstNum = randomInt(10, 25);
+                            var secondNum = randomInt(26, 40);
+                            var thirdNum = randomInt(41, 100);
                         }
-                        
-                    }
-                    return client.api.webhooks(client.user.id, interaction.token).messages('@original').patch({
-                        data: {
-                            type: 4,
-                              embeds: [{
-                                color: 0xb88fff,
-                                title: "Работа: ошибка",
-                                description: `Допущена ошибка. ${toAddErr}`,
-                                timestamp: new Date(),
-                                footer: {
-                                    text: `${user.tag}`,
-                                    icon_url: `${user.displayAvatarURL()}`,
+                        if(random1 == 2){
+                            var firstNum = randomInt(35, 76);
+                            var secondNum = randomInt(12, 34);
+                            var thirdNum = randomInt(77, 256);
+                        }
+                        if(random1 == 3){
+                            var firstNum = randomInt(64, 96);
+                            var secondNum = randomInt(34, 63);
+                            var thirdNum = randomInt(5, 33);
+                        }
+                        let workEmbed = new MessageEmbed()
+                            .setColor(client.config.embedColor)
+                            .setTitle('Работа')
+                            .setDescription(`Напишите наибольшее число: **${firstNum}**, **${secondNum}**, **${thirdNum}**.`)
+                            .setTimestamp()
+                            .setFooter({ text: `${user.tag} • У вас 10 секунд. Отправьте сообщение с числом.`, iconURL: user.displayAvatarURL({dynamic: true}) })
+                        interaction.reply({embeds: [workEmbed]})
+                        const filter = message => message.author.id === interaction.member.user.id;
+			            const collector = interaction.channel.createMessageCollector({ filter, max: 1, time: 10000 });
+			            var answered = false;
+                        collector.on('collect', async m => {
+                            if (Number(m.content) == Math.max(firstNum, secondNum, thirdNum)) {
+                                let wonXP = randomInt(1, 2);
+                                client.db.changeUser(interaction.member.user.id, 'work_currentXP', (userdb.work_currentXP + wonXP))
+                                client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_fish + curWork.ranks[curRank].income))
+                                let checkNextRank = userdb.work_rank + 1;
+                                var toAdd = ``;
+                                if(userdb.work_currentXP > curWork.ranks[checkNextRank].requiredXP){
+                                    client.db.changeUser(interaction.member.user.id, 'work_rank', (userdb.work_rank + 1))
+                                    toAdd = `\n**У вас новый ранг: ${curWork.ranks[checkNextRank].name}**`;
                                 }
-                              }]
-                        }
-                    });
+                                let successEmbed = new MessageEmbed()
+                                    .setColor(client.config.embedColor)
+                                    .setTitle("Работа: успешно")
+                                    .setDescription(`Вы выполнили задание.
+                                        Получено ${wonXP} XP и ${curWork.ranks[curRank].income} ${client.emoji.fish}. ${toAdd}`)
+                                    .setTimestamp()
+                                    .setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+                                interaction.editReply({embeds: [successEmbed]})
+                                answered = true
+                                return collector.stop()
+                            }else{
+                                var toAddErr = ``
+                                if(userdb.work_currentXP != 0){
+                                    client.db.changeUser(interaction.member.user.id, 'work_currentXP', (userdb.work_currentXP - 1))
+                                    toAddErr = `Вы потеряли 1 XP.`
+                                    if(userdb.balance_fish > curWork.ranks[curRank].income){
+                                        client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_fish - curWork.ranks[curRank].income))
+                                        toAddErr = `Вы потеряли 1 XP и ${curWork.ranks[curRank].income} ${client.emoji.fish}.`;
+                                    }
+                                    
+                                }
+                                let letError = new MessageEmbed()
+                                    .setColor(client.config.embedColor)
+                                    .setTitle('Работа: ошибка')
+                                    .setDescription(`Допущена ошибка. ${toAddErr}`)
+                                    .setTimestamp()
+                                    .setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+                                interaction.editReply({embeds: [letError]})
+                                answered = true
+                                return collector.stop()
+                            }
+                        })
+                        collector.on('end', collected => {
+                            if (!answered) {
+                                var toAddErr = ``
+                                if(userdb.work_currentXP != 0){
+                                    client.db.changeUser(interaction.member.user.id, 'work_currentXP', (userdb.work_currentXP - 1))
+                                    toAddErr = `Вы потеряли 1 XP.`;
+                                }
+                                let timeOut = new MessageEmbed()
+                                    .setColor(client.config.embedColor)
+                                    .setTitle("Работа: ошибка")
+                                    .setDescription(`Время истекло. ${toAddErr}`)
+                                    .setTimestamp()
+                                    .setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+                                return interaction.editReply({embeds: [timeOut]})
+                            } else {
+                                return 
+                            }
+                        })
+                    }
+                    break
                 }
+                break
             }
         }
-    }catch(error){
-        client.logger.log(`${error}`, "err");
-        console.log(error);
+    } catch (error) {
+        client.logger.log(error, 'err')
+        console.error(error)
+        interaction.reply({content: `Произошла ошибка при выполнении команды.`, ephemeral: true})
     }
 };
 
-module.exports.help = {
+module.exports.data = {
     name: "работа",
-	aliases: ["hf,jnf"],
 	permissions: ["member"],
-	modules: ["economy"]
+	type: "interaction"
 };

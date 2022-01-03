@@ -1,36 +1,32 @@
 const request = require('node-superfetch');
+const { MessageEmbed } = require('discord.js')
 module.exports.run = async (client, interaction) => {
-	try{
+	try {
 		const { body } = await request.get('https://randomfox.ca/floof');
-		let user = client.users.cache.get(interaction.member.user.id);
-		client.api.interactions(interaction.id, interaction.token).callback.post({
-			data: {
-				type: 4,
-				data: {
-					embeds: [
-						{
-							color: 0xb88fff,
-							timestamp: new Date(),
-							footer: {
-								text: `${user.tag}`,
-								icon_url: `${user.displayAvatarURL()}`,
-							},
-							image: {
-								url: body.image,
-							},
-						}
-					]
-				}
-			}
-		});
-	}catch(error){
-		client.logger.log(`${error}`, "err");
+		let noUser = new MessageEmbed()
+			.setColor(client.config.embedColor)
+			.setTitle('Ошибка')
+			.setDescription('Пользователь не найден в базе данных.')
+		try {
+			var user = await client.users.fetch(interaction.member.user.id);
+		} catch (error) {
+			return message.channel.send({embeds: [noUser]})
+		}
+		let foxEmbed = new MessageEmbed()
+			.setColor(client.config.embedColor)
+			.setImage(body.image)
+			.setTimestamp()
+			.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+		interaction.reply({embeds: [foxEmbed]})
+	} catch(error) {
+		client.logger.log(error, 'err')
+		console.error(error)
+		interaction.reply({content: `Произошла ошибка при выполнении команды.`, ephemeral: true})
 	}
 }
 
-module.exports.help = {
+module.exports.data = {
 	name: "лис",
-	aliases: ["лиса", "лисы", "kbc", "kbcf", "kbcs"],
 	permissions: ["member"],
-	modules: ["entertainment"]
+	type: "interaction"
 }

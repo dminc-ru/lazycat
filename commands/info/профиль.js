@@ -1,13 +1,24 @@
-let badgebase = require(`${process.env.PATHTOBASE}/badges.json`);
+const { MessageEmbed } = require('discord.js')
 module.exports.run = async (client, interaction) => {
-try{
-	let userdb = await client.db.get(interaction.member.user.id, 'users')
-	var memberProfile
-	if(interaction.data.options)
-		memberProfile = client.users.cache.get(interaction.data.options[0].value);
-	let user = client.users.cache.get(interaction.member.user.id);
-	let badgess = [];
-	if(!memberProfile) {
+	try {
+		let badgebase = require(`${client.config.jsonPath}badges.json`);
+		let userdb = await client.db.getUser(interaction.member.user.id)
+		try {
+			var memberProfile = await client.users.fetch(interaction.options.getUser('участник'));
+		} catch (error) {
+			memberProfile = undefined;
+		}
+		let noUser = new MessageEmbed()
+			.setColor(client.config.embedColor)
+			.setTitle('Ошибка')
+			.setDescription('Пользователь не найден в базе данных.')
+		try {
+			var user = await client.users.fetch(interaction.member.user.id);
+		} catch (error) {
+			return message.channel.send({embeds: [noUser]})
+		}
+		let badgess = [];
+		if(!memberProfile) {
 			let userbadges = userdb.badges.split(',')
 			userbadges.length--
 			userbadges.map(badge => {
@@ -17,65 +28,23 @@ try{
 			});
 			if(badgess == '')
 				badgess.push(`-`);
-			return client.api.interactions(interaction.id, interaction.token).callback.post({
-				data: {
-					type: 4,
-					data: {
-						embeds: [
-							{
-								color: 0xb88fff,
-								title: 'Профиль',
-								author: {
-									name: `${user.tag}`,
-									icon_url: `${user.displayAvatarURL()}`,
-								},
-								description: `**Описание:** ${userdb.description}`,
-								fields: [
-									{
-										name: 'Баланс',
-										value: `${userdb.balance_fish} <:lz_fish:742459590087803010>`,
-										inline: true
-									},
-									{
-										name: `В банке:`,
-										value: `${userdb.balance_bank} <:lz_fish:742459590087803010>`,
-										inline: true
-									},
-									{
-										name: 'Жучков:',
-										value: `${userdb.balance_bugs} <:lz_bug:742039591929905223>`,
-										inline: true
-									},
-									{
-										name: 'Значки:',
-										value: `${badgess.join('\n')}`,
-										inline: false
-									}
-								],
-								timestamp: new Date(),
-								footer: {
-									text: `${user.tag}`,
-									icon_url: `${user.displayAvatarURL()}`,
-								}
-							}
-						]
-					}
-				}
-			});
-	}
-	else {
-		let memberdb = await client.db.get(memberProfile.id, 'users')
-		if(!memberdb){
-				return client.api.interactions(interaction.id, interaction.token).callback.post({
-					data: {
-						type: 4,
-						data: {
-							flags: 64,
-							content: `Указанный пользователь не зарегистрирован в системе Lazy Cat.`
-						}
-					}
-				});
+			let profileEmbed = new MessageEmbed()
+				.setColor(client.config.embedColor)
+				.setTitle('Профиль')
+				.setAuthor({ name: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+				.setDescription(`**Описание:**\n${userdb.description}`)
+				.addField('Баланс', `${userdb.balance_fish} ${client.emoji.fish}`, true)
+				.addField('В банке:', `${userdb.balance_bank} ${client.emoji.fish}`, true)
+				.addField('Жучков:', `${userdb.balance_bugs} ${client.emoji.bug}`, true)
+				.addField('Значки:', `${badgess.join('\n')}`, false)
+				.setTimestamp()
+				.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+			return interaction.reply({embeds: [profileEmbed]})
 		}
+		else {
+			let memberdb = await client.db.getUser(memberProfile.id)
+			if(!memberdb)
+				return interaction.reply({content: "Указанный пользователь не зарегистрирован в системе Lazy Cat.", ephemeral: true})
 			let memberbadges = memberdb.badges.split(',')
 			memberbadges.length--
 			memberbadges.map(badge => {
@@ -85,61 +54,28 @@ try{
 			});
 			if(badgess == '')
 				badgess.push(`-`);
-				return client.api.interactions(interaction.id, interaction.token).callback.post({
-					data: {
-						type: 4,
-						data: {
-							embeds: [
-								{
-									color: 0xb88fff,
-									title: 'Профиль',
-									author: {
-										name: `${memberProfile.tag}`,
-										icon_url: `${memberProfile.displayAvatarURL()}`,
-									},
-									description: `**Описание:** ${memberdb.description}`,
-									fields: [
-										{
-											name: 'Баланс',
-											value: `${memberdb.balance_fish} <:lz_fish:742459590087803010>`,
-											inline: true
-										},
-										{
-											name: `В банке:`,
-											value: `${memberdb.balance_bank} <:lz_fish:742459590087803010>`,
-											inline: true
-										},
-										{
-											name: 'Жучков:',
-											value: `${memberdb.balance_bugs} <:lz_bug:742039591929905223>`,
-											inline: true
-										},
-										{
-											name: 'Значки:',
-											value: `${badgess.join('\n')}`,
-											inline: false
-										}
-									],
-									timestamp: new Date(),
-									footer: {
-										text: `${user.tag}`,
-										icon_url: `${user.displayAvatarURL()}`,
-									}
-								}
-							]
-						}
-					}
-				});
-	}
-}catch(error){
-		client.logger.log(`${error}`, "err");
-		console.log(error);
+			let profileEmbed = new MessageEmbed()
+				.setColor(client.config.embedColor)
+				.setTitle('Профиль')
+				.setAuthor({ name: memberProfile.tag, iconURL: memberProfile.displayAvatarURL({dynamic: true}) })
+				.setDescription(`**Описание:**\n${memberdb.description}`)
+				.addField('Баланс', `${memberdb.balance_fish} ${client.emoji.fish}`, true)
+				.addField('В банке:', `${memberdb.balance_bank} ${client.emoji.fish}`, true)
+				.addField('Жучков:', `${memberdb.balance_bugs} ${client.emoji.bug}`, true)
+				.addField('Значки:', `${badgess.join('\n')}`, false)
+				.setTimestamp()
+				.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+			return interaction.reply({embeds: [profileEmbed]})
+		}
+	} catch (error) {
+		client.logger.log(error, 'err')
+		console.error(error)
+		interaction.reply({content: `Произошла ошибка при выполнении команды.`, ephemeral: true})
 	}
 }
 
-module.exports.help = {
+module.exports.data = {
 	name: "профиль",
-	aliases: ["ghjabkm"],
 	permissions: ["member"],
-	modules: ["info"]
+	type: "interaction"
 }

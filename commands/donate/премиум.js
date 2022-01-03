@@ -1,12 +1,10 @@
-const { MessageEmbed } = require("discord.js"); 
-const { config } = require("dotenv");
-config({path: "/backend/.env"});
+const { MessageEmbed, CommandInteractionOptionResolver } = require("discord.js"); 
 const QiwiBillPaymentsAPI = require('@qiwi/bill-payments-node-js-sdk');
-const SECRET_KEY = process.env.SECRETKEY;
-const qiwiApi = new QiwiBillPaymentsAPI(SECRET_KEY);
 module.exports.run = async (client, message, args) => {
-	try{
-	/*if(args[0] == "купить"){
+	try {
+	/*
+	const qiwiApi = new QiwiBillPaymentsAPI(client.config.qiwiSecretKey);
+	if(args[0] == "купить"){
 		if(users[message.author.id].bills == 1){
 			let billIDCheck = `LZ-${message.author.id}-${users[message.author.id].billID}`;
 			qiwiApi.getBillInfo(billIDCheck).then(data => {
@@ -87,14 +85,14 @@ module.exports.run = async (client, message, args) => {
 		});
 		return;
 	}*/
-	let userdb = await client.db.get(message.author.id, 'users')
+	let userdb = await client.db.getUser(message.author.id)
 	if(userdb.premium_has == 'true'){
 		var premiumStatus = `активен`
 	}else{
 		var premiumStatus = `неактивен`
 	}
 	let embed = new MessageEmbed()
-			.setColor(`#b88fff`)
+			.setColor(client.config.embedColor)
 			.setTitle("Премиум-статус")
 			.setDescription(`<:lz_premium:742033865761095751> Премиум — это возможность поддержать работу Lazy Cat.\n
 			Всё очень просто: вы спонсируете нас материально — взамен мы предлагаем следующие функции:\n
@@ -108,16 +106,17 @@ module.exports.run = async (client, message, args) => {
 			На данный момент покупка Премиум временно недоступна.\n
 			Ваш Премиум-статус: ${premiumStatus}`)
 			.setTimestamp()
-			.setFooter(`${message.author.tag}`, message.author.avatarURL());
-		message.channel.send(embed);
-	}catch(error){
-		client.logger.log(`${error}`, "err");
+			.setFooter({ text: `${message.author.tag}`, iconURL: message.author.displayAvatarURL({dynamic: true}) });
+		message.channel.send({embeds: [embed]});
+	} catch (error) {
+		client.logger.log(error, 'err')
+		console.error(error)
+		message.channel.send({ content: `Произошла ошибка при выполнении команды.`})
 	}
 }
 
-module.exports.help = {
+module.exports.data = {
 	name: "премиум",
-	aliases: ["ghtvbev"],
 	permissions: ["developer"],
-	modules: ["donate"]
+	type: "message"
 }

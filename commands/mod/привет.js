@@ -1,83 +1,51 @@
+const { MessageEmbed } = require('discord.js')
 module.exports.run = async (client, interaction) => {
-try{
-	let guild = client.guilds.cache.get(interaction.guild_id);
-	let guilddb = await client.db.get(interaction.guild_id, 'guilds');
-	let user = client.users.cache.get(interaction.member.user.id);
-	let member = guild.members.cache.get(interaction.member.user.id);
-	var whattoDo = interaction.data.options[0].name;
-	if(!member.hasPermission('ADMINISTRATOR'))
-	return client.api.interactions(interaction.id, interaction.token).callback.post({
-		data: {
-			type: 4,
-			data: {
-				flags: 64,
-				content: `У вас недостаточно прав для выполнения этой команды.`
-			}
+	try {
+		try {
+			var guild = await client.guilds.fetch(interaction.guildId)
+			var user = await client.users.fetch(interaction.member.user.id)
+			var member = await guild.members.fetch(interaction.member.user.id)
+		} catch(error) {
+			return interaction.reply({content: `Произошла ошибка при получении данных.`, ephemeral: true})
 		}
-	});
-	if(whattoDo == "чат"){
-		let newChannel = interaction.data.options[0].options[0].value;
-		client.db.change(interaction.guild_id, 'guilds', 'welcomeChannel', newChannel)
-		return client.api.interactions(interaction.id, interaction.token).callback.post({
-			data: {
-				type: 4,
-				data: {
-					embeds: [
-						{
-							color: 0xb88fff,
-							title: 'Успешно',
-							description: `Канал для приветственных сообщений установлен.`,
-							timestamp: new Date(),
-							footer: {
-								text: `${user.tag}`,
-								icon_url: `${user.displayAvatarURL()}`,
-							}
-						}
-					]
-				}
+		let guilddb = await client.db.getGuild(interaction.guildId);
+		var whattoDo = interaction.options.getSubcommand();
+		if( !member.permissions.has('ADMINISTRATOR') ) {
+			return interaction.reply({content: `У вас недостаточно прав для выполнения этой команды.`, ephemeral: true})
+		}
+		if(whattoDo == "чат"){
+			let newChannel = interaction.options.getChannel('канал');
+			client.db.changeGuild(interaction.guildId, 'welcomeChannel', newChannel.id)
+			let successEmbed = new MessageEmbed()
+				.setColor(client.config.embedColor)
+				.setTitle('Успешно')
+				.setDescription('Канал для приветственных сообщений установлен.')
+				.setTimestamp()
+				.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+			return interaction.reply({embeds: [successEmbed]})
+		}
+		if (whattoDo == "мсг") {
+			if (guilddb.welcomeChannel == '') {
+				return interaction.reply({content: `Установите текстовый канал для приветственных сообщений: /привет чат <#канал>`, ephemeral: true})
 			}
-		});
-	}
-	if(whattoDo == "мсг"){
-		if(guilddb.welcomeChannel == '') 
-		return client.api.interactions(interaction.id, interaction.token).callback.post({
-			data: {
-				type: 4,
-				data: {
-					flags: 64,
-					content: `Установите текстовый канал для приветственных сообщений: /привет чат <#канал>`
-				}
-			}
-		});
-		client.db.change(interaction.guild_id, 'guilds', 'welcomeText', interaction.data.options[0].options[0].value)
-		return client.api.interactions(interaction.id, interaction.token).callback.post({
-			data: {
-				type: 4,
-				data: {
-					embeds: [
-						{
-							color: 0xb88fff,
-							title: 'Успешно',
-							description: `Текст приветственных сообщений установлен.`,
-							timestamp: new Date(),
-							footer: {
-								text: `${user.tag}`,
-								icon_url: `${user.displayAvatarURL()}`,
-							}
-						}
-					]
-				}
-			}
-		});
-	}
-}catch(error){
-		client.logger.log(`${error}`, "err");
+			client.db.changeGuild(interaction.guildId, 'welcomeText', interaction.options.getString('текст'))
+			let successEmbed = new MessageEmbed()
+				.setColor(client.config.embedColor)
+				.setTitle('Успешно')
+				.setDescription('Текст приветственных сообщений установлен.')
+				.setTimestamp()
+				.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+			return interaction.reply({embeds: [successEmbed]})
+		}
+	} catch(error) {
+		client.logger.log(error, 'err')
+		console.error(error)
+		interaction.reply({content: `Произошла ошибка при выполнении команды.`, ephemeral: true})
 	}
 }
 
-module.exports.help = {
+module.exports.data = {
 	name: "привет",
-	aliases: ["ghbdtn"],
 	permissions: ["member"],
-	modules: ["tech"]
+	type: "interaction"
 }

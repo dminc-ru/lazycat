@@ -1,34 +1,35 @@
-let messages = require(`${process.env.PATHTOBASE}/messages.json`);
 let fs = require("fs");
+const { MessageEmbed } = require('discord.js')
 module.exports = async (client, message, channel) => {
-	let guilddb = await client.db.get(message.guild.id, 'guilds')
-    if(message.author.id == client.user.id)
+	let messages = require(`${client.config.jsonPath}messages.json`);
+	let guilddb = await client.db.getGuild(message.guild.id)
+    if (message.author.id == client.user.id)
 		return;
-	if(!messages[message.guild.id]){
+	if (!messages[message.guild.id]) {
         messages[message.guild.id] = [];
     }
-	fs.writeFileSync(`${process.env.PATHTOBASE}\\messages.json`, JSON.stringify(messages, null, "\t"));
+	fs.writeFileSync(`${client.config.jsonPath}messages.json`, JSON.stringify(messages, null, "\t"));
 	let messageExists = messages[message.guild.id].findIndex(x => x.msgid === message.id);
-	if(messageExists != -1){
+	if (messageExists != -1) {
 		messages[message.guild.id].splice(messageExists, 1);
-		fs.writeFileSync(`${process.env.PATHTOBASE}\\messages.json`, JSON.stringify(messages, null, "\t"));
+		fs.writeFileSync(`${client.config.jsonPath}messages.json`, JSON.stringify(messages, null, "\t"));
 	}
-	if(guilddb.logmsg_channel == "")
+	if (guilddb.logmsg_channel == "")
 		return;
-	if(guilddb.logmsg_enable == 'false')
+	if (guilddb.logmsg_enable == 'false')
 		return;
-	if(guilddb.logmsg_type_delete == 'false')
+	if (guilddb.logmsg_type_delete == 'false')
 		return;
-	if(message.length > 500)
+	if (message.length > 500)
 		return;
 	let embed = new MessageEmbed()
 		.setColor("b88fff")
 		.setTitle("Сообщение удалено")
-		.addField(`Сообщение:`, `${message.content}`, false)
-		.addField(`Канал:`, `${message.channel.name}`, true)
-		.addField(`Автор:`, `${message.author.tag}`, true)
+		.addField(`Сообщение:`, `\`\`\`${message.content}\`\`\``, false)
+		.addField(`Канал:`, `<#${message.channel.id}>`, true)
+		.addField(`Автор:`, `<@${message.author.id}>`, true)
 		.setTimestamp()
-		.setFooter(`Lazy Cat`, client.user.avatarURL());
-	let logChan = message.guild.channels.cache.get(guilddb.logmsg_channel);
-	logChan.send(embed);
+		.setFooter({ text: `Lazy Cat`, iconURL: client.user.displayAvatarURL({dynamic: true}) });
+	let logChan = await message.guild.channels.fetch(guilddb.logmsg_channel);
+	logChan.send({ embeds: [embed] });
 }

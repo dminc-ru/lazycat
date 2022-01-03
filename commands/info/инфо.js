@@ -1,41 +1,44 @@
-let stats = require(`${process.env.PATHTOBASE}/stats.json`);
+const { MessageEmbed } = require('discord.js')
 module.exports.run = async (client, interaction) => {
-	try{
-		let user = client.users.cache.get(interaction.member.user.id);
-		var members = client.guilds.cache.reduce((a, g) => a + g.memberCount, 0);
-		client.api.interactions(interaction.id, interaction.token).callback.post({
-			data: {
-				type: 4,
-				data: {
-					embeds: [
-						{
-							color: 0xb88fff,
-							title: 'Информация о боте',
-							description: `<a:lz_b:742046121169387531> Lazy Cat — универсальный бот-менеджер для вашего сервера Discord.\n
-							<:lz_cloud:774302583564402748> Серверов: **${client.guilds.cache.size}**
-							<:lz_users:774302509333348372> Пользователей: **${members}**
-							<:lz_cmd:774302538626498580> Команд обработано: **${stats.commands}**\n
-							Список доступных команд: **/помощь**
-							[**Добавить на свой сервер**](https://discord.com/oauth2/authorize?client_id=707539807957680129&permissions=2666900726&scope=bot%20applications.commands)\n
-							[Условия использования](https://dminc.ru/terms)\n[Политика конфиденциальности](https://dminc.ru/privacy)`,
-							timestamp: new Date(),
-							footer: {
-								text: `${user.tag}`,
-								icon_url: `${user.displayAvatarURL()}`,
-							}
-						}
-					]
-				}
-			}
-		}); 
-	}catch(error){
-			client.logger.log(`${error}`, "err");
+	try {
+		let stats = require(`${client.config.jsonPath}stats.json`);
+		let noUser = new MessageEmbed()
+			.setColor(client.config.embedColor)
+			.setTitle('Ошибка')
+			.setDescription('Пользователь не найден в базе данных.')
+		try {
+			var user = await client.users.fetch(interaction.member.user.id);
+		} catch (error) {
+			return message.channel.send({embeds: [noUser]})
 		}
+		var members = client.guilds.cache.reduce((a, g) => a + g.memberCount, 0);
+		let infoEmbed = new MessageEmbed()
+			.setColor(client.config.embedColor)
+			.setTitle('Информация о боте')
+			.setDescription(`${client.emoji.b} Lazy Cat — универсальный бот для вашего сервера Discord.
+				${client.emoji.cloud} Серверов: **${client.guilds.cache.size}**
+				${client.emoji.users} Пользователей: **${members}**
+				${client.emoji.cmd} Команд обработано: **${stats.commands}**
+
+				${client.emoji.ph} Версия продукта: **${stats.version}**
+
+				Список доступных команд: **/помощь**
+				[**Добавить на свой сервер**](${client.config.inviteLink})
+
+				[Условия использования](${client.config.termsLink})
+				[Политика конфиденциальности](${client.config.privacyLink})`)
+			.setTimestamp()
+			.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+		interaction.reply({embeds: [infoEmbed]})
+	} catch (error) {
+		client.logger.log(error, 'err')
+		console.error(error)
+		interaction.reply({content: `Произошла ошибка при выполнении команды.`, ephemeral: true})
+	}
 }
 
-module.exports.help = {
+module.exports.data = {
 	name: "инфо",
-	aliases: ["byaj"],
 	permissions: ["member"],
-	modules: ["info"]
+	type: "interaction"
 }

@@ -3,7 +3,8 @@ node_modules/
 .vscode/
 db/
 base/
-emojis.js
-config.js
 package.json
 package-lock.json
+config.js
+emojis.js
+start.bat

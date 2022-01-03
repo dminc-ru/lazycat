@@ -1,124 +1,85 @@
 const fs = require("fs");
-let exchange = require(`${process.env.PATHTOBASE}/exchange.json`);
+const { MessageEmbed } = require('discord.js')
 module.exports.run = async (client, interaction) => {
-	try{
-		let user = client.users.cache.get(interaction.member.user.id);
-		var whattoDo = interaction.data.options[0].name;
-		if(bugs < 1){
-			return client.api.interactions(interaction.id, interaction.token).callback.post({
-				data: {
-					type: 4,
-					data: {
-						flags: 64,
-						content: `Укажите корректное количество <:lz_bug:742039591929905223>.`
-					}
-				}
-			});
+	try {
+		let exchange = require(`${client.config.jsonPath}exchange.json`);
+		let noUser = new MessageEmbed()
+			.setColor(client.config.embedColor)
+			.setTitle('Ошибка')
+			.setDescription('Пользователь не найден в базе данных.')
+		try {
+			var user = await client.users.fetch(interaction.member.user.id);
+		} catch (error) {
+			return interaction.reply({embeds: [noUser], ephemeral: true})
 		}
-		if(users[interaction.member.user.id].balance < count){
-			return client.api.interactions(interaction.id, interaction.token).callback.post({
-				data: {
-					type: 4,
-					data: {
-						flags: 64,
-						content: `У вас недостаточно средств.`
-					}
-				}
-			});
-		}
+		let userdb = await client.db.getUser(interaction.member.user.id);
+		var whattoDo = interaction.options.getSubcommand();
+		if(bugs < 1)
+			return interaction.reply({content: `Укажите корректное количество ${client.emoji.bug}`, ephemeral: true})
+		if(userdb.balance_fish < count)
+			return interaction.reply({content: `У вас недостаточно средств.`, ephemeral: true})
 		if(whattoDo == "купить"){
-			let userdb = await client.db.get(interaction.member.user.id, 'users')	
-			let clientdb = await client.db.get(client.user.id, 'users')
+			userdb = await client.db.getUser(interaction.member.user.id)	
+			let clientdb = await client.db.getUser(client.user.id)
 
-			var bugs = interaction.data.options[0].options[0].value;
+			var bugs = interaction.options.getInteger('количество');
 			var count = bugs * exchange.currentBugPrice; 
 
-			client.db.change(interaction.member.user.id, 'users', 'balance_fish', (userdb.balance_fish - count))
-			client.db.change(client.user.id, 'users', 'balance_fish', (clientdb.balance_fish + count))
-			client.db.change(interaction.member.user.id, 'users', 'balance_fish', (userdb.balance_bugs + bugs))
+			client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_fish - count))
+			client.db.changeUser(client.user.id, 'balance_fish', (clientdb.balance_fish + count))
+			client.db.changeUser(interaction.member.user.id, 'balance_bugs', (userdb.balance_bugs + bugs))
 			exchange.boughtBugs += bugs;
-			fs.writeFileSync(`${process.env.PATHTOBASE}\\exchange.json`, JSON.stringify(exchange, null, "\t"));
-			return client.api.interactions(interaction.id, interaction.token).callback.post({
-				data: {
-					type: 4,
-					data: {
-						embeds: [
-							{
-								color: 0xb88fff,
-								title: 'Транзакция',
-								description: `Успешно! Куплено ${bugs} <:lz_bug:742039591929905223> за ${count} <:lz_fish:742459590087803010>.`,
-								timestamp: new Date(),
-								footer: {
-									text: `${user.tag}`,
-									icon_url: `${user.displayAvatarURL()}`,
-								}
-							}
-						]
-					}
-				}
-			});
+			fs.writeFileSync(`${client.config.jsonPath}exchange.json`, JSON.stringify(exchange, null, "\t"));
+			let successEmbed = new MessageEmbed()
+				.setColor(client.config.embedColor)
+				.setTitle(`Транзакция`)
+				.setDescription(`Успешно! Куплено ${bugs} ${client.emoji.bug} за ${count} ${client.emoji.fish}`)
+				.setTimestamp()
+				.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+			return interaction.reply({embeds: [successEmbed]})
 		}
 		if(whattoDo == "продать"){
-			let userdb = await client.db.get(interaction.member.user.id, 'users')
-			let clientdb = await client.db.get(client.user.id, 'users')
+			userdb = await client.db.getUser(interaction.member.user.id)
+			let clientdb = await client.db.getUser(client.user.id)
 
-			var bugs = interaction.data.options[0].options[0].value;
+			var bugs = interaction.options.getInteger('количество');
 			var count = bugs * exchange.currentBugPrice; 
 
-			client.db.change(interaction.member.user.id, 'users', 'balance_fish', (userdb.balance_bugs - bugs))
-			client.db.change(client.user.id, 'users', 'balance_fish', (clientdb.balance_bugs + bugs))
-			client.db.change(interaction.member.user.id, 'users', 'balance_fish', (userdb.balance_fish + count))
+			client.db.changeUser(interaction.member.user.id, 'balance_bugs', (userdb.balance_bugs - bugs))
+			client.db.changeUser(client.user.id, 'balance_bugs', (clientdb.balance_bugs + bugs))
+			client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_fish + count))
 			exchange.sellBugs += bugs;
-			fs.writeFileSync(`${process.env.PATHTOBASE}\\exchange.json`, JSON.stringify(exchange, null, "\t"));
-			return client.api.interactions(interaction.id, interaction.token).callback.post({
-				data: {
-					type: 4,
-					data: {
-						embeds: [
-							{
-								color: 0xb88fff,
-								title: 'Транзакция',
-								description: `Успешно! Продано ${bugs} <:lz_bug:742039591929905223> за ${count} <:lz_fish:742459590087803010>.`,
-								timestamp: new Date(),
-								footer: {
-									text: `${user.tag}`,
-									icon_url: `${user.displayAvatarURL()}`,
-								}
-							}
-						]
-					}
-				}
-			});
+			fs.writeFileSync(`${client.config.jsonPath}exchange.json`, JSON.stringify(exchange, null, "\t"));
+			let successEmbed = new MessageEmbed()
+				.setColor(client.config.embedColor)
+				.setTitle(`Транзакция`)
+				.setDescription(`Успешно! Продано ${bugs} ${client.emoji.bug} за ${count} ${client.emoji.fish}`)
+				.setTimestamp()
+				.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+			return interaction.reply({embeds: [successEmbed]})
 		}
 		if(whattoDo == "курс"){
-			return client.api.interactions(interaction.id, interaction.token).callback.post({
-				data: {
-					type: 4,
-					data: {
-						embeds: [
-							{
-								color: 0xb88fff,
-								title: 'Жучки',
-								description: `Текущий курс обмена жучков:\n1 <:lz_bug:742039591929905223> = ${exchange.currentBugPrice} <:lz_fish:742459590087803010>\n\n/жучки купить <кол-во>\n/жучки продать <кол-во>`,
-								timestamp: new Date(),
-								footer: {
-									text: `${user.tag}`,
-									icon_url: `${user.displayAvatarURL()}`,
-								}
-							}
-						]
-					}
-				}
-			});
+			let exchangeEmbed = new MessageEmbed()
+				.setColor(client.config.embedColor)
+				.setTitle(`Жучки`)
+				.setDescription(`Текущий курс обмена жучков:
+					1 ${client.emoji.bug} = ${exchange.currentBugPrice} ${client.emoji.fish}
+
+					/жучки купить <кол-во>
+					/жучки продать <кол-во>`)
+				.setTimestamp()
+				.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+			return interaction.reply({embeds: [exchangeEmbed]})
 		}
-	}catch(error){
-			client.logger.log(`${error}`, "err");
-		}
+	} catch(error) {
+		client.logger.log(error, 'err')
+		console.error(error)
+		interaction.reply({content: `Произошла ошибка при выполнении команды.`, ephemeral: true})
+	}
 }
 
-module.exports.help = {
+module.exports.data = {
 	name: "жучки",
-	aliases: [";exrb"],
 	permissions: ["member"],
-	modules: ["economy"]
+	type: "interaction"
 }

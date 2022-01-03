@@ -44,11 +44,11 @@ module.exports.run = async (client, interaction) => {
 		let kickMessage = new MessageEmbed()
 			.setColor(client.config.embedColor)
 			.setTitle('Кик: успешно')
-			.addField('Модератор:', user.tag, true)
-			.addField('Пользователь:', usernames, true)
-			.addField('Причина:', reason, false)
+			.addField('Модератор:', `${user.tag}`, true)
+			.addField('Пользователь:', `${usernames}`, true)
+			.addField('Причина:', `${reason}`, false)
 			.setTimestamp()
-			.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+			.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 		interaction.reply({embeds: [kickMessage]})
 		if(guilddb.logmsg_channel != ""){
 			try {
@@ -56,11 +56,11 @@ module.exports.run = async (client, interaction) => {
 				let muteMessage = new MessageEmbed()
 				.setColor(`#b88fff`)
 				.setTitle("Кик: успешно")
-				.addField('Модератор:', user.tag, true)
-				.addField('Пользователь:', usernames, true)
-				.addField('Причина:', reason, false)
+				.addField('Модератор:', `${user.tag}`, true)
+				.addField('Пользователь:', `${usernames}`, true)
+				.addField('Причина:', `${reason}`, false)
 				.setTimestamp()
-				.setFooter(user.tag, user.displayAvatarURL({dynamic: true}));
+				.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) });
 				return channel.send(muteMessage);
 			} catch(error) {
 				client.db.changeGuild(interaction.guildId, 'logmsg_channel', '');

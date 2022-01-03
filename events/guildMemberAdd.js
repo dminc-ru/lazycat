@@ -1,8 +1,9 @@
 module.exports = async (client, member) => {
 	let guilddb = await client.db.getGuild(member.guild.id)
+	let guild = await client.guilds.fetch(member.guild.id)
     if(guilddb.welcomeChannel != ''){
-		const channel = await member.guild.channels.fetch(guilddb.welcomeChannel);
-		channel.send(`<@${member.id}> ${guilddb.welcomeText}`);
+		const channel = await guild.channels.fetch(guilddb.welcomeChannel);
+		channel.send({ content: `<@${member.id}> ${guilddb.welcomeText}` });
 	}
 	if(guilddb.giveRole != 'false'){
 		const role = member.guild.roles.cache.find(role => role.id === guilddb.welcomeRole);

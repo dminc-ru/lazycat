@@ -43,6 +43,8 @@ module.exports.run = async (client, interaction) => {
 		try {
 			muteUserResolve.edit({ communicationDisabledUntil: Date.now() + mutetime }, `[ ${user.tag} ]: «${reason}»`)
 		} catch (error) {
+			client.logger.log(error, 'err')
+			console.error(error)
 			return interaction.reply({content: `Произошла ошибка. Обратитесь на сервер поддержки.`, ephemeral: true})
 		}
 		let muteSuccess = new MessageEmbed()
@@ -53,7 +55,7 @@ module.exports.run = async (client, interaction) => {
 			.addField('Длительность', ms(mutetime, { long: true }))
 			.addField('Причина:', reason, false)
 			.setTimestamp()
-			.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+			.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 		interaction.reply({embeds: [muteSuccess]})
 		if(guilddb.logmsg_channel != ""){
 			try{
@@ -65,7 +67,7 @@ module.exports.run = async (client, interaction) => {
 					.addField('Длительность:', `${ms(mutetime, {long: true})}`, false)
 					.addField('Причина:', reason, false)
 					.setTimestamp()
-					.setFooter(`${user.tag}`, user.displayAvatarURL({dynamic: true}));
+					.setFooter({ text: `${user.tag}`, iconURL: user.displayAvatarURL({dynamic: true}) });
 				const channel = await guild.channels.fetch(guilddb.logmsg_channel);
 				channel.send(muteMessage);
 			}catch(error){

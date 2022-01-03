@@ -35,7 +35,7 @@ module.exports.run = async (client, interaction) => {
 						.setTitle('Успешно')
 						.setDescription(`Удалено ${_message.size} сообщений.`)
 						.setTimestamp()
-						.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+						.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 					return interaction.reply({embeds: [deletedEmbed]})
 				});
 			});
@@ -52,7 +52,7 @@ module.exports.run = async (client, interaction) => {
 						.setTitle('Успешно')
 						.setDescription(`Удалено ${_message.size} сообщений.`)
 						.setTimestamp()
-						.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+						.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 					return interaction.reply({embeds: [deletedEmbed]})
 				});
 			});

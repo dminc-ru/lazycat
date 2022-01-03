@@ -12,11 +12,11 @@ module.exports.run = async (client, interaction) => {
 			.setColor(client.config.embedColor)
 			.setTitle('Понг!')
 			.setDescription(`Задержка: **${Math.round(client.ws.ping)}**мс\n
-				${client.emoji.cloud} Серверов: ${client.guilds.cache.size}.
-				${client.emoji.users} Пользователей: ${members}.
+				${client.emoji.cloud} Серверов: ${client.guilds.cache.size}
+				${client.emoji.users} Пользователей: ${members}
 				${client.emoji.time} Аптайм: ${ms(client.uptime, {long: true})}`)
 			.setTimestamp()
-			.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+			.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 		interaction.reply({embeds: [pongEmbed]})
 	} catch(error) {
 		client.logger.log(error, 'err')

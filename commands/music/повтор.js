@@ -1,5 +1,5 @@
 const { QueueRepeatMode } = require("discord-player");
-
+const { MessageEmbed } = require('discord.js')
 module.exports.run = async (client, interaction) => {
     await interaction.deferReply();
     const queue = client.player.getQueue(interaction.guildId);

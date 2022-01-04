@@ -22,3 +22,8 @@ module.exports.run = async (client, interaction) => {
         .setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
     return void interaction.followUp({ embeds: [nowPlaying] })
 }
+module.exports.data = {
+    name: "сейчас",
+    permissions: ["tester"],
+    type: "interaction"
+}

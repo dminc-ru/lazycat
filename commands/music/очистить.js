@@ -1,6 +1,6 @@
 const { MessageEmbed } = require('discord.js')
 module.exports.run = async (client, interaction) => {
-    await ctx.defer();
+    await interaction.deferReply();
 
     const queue = client.player.getQueue(interaction.guildId);
     let noMusic = new MessageEmbed()

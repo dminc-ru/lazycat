@@ -2,7 +2,7 @@ const { MessageEmbed } = require("discord.js");
 
 module.exports.run = async (client, interaction) => {
     await interaction.deferReply();
-    const queue = client.player.getQueue(ctx.guildID);
+    const queue = client.player.getQueue(interaction.guildId);
     var page = interaction.options.getInteger('страница')
     let noMusic = new MessageEmbed()
         .setColor(client.config.embedColor)

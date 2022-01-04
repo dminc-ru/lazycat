@@ -2,7 +2,7 @@ const { Client, Collection, Intents } = require("discord.js"); // подгруз
 const chalk = require("chalk"); // библиотека для красивой консоли
 console.log(chalk.hex("#B88FFF")(`[!] Загрузка файлов...`));
 const fs = require("fs"); // чтение json файлов
-const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.DIRECT_MESSAGES] }); // интенты для бота
+const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES] }); // интенты для бота
 
 client.config = require('./config')
 

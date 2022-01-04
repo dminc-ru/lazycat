@@ -12,6 +12,7 @@ client.logger = require('./utils/logger'); // утилита для логов
 client.db = require('./utils/db') // утилита для базы данных
 client.emoji = require('./emojis') //кастом эмодзи
 client.messages = require('./messages')
+client.queue = new Map();
 
 function LazyLoader() {
 	const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js')); // чтение папки events

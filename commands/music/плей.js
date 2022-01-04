@@ -21,9 +21,9 @@ module.exports.run = async (client, interaction) => {
         .setTimestamp()
         .setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
     if (!searchResult || !searchResult.tracks.length) return void interaction.followUp({ embeds: [notFound] });
-    const queue = client.player.getQueue(interaction.guildId);
+    var queue = client.player.getQueue(interaction.guildId);
     if (!queue || !queue.playing) {
-        var queue = await client.player.createQueue(guild, {
+        queue = await client.player.createQueue(guild, {
             ytdlOptions: {
                 filter: 'audioonly',
                 highWaterMark: 1 << 30,

@@ -22,6 +22,9 @@ module.exports.run = async (client, interaction) => {
         return void interaction.followUp({ embeds: [skipped] });
     } else {
         const trackIndex = count - 1;
+        if ( (queue.length - 1) > trackIndex) {
+            return interaction.followUp({ content: `Произошла ошибка.` })
+        }
         queue.jump(trackIndex);
         let skipped = new MessageEmbed()
             .setColor(client.config.embedColor)
@@ -30,4 +33,10 @@ module.exports.run = async (client, interaction) => {
             .setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
         return void interaction.followUp({ embeds: [skipped] });
     }
+}
+
+module.exports.data = {
+    name: "скип",
+    permissions: ["tester"],
+    type: "interaction"
 }

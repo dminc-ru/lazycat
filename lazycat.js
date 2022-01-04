@@ -1,8 +1,13 @@
 const { Client, Collection, Intents } = require("discord.js"); // подгрузка библиотеки discord.js
+const { Player } = require('discord-player')
+const { registerPlayerEvents } = require('./events');
 const chalk = require("chalk"); // библиотека для красивой консоли
 console.log(chalk.hex("#B88FFF")(`[!] Загрузка файлов...`));
 const fs = require("fs"); // чтение json файлов
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES] }); // интенты для бота
+
+client.player = new Player(client);
+registerPlayerEvents(client.player);
 
 client.config = require('./config')
 

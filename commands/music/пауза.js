@@ -10,12 +10,12 @@ module.exports.run = async (client, interaction) => {
         .setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
     if (!queue || !queue.playing) return void interaction.followUp({ embeds: [noMusic] });
     const paused = queue.setPaused(true);
-    let paused = new MessageEmbed()
+    let pausedEmbed = new MessageEmbed()
         .setColor(client.config.embedColor)
         .setTitle(`${paused ? `Приостановлено.` : `Произошла ошибка.`}`)
         .setTimestamp()
         .setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
-    return void interaction.followUp({ embeds: [paused] });
+    return void interaction.followUp({ embeds: [pausedEmbed] });
 }
 
 module.exports.data = {

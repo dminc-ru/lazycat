@@ -2,6 +2,7 @@ const { MessageEmbed } = require ('discord.js')
 
 module.exports.run = async (client, interaction) => {
     await interaction.deferReply();
+    var user = client.users.cache.get(interaction.member.user.id)
     const queue = client.player.getQueue(interaction.guildId);
     let noMusic = new MessageEmbed()
         .setColor(client.config.embedColor)
@@ -11,7 +12,6 @@ module.exports.run = async (client, interaction) => {
     if (!queue || !queue.playing) return void interaction.followUp({ embeds: [noMusic] });
     await queue.setFilters({
         bassboost: !queue.getFiltersEnabled().includes('bassboost'),
-        normalizer2: !queue.getFiltersEnabled().includes('bassboost')
     });
     setTimeout(() => {
         let bass = new MessageEmbed()
@@ -19,7 +19,7 @@ module.exports.run = async (client, interaction) => {
             .setTitle(`Бассбуст ${queue.getFiltersEnabled().includes('bassboost') ? 'включён.' : 'выключен.'}.`)
             .setTimestamp()
             .setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
-        return void ctx.sendFollowUp({ embeds: [bass] });
+        return void interaction.followUp({ embeds: [bass] });
     }, queue.options.bufferingTimeout);
 }
 

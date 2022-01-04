@@ -16,6 +16,7 @@ module.exports.run = async (client, interaction) => {
     let nowPlaying = new MessageEmbed()
         .setColor(client.config.embedColor)
         .setTitle('Сейчас играет')
+        .setThumbnail(queue.current.thumbnail)
         .setDescription(`**${queue.current.title}** (\`${perc.progress == 'Infinity' ? 'Live' : perc.progress + '%'}\`)`)
         .addField(`\u200b`, `${progress.replace(/ 0:00/g, ' ◉ LIVE')}`)
         .setTimestamp()

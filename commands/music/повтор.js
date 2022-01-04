@@ -10,7 +10,7 @@ module.exports.run = async (client, interaction) => {
         .setTimestamp()
         .setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
     if (!queue || !queue.playing) return void interaction.followUp({ embeds: [noMusic] });
-    const loopMode = interaction.options.getString('режим')
+    var loopMode = interaction.options.getString('режим')
     if (loopMode == 'off')
         loopMode = QueueRepeatMode.OFF
     else if (loopMode == 'track')
@@ -22,7 +22,7 @@ module.exports.run = async (client, interaction) => {
     const success = queue.setRepeatMode(loopMode);
     let repeatSet = new MessageEmbed()
         .setColor(client.config.embedColor)
-        .setTitle('Повтор включён.')
+        .setTitle(`${(loopMode == 'off') ? `Повтор выключен.` : ((loopMode == 'track') ? `Повтор трека включён.` : ((loopMode == 'queue') ? `Повтор очереди включён.` : `Автопроигрывание включено.`))}Повтор включён.`)
         .setTimestamp()
         .setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
     return void interaction.followUp({ embeds: [repeatSet] });

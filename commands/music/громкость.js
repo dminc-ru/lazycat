@@ -26,7 +26,7 @@ module.exports.run = async (client, interaction) => {
     const success = queue.setVolume(vol);
     let set = new MessageEmbed()
         .setColor(client.config.embedColor)
-        .setTitle(`Громкость установлена! (${vol}%)`)
+        .setTitle(`Громкость установлена. (${vol}%)`)
         .setTimestamp()
         .setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
     return void interaction.followUp({ embeds: [set] });

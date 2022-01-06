@@ -19,10 +19,10 @@ module.exports.run = async (client, interaction) => {
     if (!vol) return void interaction.followUp({ embeds: [curLevel] });
     let notInRange = new MessageEmbed()
         .setColor(client.config.embedColor)
-        .setTitle(`Громкость должна быть на уровне от 0 до 100%`)
+        .setTitle(`Громкость должна быть на уровне от 0 до 200%`)
         .setTimestamp()
         .setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
-    if (vol < 0 || vol > 100) return void interaction.followUp({ embeds: [notInRange] });
+    if (vol < 0 || vol > 200) return void interaction.followUp({ embeds: [notInRange] });
     const success = queue.setVolume(vol);
     let set = new MessageEmbed()
         .setColor(client.config.embedColor)

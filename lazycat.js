@@ -1,8 +1,13 @@
 const { Client, Collection, Intents } = require("discord.js"); // подгрузка библиотеки discord.js
+const { Player } = require('discord-player')
+const { registerPlayerEvents } = require('./events');
 const chalk = require("chalk"); // библиотека для красивой консоли
 console.log(chalk.hex("#B88FFF")(`[!] Загрузка файлов...`));
 const fs = require("fs"); // чтение json файлов
-const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.DIRECT_MESSAGES] }); // интенты для бота
+const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES] }); // интенты для бота
+
+client.player = new Player(client);
+registerPlayerEvents(client.player);
 
 client.config = require('./config')
 
@@ -12,6 +17,7 @@ client.logger = require('./utils/logger'); // утилита для логов
 client.db = require('./utils/db') // утилита для базы данных
 client.emoji = require('./emojis') //кастом эмодзи
 client.messages = require('./messages')
+client.queue = new Map();
 
 function LazyLoader() {
 	const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js')); // чтение папки events

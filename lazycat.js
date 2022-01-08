@@ -98,8 +98,12 @@ client.on("interactionCreate", async interaction => {
 		stats.commands += 1;
 		fs.writeFileSync(`${client.config.jsonPath}stats.json`, JSON.stringify(stats, null, "\t"));
 		if(commandfile){
-			client.logger.log(`INTERACTION || ${fetchedUser.tag} || ${interaction.member.user.id} || ${interaction.commandName}`, 'cmd')
-			commandfile.run(client, interaction);
+			client.logger.log(`INTERACTION ${interaction.id} || ${fetchedUser.tag} || ${interaction.member.user.id} || ${interaction.commandName}`, 'cmd')
+			try {
+				await commandfile.run(client, interaction);
+			} catch (error) {
+				await interaction.reply({ content: `Произошла ошибка при выполнении команды. Пожалуйста, сообщите нам через Сервер Поддержки.\nКод ошибки: ${interaction.id}`})
+			}
 		}else{
 			return; 
 		};

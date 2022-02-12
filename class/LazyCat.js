@@ -30,4 +30,8 @@ class LazyCat extends Client {
         nameFile = () => Object.keys({ name })[0];
         fs.writeFileSync(`${this.config.jsonPath}${name}.json`, JSON.stringify(name, null, "\t"));
     }
+    randInt(min, max) {
+        let rand = min - 0.5 + Math.random() * (max - min + 1);
+        return Math.round(rand);
+    }
 }

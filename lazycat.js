@@ -31,24 +31,18 @@ const LazyLoader = async () => {
 	});
 	client.login(client.config.token);
 };
-
-
-function randInt(min, max) {
-	let rand = min - 0.5 + Math.random() * (max - min + 1);
-	return Math.round(rand);
-}
 setInterval(() =>{
 	let transactions = exchange.boughtBugs + exchange.sellBugs;
 	if(transactions > 9)
-		exchange.currentBugPrice += randInt(1, 3);
+		exchange.currentBugPrice += client.randInt(1, 3);
 	else {
 		if (exchange.currentBugPrice > 30) {
-			exchange.currentBugPrice -= randInt(1, 3);
+			exchange.currentBugPrice -= client.randInt(1, 3);
 		}
 	}
 	exchange.boughtBugs = 0;
 	exchange.sellBugs = 0;
-	fs.writeFileSync(`${client.config.jsonPath}exchange.json`, JSON.stringify(exchange, null, "\t"));
+	client.saveJSON(exchange)
 }, 86400000);
 setInterval( async () => {
 	let userTable = await client.db.getTable('users')
@@ -61,11 +55,11 @@ setInterval( async () => {
 }, 86400000);
 setInterval(() => {
 	for(var i = 0; i<=1; i++){
-		let randomType = randInt(1, 4);
+		let randomType = client.randInt(1, 4);
 		if(randomType == 1){
-			let checkit = randInt(1, 10);
+			let checkit = client.randInt(1, 10);
 			if(checkit == 1){
-				let numCase = randInt(1, 2);
+				let numCase = client.randInt(1, 2);
 				if(numCase == 1){
 					shop[i].name = "Лакикейс садовника";
 					shop[i].cost = 20;
@@ -80,11 +74,11 @@ setInterval(() => {
 					shop[i].uid = 2;
 				}
 			}else{
-				randomType = randInt(2, 4);
+				randomType = client.randInt(2, 4);
 			}
 		}
 		if(randomType == 2){
-			let numCase = randInt(1, 2);
+			let numCase = client.randInt(1, 2);
 			if(numCase == 1){
 				shop[i].name = "Мегакейс садовника";
 				shop[i].cost = 15;
@@ -118,7 +112,7 @@ setInterval(() => {
 			}
 		}
 		if(randomType == 4){
-			let numCost = randInt(90, 110);
+			let numCost = client.randInt(90, 110);
 			shop[i].name = "Жучок";
 			shop[i].cost = numCost;
 			shop[i].currency = client.emoji.fish;
@@ -126,6 +120,6 @@ setInterval(() => {
 			shop[i].uid = 0;
 		}
 	}
-	fs.writeFileSync(`${client.config.jsonPath}shop.json`, JSON.stringify(shop, null, "\t"));
+	client.saveJSON(shop);
 	client.logger.log(`Магазин обновлён.`, "log");
 }, 86400000);

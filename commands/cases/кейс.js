@@ -1,4 +1,3 @@
-const { MessageEmbed } = require('discord.js')
 module.exports.run = async (client, interaction) => {
 	try {
 		let cases = client.json.cases;
@@ -39,32 +38,32 @@ module.exports.run = async (client, interaction) => {
 		}else{
 			return interaction.reply({content: "У вас нет этого кейса.", ephemeral: true})
 		}
-		let chuck = client.randInt(1, 100);
+		let chuck = client.utils.randInt(1, 100);
 		if(chuck == 1){
-			var chuck1 = client.randInt(1, 100);
+			var chuck1 = client.utils.randInt(1, 100);
 				if(chuck1 == 2){
 					var result = 30;
 			}else{
-				var chuck2 = client.randInt(1, 100);
+				var chuck2 = client.utils.randInt(1, 100);
 				if(chuck2 == 5)
-					var result = client.randInt(25, 29)
-				else{var result = client.randInt(0, 4)}
+					var result = client.utils.randInt(25, 29)
+				else{var result = client.utils.randInt(0, 4)}
 			}
 		}
 		if(chuck >= 2 && chuck <= 4){
-			var result = client.randInt(20, 24);
+			var result = client.utils.randInt(20, 24);
 		}
 		if(chuck >= 5 && chuck <= 12){
-			var result = client.randInt(15, 19);
+			var result = client.utils.randInt(15, 19);
 		}
 		if(chuck >= 13 && chuck <= 25){
-			var result = client.randInt(10, 14);
+			var result = client.utils.randInt(10, 14);
 		}
 		if(chuck >= 26 && chuck <= 49){
-			var result = client.randInt(5, 9);
+			var result = client.utils.randInt(5, 9);
 		}
 		if(chuck >= 50 && chuck <= 100){
-			var result = client.randInt(0, 4);
+			var result = client.utils.randInt(0, 4);
 		}
 		if(!inventory[interaction.member.user.id]){
 			inventory[interaction.member.user.id] = {

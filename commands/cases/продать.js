@@ -1,4 +1,3 @@
-const { MessageEmbed } = require('discord.js')
 module.exports.run = async (client, interaction) => {
 	try {
 		let inventory = client.json.inventory;

@@ -23,13 +23,16 @@ class LazyCat extends Client {
         this.messages = require('./messages');
         this.utils = require('./utils/utils')
         this.queue = new Map();
-        this.stats = require(`${this.config.jsonPath}stats.json`);
-        this.exchange = require(`${this.config.jsonPath}exchange.json`);
-        this.shop = require(`${this.config.jsonPath}shop.json`);
+        this.jsonDB = {
+            'badges': require(`${this.config.jsonPath}badges.json`),
+            'stats': require(`${this.config.jsonPath}stats.json`),
+            'exchange': require(`${this.config.jsonPath}exchange.json`),
+            'shop': require(`${this.config.jsonPath}shop.json`)
+        }
     };
     saveJSON (name) {
-        nameFile = () => Object.keys({ name })[0];
-        fs.writeFileSync(`${this.config.jsonPath}${name}.json`, JSON.stringify(name, null, "\t"));
+        db = this.jsonDB[name]
+        fs.writeFileSync(`${this.config.jsonPath}${name}.json`, JSON.stringify(db, null, "\t"));
     }
     randInt (min, max) {
         let rand = min - 0.5 + Math.random() * (max - min + 1);

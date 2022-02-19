@@ -2,11 +2,8 @@ const fs = require("fs");
 const { MessageEmbed } = require('discord.js')
 module.exports.run = async (client, interaction) => {
 	try{
-		let inventory = require(`${client.config.jsonPath}inventory.json`);
-		let noUser = new MessageEmbed()
-			.setColor(client.config.embedColor)
-			.setTitle('Ошибка')
-			.setDescription('Пользователь не найден в базе данных.')
+		let inventory = client.json.inventory
+		let noUser = client.utils.error('Пользователь не найден в базе данных.')
 		try {
 			var user = await client.users.fetch(interaction.member.user.id);
 		} catch (error) {
@@ -30,21 +27,16 @@ module.exports.run = async (client, interaction) => {
 				],
 				items: []
 			};
-			fs.writeFileSync(`${client.config.jsonPath}inventory.json`, JSON.stringify(inventory, null, "\t"));
+			await client.saveJSON('inventory', inventory)
 		}
 		let comlength = Object.keys(inventory[interaction.member.user.id].items).length;
 		if(comlength == 0){
 			let inventorys = "Пусто. Откройте кейс!";
-			let inventoryEmbed = new MessageEmbed()
-				.setColor(client.config.embedColor)
-				.setTitle(`Инвентарь ${user.tag}`)
-				.setDescription(inventorys)
-				.setTimestamp()
-				.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+			let inventoryEmbed = client.utils.embed(`Инвентарь ${user.tag}`, inventorys, user)
 			return interaction.reply({embeds: [inventoryEmbed]});
 		}
 		let number = 1;
-		pages = Math.ceil(comlength/15);
+		let pages = Math.ceil(comlength/15);
 		if(!interaction.options.getInteger('страница')){
 			let inventoryss = "";
 			for(i=0; i<15; i++){
@@ -52,17 +44,15 @@ module.exports.run = async (client, interaction) => {
 				inventoryss += `${number}. ${inventory[interaction.member.user.id].items[i].itemname} • ${inventory[interaction.member.user.id].items[i].cost} ${inventory[interaction.member.user.id].items[i].currency} • ${inventory[interaction.member.user.id].items[i].county} шт. • ${inventory[interaction.member.user.id].items[i].heart}\n`;
 				number+=1;
 			}
-			if(inventoryss == "")
-				inventorys = "Пусто. Откройте кейс!";
+			if(inventoryss == "") {
+				inventoryss = "Пусто. Откройте кейс!";
+				break
+			}
 			}
 		
 			if(inventoryss == "")
-				inventorys = "Пусто. Откройте кейс!";
-				let inventoryEmbed = new MessageEmbed()
-					.setColor(client.config.embedColor)
-					.setTitle(`Инвентарь ${user.tag}`)
-					.setDescription(inventoryss)
-					.setTimestamp()
+				inventoryss = "Пусто. Откройте кейс!";
+				let inventoryEmbed = client.utils.embed(`Инвентарь ${user.tag}`, inventoryss)
 					.setFooter({ text: `${user.tag} • Страница 1/${pages}`, iconURL: user.displayAvatarURL({dynamic: true}) })
 				return interaction.reply({embeds: [inventoryEmbed]})
 		}
@@ -83,11 +73,7 @@ module.exports.run = async (client, interaction) => {
 						number+=1;
 					}
 				}
-				let inventoryEmbed = new MessageEmbed()
-					.setColor(client.config.embedColor)
-					.setTitle(`Инвентарь ${user.tag}`)
-					.setDescription(inventoryss)
-					.setTimestamp()
+				let inventoryEmbed = client.utils.embed(`Инвентарь ${user.tag}`, inventoryss)
 					.setFooter({ text: `${user.tag} • Страница ${page}/${pages}`, iconURL: user.displayAvatarURL({dynamic: true}) })
 				return interaction.reply({embeds: [inventoryEmbed]})
 				}
@@ -102,11 +88,7 @@ module.exports.run = async (client, interaction) => {
 						number+=1;
 					}
 				}
-				let inventoryEmbed = new MessageEmbed()
-					.setColor(client.config.embedColor)
-					.setTitle(`Инвентарь ${user.tag}`)
-					.setDescription(inventoryss)
-					.setTimestamp()
+				let inventoryEmbed = client.utils.embed(`Инвентарь ${user.tag}`, inventoryss)
 					.setFooter({ text: `${user.tag} • Страница ${page}/${pages}`, iconURL: user.displayAvatarURL({dynamic: true}) })
 				return interaction.reply({embeds: [inventoryEmbed]})
 			}

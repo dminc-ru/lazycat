@@ -1,4 +1,4 @@
-const { Client, Collection, Intents } = require('discord.js');
+const { MessageEmbed, Client, Collection, Intents } = require('discord.js');
 const { Player } = require('discord-player');
 class LazyCat extends Client {
     constructor() {
@@ -21,6 +21,7 @@ class LazyCat extends Client {
         this.db = require('./utils/db');
         this.emoji = require('./emojis');
         this.messages = require('./messages');
+        this.utils = require('./utils/utils')
         this.queue = new Map();
         this.stats = require(`${this.config.jsonPath}stats.json`);
         this.exchange = require(`${this.config.jsonPath}exchange.json`);

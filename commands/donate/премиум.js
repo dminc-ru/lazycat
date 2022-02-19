@@ -1,4 +1,3 @@
-const { MessageEmbed, CommandInteractionOptionResolver } = require("discord.js"); 
 const QiwiBillPaymentsAPI = require('@qiwi/bill-payments-node-js-sdk');
 module.exports.run = async (client, message, args) => {
 	try {
@@ -91,10 +90,7 @@ module.exports.run = async (client, message, args) => {
 	}else{
 		var premiumStatus = `неактивен`
 	}
-	let embed = new MessageEmbed()
-			.setColor(client.config.embedColor)
-			.setTitle("Премиум-статус")
-			.setDescription(`<:lz_premium:742033865761095751> Премиум — это возможность поддержать работу Lazy Cat.\n
+	let embed = client.utils.embed('Премиум-статус', `<:lz_premium:742033865761095751> Премиум — это возможность поддержать работу Lazy Cat.\n
 			Всё очень просто: вы спонсируете нас материально — взамен мы предлагаем следующие функции:\n
 			— Музыкальный плагин
 			— Значок в профиле (/профиль)
@@ -104,9 +100,7 @@ module.exports.run = async (client, message, args) => {
 			— Уникальные предметы (/магазин)
 			
 			На данный момент покупка Премиум временно недоступна.\n
-			Ваш Премиум-статус: ${premiumStatus}`)
-			.setTimestamp()
-			.setFooter({ text: `${message.author.tag}`, iconURL: message.author.displayAvatarURL({dynamic: true}) });
+			Ваш Премиум-статус: ${premiumStatus}`, message.author)
 		message.channel.send({embeds: [embed]});
 	} catch (error) {
 		client.logger.log(error, 'err')

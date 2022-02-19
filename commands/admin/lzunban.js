@@ -1,47 +1,32 @@
 const { MessageEmbed, WebhookClient } = require("discord.js");
 module.exports.run = async (client, message, args) => {
 	try {
+		
 		const webhookBan = new WebhookClient({id: client.config.webhookBan.id, token: client.config.webhookBan.token});
-		let noUser = new MessageEmbed()
-			.setColor(client.config.embedColor)
-			.setTitle('Ошибка')
-			.setDescription('Не смог получить ID пользователя.')
+		let noUser = client.utils.error('Не смог получить ID пользователя.', message.author)
 		try{
 			var user = await client.users.fetch((message.mentions.users.first() || args[0]));
 		} catch (error) {
 			return message.channel.send({embeds: [noUser]})
 		}
-		var userdb = await client.db.getUser(user.id);
-		var bannedAlready = new MessageEmbed()
-			.setColor(client.config.embedColor)
-			.setTitle('Ошибка')
-			.setDescription('Пользователь не заблокирован.')
+		let userdb = await client.db.getUser(user.id);
+
+
+		let bannedAlready = client.utils.error('Пользователь не заблокирован.', message.author)
 		if (!userdb) return message.channel.send({embeds: [noUser]});
 		if (userdb.banned == false) {
 			return message.channel.send({embeds: [bannedAlready]})
 		}
-		let reasonUnban = message.content.split(' ').slice(2).join(' ')
-		if(!reasonUnban)
-			reasonUnban = `Рассмотрение апелляции`
+		let reasonUnban = message.content.slice(2) || `Рассмотрение апелляции`
 		await client.db.changeUser(user.id, 'banned', 0);
-		let lazyBan = new MessageEmbed()
-			.setColor(client.config.embedColor)
-			.setTitle(`Глобальная разблокировка`)
-			.setDescription(`Пользователь ${user.tag} успешно разблокирован в системе Lazy Cat.`)
+		let lazyBan = client.utils.embed('Глобальная разблокировка', `Пользователь ${user.tag} успешно разблокирован в системе Lazy Cat.`, message.author)
 		message.channel.send({embeds: [lazyBan]});
-		let newUnban = new MessageEmbed()
-			.setColor(client.config.embedColor)
-			.setTitle(`Пользователь разблокирован`)
-			.setDescription(`Пользователю предоставлен доступ к функциям`)
+		let newUnban = client.utils.embed('Пользователь разблокирован', 'Пользователю предоставлен доступ к функциям', message.author)
 			.addField(`Причина`, `${reasonUnban}`, false)
-			.addField(`Пользователь`, `${user.tag}`, true)
-			.addField(`Модератор`, `${message.author.tag}`, true)
-			.setFooter({ text: `User ID: ${user.id} • Moderator ID: ${message.author.id}` })
+			.addField(`Пользователь`, `${user.tag} (${user.id})`, true)
+			.addField(`Модератор`, `${message.author.tag} (${message.author.id})`, true)
 		webhookBan.send({embeds: [newUnban]});
-		let lazyUnbanUser = new MessageEmbed()
-			.setColor(client.config.embedColor)
-			.setTitle(`Глобальная разблокировка`)
-			.setDescription(`**Вы разблокированы в системе Lazy Cat.** Это означает, что вам предоставлен доступ к функциям Lazy Cat.`)
+		let lazyUnbanUser = client.utils.embed('Глобальная разблокировка', '**Вы разблокированы в системе Lazy Cat.** Это означает, что вам предоставлен доступ к функциям Lazy Cat.')
 			.addField(`Причина`, `${reasonUnban}`, true)
 		try{
 			await client.users.fetch(user.id).send({embeds: [lazyUnbanUser]});

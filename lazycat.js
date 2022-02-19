@@ -32,16 +32,16 @@ const LazyLoader = async () => {
 	client.login(client.config.token);
 };
 setInterval(() =>{
-	let transactions = exchange.boughtBugs + exchange.sellBugs;
+	let transactions = client.exchange.boughtBugs + client.exchange.sellBugs;
 	if(transactions > 9)
-		exchange.currentBugPrice += client.randInt(1, 3);
+		client.exchange.currentBugPrice += client.randInt(1, 3);
 	else {
-		if (exchange.currentBugPrice > 30) {
-			exchange.currentBugPrice -= client.randInt(1, 3);
+		if (client.exchange.currentBugPrice > 30) {
+			client.exchange.currentBugPrice -= client.randInt(1, 3);
 		}
 	}
-	exchange.boughtBugs = 0;
-	exchange.sellBugs = 0;
+	client.exchange.boughtBugs = 0;
+	client.exchange.sellBugs = 0;
 	client.saveJSON(exchange)
 }, 86400000);
 setInterval( async () => {

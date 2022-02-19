@@ -2,32 +2,21 @@ const { MessageEmbed, WebhookClient } = require("discord.js");
 module.exports.run = async (client, message, args) => {
 	try {
 		const webhookBan = new WebhookClient({id: client.config.webhookBan.id, token: client.config.webhookBan.token})
-		let noUser = new MessageEmbed()
-			.setColor(client.config.embedColor)
-			.setTitle('Ошибка')
-			.setDescription('Пользователь не найден в базе данных.')
+		let noUser = client.utils.createError('Пользователь не найден в базе данных.')
 		try {
-			var user = await client.users.fetch((message.mentions.users.first() || args[0]));
+			var user = await client.users.cache.get((message.mentions.users.first() || args[0])) || await client.users.fetch((message.mentions.users.first() || args[0]));
 		} catch (error) {
 			return message.channel.send({embeds: [noUser]})
 		}
-		var userdb = await client.db.getUser(user.id);
-		var bannedAlready = new MessageEmbed()
-			.setColor(client.config.embedColor)
-			.setTitle('Ошибка')
-			.setDescription('Пользователь уже заблокирован.')
+		let userdb = await client.db.getUser(user.id);
 		if (!userdb) return message.channel.send({embeds: [noUser]});
 		if (userdb.banned == true) {
+			let bannedAlready = client.utils.createError('Пользователь уже заблокирован.', user)
 			return message.channel.send({embeds: [bannedAlready]})
 		}
-		let reasonBan = message.content.split(' ').slice(2).join(' ');
-		if(!reasonBan)
-			reasonBan = `Нарушение Пользовательского соглашения`;
+		let reasonBan = message.content.slice(2) || `Нарушение Пользовательского соглашения`
 		await client.db.changeUser(user.id, 'banned', 1);
-		let lazyBan = new MessageEmbed()
-			.setColor(client.config.embedColor)
-			.setTitle(`Глобальная блокировка`)
-			.setDescription(`Пользователь ${user.tag} успешно заблокирован в системе Lazy Cat.`)
+		let lazyBan = client.utils.createSuccess(`Пользователь ${user.tag} успешно заблокирован в системе Lazy Cat.`)
 		message.channel.send({embeds: [lazyBan]});
 		let newBan = new MessageEmbed()
 			.setColor(client.config.embedColor)

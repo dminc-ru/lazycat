@@ -23,4 +23,15 @@ module.exports = class Utils {
         }
         return successMessage
     }
+
+    static createEmbed (title, text, user) {
+        let simpleEmbed = new MessageEmbed()
+            .setColor(client.config.embedColor)
+            .setTitle(title)
+            .setDescription(text)
+            .setTimestamp()
+        if (user) {
+            successMessage.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({ dynamic: true}) })
+        }
+    }
 }

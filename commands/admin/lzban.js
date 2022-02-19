@@ -2,7 +2,7 @@ const { MessageEmbed, WebhookClient } = require("discord.js");
 module.exports.run = async (client, message, args) => {
 	try {
 		const webhookBan = new WebhookClient({id: client.config.webhookBan.id, token: client.config.webhookBan.token})
-		let noUser = client.utils.createError('Пользователь не найден в базе данных.')
+		let noUser = client.utils.error('Пользователь не найден в базе данных.')
 		try {
 			var user = await client.users.cache.get((message.mentions.users.first() || args[0])) || await client.users.fetch((message.mentions.users.first() || args[0]));
 		} catch (error) {
@@ -11,12 +11,12 @@ module.exports.run = async (client, message, args) => {
 		let userdb = await client.db.getUser(user.id);
 		if (!userdb) return message.channel.send({embeds: [noUser]});
 		if (userdb.banned == true) {
-			let bannedAlready = client.utils.createError('Пользователь уже заблокирован.', user)
+			let bannedAlready = client.utils.error('Пользователь уже заблокирован.', user)
 			return message.channel.send({embeds: [bannedAlready]})
 		}
 		let reasonBan = message.content.slice(2) || `Нарушение Пользовательского соглашения`
 		await client.db.changeUser(user.id, 'banned', 1);
-		let lazyBan = client.utils.createSuccess(`Пользователь ${user.tag} успешно заблокирован в системе Lazy Cat.`)
+		let lazyBan = client.utils.success(`Пользователь ${user.tag} успешно заблокирован в системе Lazy Cat.`)
 		message.channel.send({embeds: [lazyBan]});
 		let newBan = new MessageEmbed()
 			.setColor(client.config.embedColor)

@@ -1,5 +1,6 @@
 const { MessageEmbed, Client, Collection, Intents } = require('discord.js');
 const { Player } = require('discord-player');
+let fs = require('fs');
 class LazyCat extends Client {
     constructor() {
         super({

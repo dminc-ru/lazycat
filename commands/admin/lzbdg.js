@@ -256,7 +256,6 @@ module.exports.run = async (client, message, args) => {
 			}
 			default: {
 				let Syntax = client.utils.embed('Значки: синтаксис', undefined, message.author)
-				Syntax
 					.addField(`Субкоманда`, `\`create <код> <эмодзи> <название>|<описание>\` — создать значок
 						\`info <код>\` — информация о значке 
 						\`all\` — список всех значков 

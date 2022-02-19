@@ -1,4 +1,3 @@
-const { MessageEmbed } = require("discord.js");
 const fs = require("fs");
 module.exports.run = async (client, message, args) => {
 	let stats = client.json.stats

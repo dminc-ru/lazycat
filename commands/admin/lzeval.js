@@ -1,4 +1,3 @@
-const { MessageEmbed } = require("discord.js");
 const beautify = require('js-beautify').js;
 module.exports.run = async (client, message, args) => {
 	if(message.author.id != '561822820632494081')

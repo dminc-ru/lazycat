@@ -1,4 +1,4 @@
-const { MessageEmbed, WebhookClient } = require("discord.js");
+const { WebhookClient } = require("discord.js");
 module.exports.run = async (client, message, args) => {
 	try {
 		const webhookBan = new WebhookClient({id: client.config.webhookBan.id, token: client.config.webhookBan.token})

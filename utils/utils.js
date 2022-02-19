@@ -33,5 +33,6 @@ module.exports = class Utils {
         if (user) {
             successMessage.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({ dynamic: true}) })
         }
+        return simpleEmbed
     }
 }

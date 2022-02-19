@@ -1,12 +1,8 @@
-const { MessageEmbed } = require('discord.js')
 module.exports.run = async (client, interaction) => {
 	try {
-		let cases = require(`${client.config.jsonPath}cases.json`);
-		let inventory = require(`${client.config.jsonPath}inventory.json`);
-		let noUser = new MessageEmbed()
-			.setColor(client.config.embedColor)
-			.setTitle('Ошибка')
-			.setDescription('Пользователь не найден в базе данных.')
+		let cases = client.json.cases
+		let inventory = client.json.inventory
+		let noUser = client.utils.error('Пользователь не найден в базе данных.')
 		try {
 			var user = await client.users.fetch(interaction.member.user.id);
 		} catch (error) {
@@ -18,11 +14,9 @@ module.exports.run = async (client, interaction) => {
 		let numberOfCase1 = inventory[interaction.member.user.id].cases[memIndex1].luckyCount;
 		let numberOfCase2 = inventory[interaction.member.user.id].cases[memIndex2].luckyCount;
 		if(!IDcase) {
-			let caseInfo = new MessageEmbed()
-				.setTitle(`Лакикейсы`)
-				.setDescription(`Доступные лакикейсы:
-					1. ${client.emoji.tree} Кейс садовника • У вас ${numberOfCase1} шт.
-					2. ${client.emoji.cmd} Школьная библиотека • У вас: ${numberOfCase2} шт.`)
+			let caseInfo = client.utils.embed('Лакикейсы', `Доступные лакикейсы:
+				1. ${client.emoji.tree} Кейс садовника • У вас ${numberOfCase1} шт.
+				2. ${client.emoji.cmd} Школьная библиотека • У вас: ${numberOfCase2} шт.`, user)
 				.addField(`Редкости:`, `${client.emoji.ph} Обычный ${client.emoji.ph}
 					${client.emoji.bh} Стандартный ${client.emoji.bh}
 					${client.emoji.gh} __Особый__ ${client.emoji.gh}
@@ -31,8 +25,6 @@ module.exports.run = async (client, interaction) => {
 					${client.emoji.rh} ***Легендарный*** ${client.emoji.rh}`, true)
 				.addField(`Команды:`, `Открыть: /лакикейс <номер_кейса>
 					Инвентарь: /инвентарь`, true)
-				.setTimestamp()
-				.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 			return interaction.reply({embeds: [caseInfo]})
 		}
 		if( (IDcase < 1) || (!cases[IDcase]) )
@@ -41,39 +33,34 @@ module.exports.run = async (client, interaction) => {
 		let balances = Number(inventory[interaction.member.user.id].cases[memIndex].luckyCount);
 		if(balances > 0){
 			inventory[interaction.member.user.id].cases[memIndex].luckyCount = balances - 1;
-			let fs = require('fs');
-			fs.writeFileSync(`${client.config.jsonPath}inventory.json`, JSON.stringify(inventory, null, "\t"));
+			await client.saveJSON('inventory', inventory)
 		}else{
 			return interaction.reply({content: "У вас нет этого кейса.", ephemeral: true})
 		}
-		function random(min, max) {
-			let rand = min - 0.5 + Math.random() * (max - min + 1);
-			return Math.round(rand);
-		}
-		let chuck = random(1, 100);
+		let chuck = client.utils.randInt(1, 100);
 		if(chuck == 1){
-			var chuck1 = random(1, 100);
+			var chuck1 = client.utils.randInt(1, 100);
 			if(chuck1 >= 1 && chuck1 <= 3){
 				var result = 30;
 			}
 		}
 		if(chuck >= 2 && chuck <= 4){
-			var result = random(25, 29)
+			var result = client.utils.randInt(25, 29)
 		}
 		if(chuck >= 5 && chuck <= 17){
-			var result = random(20, 24);
+			var result = client.utils.randInt(20, 24);
 		}
 		if(chuck >= 18 && chuck <= 32){
-			var result = random(15, 19);
+			var result = client.utils.randInt(15, 19);
 		}
 		if(chuck >= 33 && chuck <= 48){
-			var result = random(10, 14);
+			var result = client.utils.randInt(10, 14);
 		}
 		if(chuck >= 49 && chuck <= 74){
-			var result = random(5, 9);
+			var result = client.utils.randInt(5, 9);
 		}
 		if(chuck >= 75 && chuck <= 100){
-			var result = random(0, 4);
+			var result = client.utils.randInt(0, 4);
 		}
 		if(!inventory[interaction.member.user.id]){
 			inventory[interaction.member.user.id] = {
@@ -136,8 +123,7 @@ module.exports.run = async (client, interaction) => {
 		for(var i = 0; i<comlength; i++){
 			if(inventory[interaction.member.user.id].items[i].itemname == cases[IDcase].items[result].name){
 				inventory[interaction.member.user.id].items[i].county += 1;
-				let fs = require("fs");
-				fs.writeFileSync(`${client.config.jsonPath}inventory.json`, JSON.stringify(inventory, null, "\t"));
+				await client.saveJSON('inventory', inventory)
 				checks = true;
 				break;
 			}
@@ -158,18 +144,13 @@ module.exports.run = async (client, interaction) => {
 			IDcase: IDcase
 		});
 		}
-		let fs = require("fs");
-		fs.writeFileSync(`${client.config.jsonPath}inventory.json`, JSON.stringify(inventory, null, "\t"));
-		let newItem = new MessageEmbed()
-			.setColor(client.config.embedColor)
-			.setTitle(`Лакикейсы`)
-			.setDescription(`Поздравляем! Вам выпал предмет: ${cases[IDcase].items[result].name}`)
+		await client.saveJSON('inventory', inventory)
+		let newItem = client.utils.embed('Лакикейсы', `Поздравляем! Вам выпал предмет: ${cases[IDcase].items[result].name}`)
 			.addField(`Описание`, cases[IDcase].items[result].description, false)
 			.addField(`Класс`, `${resheart} ${resclass} ${resheart}`, true)
 			.addField(`Стоимость`, `${cases[IDcase].items[result].cost} ${cases[IDcase].items[result].currency}`, true)
 			.addField(`Кейс`, cases[IDcase].name)
 			.setThumbnail(cases[IDcase].items[result].image)
-			.setTimestamp()
 			.setFooter({ text: `${user.tag} • /инвентарь`, iconURL: user.displayAvatarURL({dynamic: true}) })
 		return interaction.reply({embeds: [newItem]})
 	} catch (error) {

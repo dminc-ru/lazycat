@@ -18,20 +18,13 @@ module.exports.run = async (client, message, args) => {
 		await client.db.changeUser(user.id, 'banned', 1);
 		let lazyBan = client.utils.success(`Пользователь ${user.tag} успешно заблокирован в системе Lazy Cat.`)
 		message.channel.send({embeds: [lazyBan]});
-		let newBan = new MessageEmbed()
-			.setColor(client.config.embedColor)
-			.setTitle(`Пользователь заблокирован`)
-			.setDescription(`Пользователю ограничен доступ к функциям`)
+		let newBan = client.utils.embed('Пользователь заблокирован', 'Пользователю ограничен доступ к функциям')
 			.addField(`Причина`, `${reasonBan}`, false)
 			.addField(`Срок`, `навсегда`, false)
-			.addField(`Пользователь`, `${user.tag}`, true)
-			.addField(`Модератор`, `${message.author.tag}`, true)
-			.setFooter({ text: `User ID: ${user.id} • Moderator ID: ${message.author.id}` });
+			.addField(`Пользователь`, `${user.tag} (${user.id})`, true)
+			.addField(`Модератор`, `${message.author.tag} (${message.author.id})`, true)
 		webhookBan.send({embeds: [newBan]});
-		let lazyBanUser = new MessageEmbed()
-			.setColor(client.config.embedColor)
-			.setTitle(`Глобальная блокировка`)
-			.setDescription(client.messages.userBlocked)
+		let lazyBanUser = client.utils.embed('Глобальная блокировка', client.messages.userBlocked)
 			.addField(`Причина`, `${reasonBan}`, false)
 			.addField(`Срок`, `навсегда`, true)
 			.addField(`Модератор`, `${message.author.id}`, true)

@@ -7,6 +7,7 @@ const LazyCat = require('./class/LazyCat')
 const client = new LazyCat();
 registerPlayerEvents(client.player);
 
+client.LazyLoader();
 
 setInterval(() =>{
 	let transactions = client.exchange.boughtBugs + client.exchange.sellBugs;

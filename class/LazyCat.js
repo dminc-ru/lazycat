@@ -30,8 +30,33 @@ class LazyCat extends Client {
         nameFile = () => Object.keys({ name })[0];
         fs.writeFileSync(`${this.config.jsonPath}${name}.json`, JSON.stringify(name, null, "\t"));
     }
-    randInt(min, max) {
+    randInt (min, max) {
         let rand = min - 0.5 + Math.random() * (max - min + 1);
         return Math.round(rand);
     }
+
+    async LazyLoader () {
+        const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js')); // чтение папки events
+        this.logger.log(`[!] DISCORD EVENTS`, "log")
+        for (const file of eventFiles) {
+            const event = require(`./events/${file}`);
+            let eventName = file.split(".")[0];
+            this.logger.log(`[!] Загружено событие ${file}`, "log")
+            this.on(eventName, event.bind(null, this));
+            delete require.cache[require.resolve(`./events/${file}`)];
+        };
+        this.logger.log(`[!] COMMANDS`, "log")
+        fs.readdirSync("./commands/").forEach(dirs => {
+            const allCommands = fs.readdirSync(`./commands/${dirs}`).filter(files => files.endsWith('.js'));
+            for (const file of allCommands) {
+                let command = require(`./commands/${dirs}/${file}`);
+                this.logger.log(`[!] Загружена команда ${file}`, "log")
+                this.commands.set(command.data.name, command);
+                command.data.permissions.forEach(permission => {
+                    this.permissions.set(permission, command.data.name)
+                });
+            };
+        });
+        this.login(this.config.token);
+    };
 }

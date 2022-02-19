@@ -7,30 +7,7 @@ const LazyCat = require('./class/LazyCat')
 const client = new LazyCat();
 registerPlayerEvents(client.player);
 
-const LazyLoader = async () => {
-	const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js')); // чтение папки events
-	client.logger.log(`[!] DISCORD EVENTS`, "log")
-	for (const file of eventFiles) {
-		const event = require(`./events/${file}`);
-		let eventName = file.split(".")[0];
-		client.logger.log(`[!] Загружено событие ${file}`, "log")
-		client.on(eventName, event.bind(null, client));
-		delete require.cache[require.resolve(`./events/${file}`)];
-	};
-	client.logger.log(`[!] COMMANDS`, "log")
-	fs.readdirSync("./commands/").forEach(dirs => {
-		const allCommands = fs.readdirSync(`./commands/${dirs}`).filter(files => files.endsWith('.js'));
-		for (const file of allCommands) {
-			let command = require(`./commands/${dirs}/${file}`);
-			client.logger.log(`[!] Загружена команда ${file}`, "log")
-			client.commands.set(command.data.name, command);
-			command.data.permissions.forEach(permission => {
-				client.permissions.set(permission, command.data.name)
-			});
-		};
-	});
-	client.login(client.config.token);
-};
+
 setInterval(() =>{
 	let transactions = client.exchange.boughtBugs + client.exchange.sellBugs;
 	if(transactions > 9)

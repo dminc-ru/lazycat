@@ -34,10 +34,6 @@ class LazyCat extends Client {
     async saveJSON (name, db) {
         fs.writeFileSync(`${this.config.jsonPath}${name}.json`, JSON.stringify(db, null, "\t"));
     }
-    randInt (min, max) {
-        let rand = min - 0.5 + Math.random() * (max - min + 1);
-        return Math.round(rand);
-    }
 
     async LazyLoader () {
         const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js')); // чтение папки events

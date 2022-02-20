@@ -189,7 +189,7 @@ module.exports.run = async (client, message, args) => {
 							client.db.changeUser(membermention.id, 'badges', stroka)
 						}
 						else {
-							let stroka = `${currentBadges}, ${args[2]}`
+							let stroka = `${currentBadges}${args[2]},`
 							client.db.changeUser(membermention.id, 'badges', stroka);
 						}
 						let Success = new MessageEmbed()

@@ -3,31 +3,28 @@ var fs = require('fs');
 const { MessageEmbed, UserContextMenuInteraction } = require('discord.js')
 module.exports.run = async (client, interaction) => {
 	try {
-		let inventory = require(`${client.config.jsonPath}inventory.json`);
-		let shop = require(`${client.config.jsonPath}shop.json`);
-		let cases = require(`${client.config.jsonPath}cases.json`);
-		let daystrike = require(`${client.config.jsonPath}daystrike.json`);
-		let weekstrike = require(`${client.config.jsonPath}weekstrike.json`);
+		let inventory = client.json.inventory;
+		let shop = client.json.shop;
+		let cases = client.json.cases;
+		let daystrike = client.json.daystrike;
+		let weekstrike = client.json.weekstrike;
 		var whattoDo = interaction.options.getSubcommand();
-		let noUser = new MessageEmbed()
-			.setColor(client.config.embedColor)
-			.setTitle('Ошибка')
-			.setDescription('Пользователь не найден в базе данных.')
+		let noUser = client.utils.error('Пользователь не найден в базе данных.')
 		try {
 			var user = await client.users.fetch(interaction.member.user.id);
 		} catch (error) {
 			return interaction.reply({embeds: [noUser], ephemeral: true})
 		}
 		let userdb = await client.db.getUser(interaction.member.user.id)
-		if(Date.now() > Number(userdb.reward_daily)){
+		if (Date.now() > Number(userdb.reward_daily)) {
 			var dailyStatus = `доступна!`;
-		}else{
+		} else {
 			let razn = Number(userdb.reward_daily) - Date.now();
 			var dailyStatus = `${ms(razn)} осталось`;
 		}
-		if(Date.now() > Number(userdb.reward_weekly)){
+		if (Date.now() > Number(userdb.reward_weekly)) {
 			var weeklyStatus = `доступна!`;
-		}else{
+		} else {
 			let razn = Number(userdb.reward_weekly) - Date.now();
 			var weeklyStatus = `${ms(razn)} осталось`;
 		}
@@ -53,12 +50,7 @@ module.exports.run = async (client, interaction) => {
 				let reward = daystrike.find(day => day.dayStrike == userdb.reward_dayStrike)
 				client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_fish + reward.count))
 				client.db.changeUser(interaction.member.user.id, 'reward_dayStrike', (userdb.reward_dayStrike + 1))
-				let successEmbed = new MessageEmbed()
-					.setColor(client.config.embedColor)
-					.setTitle(`Успешно`)
-					.setDescription(`Вы получили ежедневную награду — ${reward.count} ${client.emoji.fish}`)
-					.setTimestamp()
-					.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+				let successEmbed = client.utils.success(`Вы получили ежедневную награду — ${reward.count} ${client.emoji.fish}`, user)
 				interaction.reply({embeds: [successEmbed]})
 				break
 			}
@@ -88,13 +80,8 @@ module.exports.run = async (client, interaction) => {
 				inventory[interaction.member.user.id].cases[random].megaCount = numbers.toString();
 				inventory[interaction.member.user.id].cases[random2].luckyCount = numbers2.toString();
 				client.db.changeUser(interaction.member.user.id, 'reward_weekStrike', (userdb.reward_weekStrike + 1))
-				fs.writeFileSync(`${client.config.jsonPath}inventory.json`, JSON.stringify(inventory, null, "\t"));
-				let successEmbed = new MessageEmbed()
-					.setColor(client.config.embedColor)
-					.setTitle('Успешно')
-					.setDescription(`Вы получили еженедельную награду — ${(reward.megaCase > 0) ? `${reward.megaCase} мегакейсов` : ``} ${(reward.luckyCase > 0) ? `${reward.luckyCase} лакикейсов` : ``}`)
-					.setTimestamp()
-					.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+				await client.saveJSON('inventory', inventory)
+				let successEmbed = client.utils.success(`Вы получили еженедельную награду — ${(reward.megaCase > 0) ? `${reward.megaCase} мегакейсов` : ``} ${(reward.luckyCase > 0) ? `${reward.luckyCase} лакикейсов` : ``}`, user)
 				interaction.reply({embeds: [successEmbed]})
 				break
 			}
@@ -112,26 +99,13 @@ module.exports.run = async (client, interaction) => {
 					interaction.reply({content: 'Укажите корректное количество кейсов', ephemeral: true})
 					break
 				}
-				function declOfNum(n, text_forms) {  
-					n = Math.abs(n) % 100; var n1 = n % 10;
-					if (n > 10 && n < 20) { return text_forms[2]; }
-					if (n1 > 1 && n1 < 5) { return text_forms[1]; }
-					if (n1 == 1) { return text_forms[0]; }
-					return text_forms[2];
-				}
 				let summa = cases[IDcase].cost * count;
 				if(userdb.balance_bugs >= summa){
 					let memIndex = inventory[interaction.member.user.id].cases.findIndex((obj => obj.caseID == IDcase));
 					inventory[interaction.member.user.id].cases[memIndex].count += 1;
 					client.db.changeUser(interaction.member.user.id, 'balance_bugs', (userdb.balance_bugs - summa))
-					let fs = require('fs');
-					fs.writeFileSync(`${client.config.jsonPath}inventory.json`, JSON.stringify(inventory, null, "\t"));
-					let successEmbed = new MessageEmbed()
-						.setColor(client.config.embedColor)
-						.setTitle('Успешно')
-						.setDescription(`Вы купили ${count} ${declOfNum(count, ['кейс', 'кейса', 'кейсов'])}`)
-						.setTimestamp()
-						.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+					await client.saveJSON('inventory', inventory)
+					let successEmbed = client.utils.success(`Вы купили ${count} ${client.declOfNum(count, ['кейс', 'кейса', 'кейсов'])}`)
 					interaction.reply({embeds: [successEmbed]})
 					break
 				}else{
@@ -169,14 +143,9 @@ module.exports.run = async (client, interaction) => {
 								client.db.changeUser(interaction.member.user.id, 'shop_second', 1)
 							}
 							inventory[interaction.member.user.id].cases[memIndex].megaCount += 1;
-							fs.writeFileSync(`${client.config.jsonPath}inventory.json`, JSON.stringify(inventory, null, "\t"));
+							await client.saveJSON('inventory', inventory)
 							client.db.changeUser(interaction.member.user.id, 'balance_bugs', (userdb.balance_bugs - shop[itemID].cost))
-							let successEmbed = new MessageEmbed()
-								.setColor(client.config.embedColor)
-								.setTitle('Успешно')
-								.setDescription(`Успешная покупка: ${shop[itemID].name}`)
-								.setTimestamp()
-								.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+							let successEmbed = client.utils.success(`Успешная покупка: ${shop[itemID].name}`, user)
 							interaction.reply({embeds: [successEmbed]})
 							break
 						}else{
@@ -195,14 +164,9 @@ module.exports.run = async (client, interaction) => {
 								client.db.changeUser(interaction.member.user.id, 'shop_second', 1)
 							}
 							inventory[interaction.member.user.id].cases[memIndex].luckyCount += 1;
-							fs.writeFileSync(`${client.config.jsonPath}inventory.json`, JSON.stringify(inventory, null, "\t"));
+							await client.saveJSON('inventory', inventory)
 							client.db.changeUser(interaction.member.user.id, 'balance_bugs', (userdb.balance_bugs - shop[itemID].cost))
-							let successEmbed = new MessageEmbed()
-								.setColor(client.config.embedColor)
-								.setTitle('Успешно')
-								.setDescription(`Успешная покупка: ${shop[itemID].name}.`)
-								.setTimestamp()
-								.setFooter(user.tag, user.displayAvatarURL({dynamic: true}))
+							let successEmbed = client.utils.success(`Успешная покупка: ${shop[itemID].name}.`, user)
 							interaction.reply({embeds: [successEmbed]})
 							break
 						}else{
@@ -215,27 +179,25 @@ module.exports.run = async (client, interaction) => {
 						let comlength = Object.keys(inventory[interaction.member.user.id].items).length;
 						var checks;
 						if (userdb.balance_fish >= shop[itemID].cost) {
-							if(itemID == 0){
+							if (itemID == 0) {
 								client.db.changeUser(interaction.member.user.id, 'shop_first', 1)
 							}
-							if(itemID == 1){
+							if (itemID == 1) {
 								client.db.changeUser(interaction.member.user.id, 'shop_second', 1)
 							}
 							client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_bugs - shop[itemID].cost))
-							for(var i = 0; i<comlength; i++){
+							for (var i = 0; i<comlength; i++) {
 								if(inventory[interaction.member.user.id].items[i].itemname == cases[1].items[newID].name){
 									inventory[interaction.member.user.id].items[i].county += 1;
-									let fs = require("fs");
-									fs.writeFileSync(`${client.config.jsonPath}inventory.json`, JSON.stringify(inventory, null, "\t"));
+									await client.saveJSON('inventory', inventory)
 									checks = true;
 									break;
 								}
 								checks = false;
 							}
-							if(cases[1].items[newID].class == 'Обычный'){
+							if (cases[1].items[newID].class == 'Обычный') {
 								resheart = client.emoji.ph
-							}
-							else if(cases[1].items[newID].class == 'Стандартный'){
+							} else if(cases[1].items[newID].class == 'Стандартный') {
 								resheart = client.emoji.bh;
 							}
 							if(!checks){
@@ -252,14 +214,9 @@ module.exports.run = async (client, interaction) => {
 									county: 1,
 									IDcase: 1
 								});
-								fs.writeFileSync(`${client.config.jsonPath}inventory.json`, JSON.stringify(inventory, null, "\t"));
+								await client.saveJSON('inventory', inventory)
 							}
-							let successEmbed = new MessageEmbed()
-								.setColor(client.config.embedColor)
-								.setTitle('Успешно')
-								.setDescription(`Успешная покупка: ${shop[itemID].name}.`)
-								.setTimestamp()
-								.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+							let successEmbed = client.utils.success(`Успешная покупка: ${shop[itemID].name}.`, user)
 							interaction.reply({embeds: [successEmbed]})
 							break
 						}else{
@@ -277,12 +234,7 @@ module.exports.run = async (client, interaction) => {
 							}
 							client.db.changeUser(interaction.member.user.id, 'balance_bugs', (userdb.balance_bugs + 1))
 							client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_fish - shop[itemID].cost))
-							let successEmbed = new MessageEmbed()
-								.setColor(client.config.embedColor)
-								.setTitle('Успешно')
-								.setDescription(`Успешная покупка: ${shop[itemID].name}.`)
-								.setTimestamp()
-								.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+							let successEmbed = client.utils.success(`Успешная покупка: ${shop[itemID].name}.`, user)
 							interaction.reply({embeds: [successEmbed]})
 							break
 						}else{
@@ -293,15 +245,11 @@ module.exports.run = async (client, interaction) => {
 				}
 			}
 			case 'магазин': {
-				let shopEmbed = new MessageEmbed()
-					.setColor(client.config.embedColor)
-					.setTitle('Магазин')
+				let shopEmbed = client.utils.embed('Магазин', undefined, user)
 					.addField('Награды', `Ежедневная — ${dailyStatus}\nЕженедельная — ${weeklyStatus}`, false)
 					.addField('Витрина', `1. ${shop[0].name} | ${shop[0].cost} ${shop[0].currency}
 						2. ${shop[1].name} | ${shop[1].cost} ${shop[1].currency}`, false)
 					.addField('Кейсы', `1. ${client.emoji.tree} Кейс садовника\n2. ${client.emoji.cmd} Школьная библиотека`, false)
-					.setTimestamp()
-					.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 				interaction.reply({embeds: [shopEmbed]})
 				break
 			}

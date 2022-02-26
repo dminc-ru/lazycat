@@ -1,4 +1,3 @@
-const { MessageEmbed } = require('discord.js')
 module.exports.run = async (client, interaction) => {
 	try {
 		let userdb = await client.db.getUser(interaction.member.user.id)

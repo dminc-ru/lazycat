@@ -1,12 +1,8 @@
 const { MessageEmbed } = require('discord.js');
-const { max } = require('moment');
 module.exports.run = async (client, interaction) => {
     try {
-        let works = require(`${client.config.jsonPath}works.json`);
-	    let noUser = new MessageEmbed()
-		    .setColor(client.config.embedColor)
-		    .setTitle('Ошибка')
-            .setDescription('Пользователь не найден в базе данных.')
+        let works = client.json.works
+        let noUser = client.utils.error('Пользователь не найден в базе данных.')
 	    try {
 		    var user = await client.users.fetch(interaction.member.user.id);
 	    } catch (error) {
@@ -16,14 +12,10 @@ module.exports.run = async (client, interaction) => {
 	    var whattoDo = interaction.options.getSubcommand();
         switch (whattoDo) {
             case 'список': {
-                let workList = new MessageEmbed()
-                    .setColor(client.config.embedColor)
-                    .setTitle('Работа')
+                let workList = client.utils.embed('Работа', undefined, user)
                     .addField(`1. ${works[0].name}`, works[0].description, false)
                     .addField(`2. ${works[1].name}`, works[1].description, false)
                     .addField(`3. ${works[2].name}`, works[2].description, false)
-                    .setTimestamp()
-                    .setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
                 interaction.reply({embeds: [workList]})
                 break
             }
@@ -37,20 +29,16 @@ module.exports.run = async (client, interaction) => {
                 var nextRank = curRank + 1;
                 if(curRank == 5)
                     nextRank = 5;
-                let rankList = new MessageEmbed()
-                    .setColor(client.config.embedColor)
-                    .setTitle('Ранги')
-                    .setDescription(`Ваша текущая работа — ${curWork.name}
+                let rankList = client.utils.embed('Ранги', 
+                        `Ваша текущая работа — ${curWork.name}
                         Ваш ранг — ${curWork.ranks[curRank].name}
-                        Опыт: ${userdb.work_currentXP}/${curWork.ranks[nextRank].requiredXP} XP`)
+                        Опыт: ${userdb.work_currentXP}/${curWork.ranks[nextRank].requiredXP} XP`, user)
                     .addField(`1. ${curWork.ranks[0].name}`, `Доход: ${curWork.ranks[0].income} ${client.emoji.fish}`, false)
                     .addField(`2. ${curWork.ranks[1].name}`, `Доход: ${curWork.ranks[1].income} ${client.emoji.fish}`, false)
                     .addField(`3. ${curWork.ranks[2].name}`, `Доход: ${curWork.ranks[2].income} ${client.emoji.fish}`, false)
                     .addField(`4. ${curWork.ranks[3].name}`, `Доход: ${curWork.ranks[3].income} ${client.emoji.fish}`, false)
                     .addField(`5. ${curWork.ranks[4].name}`, `Доход: ${curWork.ranks[4].income} ${client.emoji.fish}`, false)
                     .addField(`6. ${curWork.ranks[5].name}`, `Доход: ${curWork.ranks[5].income} ${client.emoji.fish}`, false)
-                    .setTimestamp()
-                    .setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
                 interaction.reply({embeds: [rankList]})
                 break
             }
@@ -76,12 +64,7 @@ module.exports.run = async (client, interaction) => {
                 client.db.changeUser(interaction.member.user.id, 'work_current', works[workID].codename)
                 client.db.changeUser(interaction.member.user.id, 'work_currentXP', 0)
                 client.db.changeUser(interaction.member.user.id, 'work_rank', 0)
-                let successEmbed = new MessageEmbed()
-                    .setColor(client.config.embedColor)
-                    .setTitle('Успешно')
-                    .setDescription(`Вы устроились на работу — ${works[workID].name}. Ваш текущий ранг: ${works[workID].ranks[0].name}`)
-                    .setTimestamp()
-                    .setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+                let successEmbed = client.utils.success(`Вы устроились на работу — ${works[workID].name}. Ваш текущий ранг: ${works[workID].ranks[0].name}`, user)
                 interaction.reply({embeds: [successEmbed]})
                 break
             }
@@ -103,12 +86,7 @@ module.exports.run = async (client, interaction) => {
                 client.db.changeUser(interaction.member.user.id, 'work_current', "")
                 client.db.changeUser(interaction.member.user.id, 'work_currentXP', 0)
                 client.db.changeUser(interaction.member.user.id, 'work_rank', 0)
-                let successEmbed = new MessageEmbed()
-                    .setColor(client.config.embedColor)
-                    .setTitle('Успешно')
-                    .setDescription(`Вы уволились с текущей работы — ${curWork.name}. ${toAdd}`)
-                    .setTimestamp()
-                    .setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+                let successEmbed = client.utils.success(`Вы уволились с текущей работы — ${curWork.name}. ${toAdd}`, user)
                 interaction.reply({embeds: [successEmbed]})
                 break
             }
@@ -128,11 +106,7 @@ module.exports.run = async (client, interaction) => {
                         else
                             var chetType = `чётное`;
                         let taskZnak = randomInt(1, 4);
-                        let workEmbed = new MessageEmbed()
-                            .setColor(client.config.embedColor)
-                            .setTitle('Работа')
-                            .setDescription(`Напишите любое **${chetType} ${taskZnak}-х значное** число.`)
-                            .setTimestamp()
+                        let workEmbed = client.utils.embed('Работа', `Напишите любое **${chetType} ${taskZnak}-х значное** число.`)
                             .setFooter({ text: `${user.tag} • У вас 10 секунд. Отправьте сообщение с числом.`, iconURL: user.displayAvatarURL({dynamic: true}) })
                         interaction.reply({embeds: [workEmbed]})
                         const filter = message => message.author.id === interaction.member.user.id;
@@ -152,13 +126,8 @@ module.exports.run = async (client, interaction) => {
                                         toAdd = `\n**У вас новый ранг: ${curWork.ranks[checkNextRank].name}**`;
                                     }
                                 }
-                                let successEmbed = new MessageEmbed()
-                                    .setColor(client.config.embedColor)
-                                    .setTitle("Работа: успешно")
-                                    .setDescription(`Вы выполнили задание.
-                                        Получено ${wonXP} XP и ${curWork.ranks[curRank].income} ${client.emoji.fish}. ${toAdd}`)
-                                    .setTimestamp()
-                                    .setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+                                let successEmbed = client.utils.success(`Вы выполнили задание.
+                                    Получено ${wonXP} XP и ${curWork.ranks[curRank].income} ${client.emoji.fish}. ${toAdd}`, user)
                                 interaction.editReply({embeds: [successEmbed]})
                                 answered = true
                                 return collector.stop()
@@ -172,12 +141,7 @@ module.exports.run = async (client, interaction) => {
                                         toAddErr = `Вы потеряли 1 XP и ${curWork.ranks[curRank].income} ${client.emoji.fish}.`;
                                     }
                                 }
-                                let letError = new MessageEmbed()
-                                    .setColor(client.config.embedColor)
-                                    .setTitle("Работа: ошибка")
-                                    .setDescription(`Допущена ошибка. ${toAddErr}`)
-                                    .setTimestamp()
-                                    .setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+                                let letError = client.utils.error(`Допущена ошибка. ${toAddErr}`, user)
                                 interaction.editReply({embeds: [letError]})
                                 answered = true
                                 return collector.stop()
@@ -190,12 +154,7 @@ module.exports.run = async (client, interaction) => {
                                     client.db.changeUser(interaction.member.user.id, 'work_currentXP', (userdb.work_currentXP - 1))
                                     toAddErr = `Вы потеряли 1 XP.`;
                                 }
-                                let timeOut = new MessageEmbed()
-                                    .setColor(client.config.embedColor)
-                                    .setTitle('Работа: ошибка')
-                                    .setDescription(`Время истекло. ${toAddErr}`)
-                                    .setTimestamp()
-                                    .setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+                                let timeOut = client.utils.error(`Время истекло. ${toAddErr}`, user)
                                 return interaction.editReply({embeds: [timeOut]})
                             } else {
                                 return 
@@ -220,11 +179,7 @@ module.exports.run = async (client, interaction) => {
                             var secondNum = randomInt(34, 63);
                             var thirdNum = randomInt(5, 33);
                         }
-                        let workEmbed = new MessageEmbed()
-                            .setColor(client.config.embedColor)
-                            .setTitle('Работа')
-                            .setDescription(`Напишите наибольшее число: **${firstNum}**, **${secondNum}**, **${thirdNum}**.`)
-                            .setTimestamp()
+                        let workEmbed = client.utils.embed('Работа', `Напишите наибольшее число: **${firstNum}**, **${secondNum}**, **${thirdNum}**.`)
                             .setFooter({ text: `${user.tag} • У вас 10 секунд. Отправьте сообщение с числом.`, iconURL: user.displayAvatarURL({dynamic: true}) })
                         interaction.reply({embeds: [workEmbed]})
                         const filter = message => message.author.id === interaction.member.user.id;
@@ -241,13 +196,8 @@ module.exports.run = async (client, interaction) => {
                                     client.db.changeUser(interaction.member.user.id, 'work_rank', (userdb.work_rank + 1))
                                     toAdd = `\n**У вас новый ранг: ${curWork.ranks[checkNextRank].name}**`;
                                 }
-                                let successEmbed = new MessageEmbed()
-                                    .setColor(client.config.embedColor)
-                                    .setTitle("Работа: успешно")
-                                    .setDescription(`Вы выполнили задание.
-                                        Получено ${wonXP} XP и ${curWork.ranks[curRank].income} ${client.emoji.fish}. ${toAdd}`)
-                                    .setTimestamp()
-                                    .setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+                                let successEmbed = client.utils.success(`Вы выполнили задание.
+                                    Получено ${wonXP} XP и ${curWork.ranks[curRank].income} ${client.emoji.fish}. ${toAdd}`, user)
                                 interaction.editReply({embeds: [successEmbed]})
                                 answered = true
                                 return collector.stop()
@@ -262,12 +212,7 @@ module.exports.run = async (client, interaction) => {
                                     }
                                     
                                 }
-                                let letError = new MessageEmbed()
-                                    .setColor(client.config.embedColor)
-                                    .setTitle('Работа: ошибка')
-                                    .setDescription(`Допущена ошибка. ${toAddErr}`)
-                                    .setTimestamp()
-                                    .setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+                                let letError = client.utils.error(`Допущена ошибка. ${toAddErr}`, user)
                                 interaction.editReply({embeds: [letError]})
                                 answered = true
                                 return collector.stop()
@@ -280,12 +225,7 @@ module.exports.run = async (client, interaction) => {
                                     client.db.changeUser(interaction.member.user.id, 'work_currentXP', (userdb.work_currentXP - 1))
                                     toAddErr = `Вы потеряли 1 XP.`;
                                 }
-                                let timeOut = new MessageEmbed()
-                                    .setColor(client.config.embedColor)
-                                    .setTitle("Работа: ошибка")
-                                    .setDescription(`Время истекло. ${toAddErr}`)
-                                    .setTimestamp()
-                                    .setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+                                let timeOut = client.utils.error(`Время истекло. ${toAddErr}`, user)
                                 return interaction.editReply({embeds: [timeOut]})
                             } else {
                                 return 

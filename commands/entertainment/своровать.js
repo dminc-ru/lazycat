@@ -1,10 +1,7 @@
 const { MessageEmbed } = require('discord.js')
 module.exports.run = async (client, interaction) => {
 	try {
-		let noUser = new MessageEmbed()
-			.setColor(client.config.embedColor)
-			.setTitle('Ошибка')
-			.setDescription('Пользователь не найден в базе данных.')
+		let noUser = client.utils.error('Пользователь не найден в базе данных.')
 		try {
 			var user = await client.users.fetch(interaction.member.user.id);
 		} catch (error) {
@@ -28,24 +25,14 @@ module.exports.run = async (client, interaction) => {
 		}
 		let tryin = randomSteal(1, 100)
 		if(tryin < 30){
-			let failEmbed = new MessageEmbed()
-				.setColor(client.config.embedColor)
-				.setTitle('Воровство: неудача')
-				.setDescription(`${client.emoji.fish} Неудача! Вас заметили, и вы пытаетесь скрыться.`)
-				.setTimestamp()
-				.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+			let failEmbed = client.utils.embed('Воровство: неудача', `${client.emoji.fish} Неудача! Вас заметили, и вы пытаетесь скрыться.`, user)
 			return interaction.reply({embeds: [failEmbed]})
 		}
 		else{
 			let stFish = randomSteal(1, 5)
 			client.db.changeUser(memberdb.discord_id, 'balance_fish', (memberdb.balance_fish - stFish))
 			client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_fish + stFish))
-			let successEmbed = new MessageEmbed()
-				.setColor(client.config.embedColor)
-				.setTitle('Воровство: успешно')
-				.setDescription(`Шалость удалась! Вам зачислено ${stFish} ${client.emoji.fish}`)
-				.setTimestamp()
-				.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
+			let successEmbed = client.utils.success(`Шалость удалась! Вам зачислено ${stFish} ${client.emoji.fish}`, user)
 			return interaction.reply({embeds: [successEmbed]})
 		};
 	} catch (error) {

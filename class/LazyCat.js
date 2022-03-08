@@ -26,9 +26,21 @@ class LazyCat extends Client {
         this.queue = new Map();
         this.json = {
             badges: this.badges = require(`${this.config.jsonPath}badges.json`),
-            stats: this.stats = require(`${this.config.jsonPath}stats.json`),
+            bans: this.bans = require(`${this.config.jsonPath}bans.json`),
+            cases: this.cases = require(`${this.config.jsonPath}cases.json`),
+            config: this.config = require(`${this.config.jsonPath}config.json`),
+            daystrike: this.daystrike = require(`${this.config.jsonPath}daystrike.json`),
             exchange: this.exchange = require(`${this.config.jsonPath}exchange.json`),
-            shop: this.shop = require(`${this.config.jsonPath}shop.json`)
+            inventory: this.inventory = require(`${this.config.jsonPath}inventory.json`),
+            items: this.items = require(`${this.config.jsonPath}items.json`),
+            levels: this.items = require(`${this.config.jsonPath}levels.json`),
+            messages: this.items = require(`${this.config.jsonPath}messages.json`),
+            mutes: this.items = require(`${this.config.jsonPath}mutes.json`),
+            playlists: this.items = require(`${this.config.jsonPath}playlists.json`),
+            stats: this.stats = require(`${this.config.jsonPath}stats.json`),
+            shop: this.shop = require(`${this.config.jsonPath}shop.json`),
+            weekstrike: this.weekstrike = require(`${this.config.jsonPath}weekstrike.json`),
+            works: this.works = require(`${this.config.jsonPath}works.json`)
         }
     };
     async saveJSON (name, db) {

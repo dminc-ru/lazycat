@@ -1,7 +1,6 @@
 const { registerPlayerEvents } = require('./events');
 const chalk = require("chalk"); // библиотека для красивой консоли
 console.log(chalk.hex("#B88FFF")(`[!] Загрузка файлов...`));
-const fs = require("fs"); // чтение json файлов
 
 const LazyCat = require('./class/LazyCat')
 const client = new LazyCat();

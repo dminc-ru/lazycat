@@ -2,10 +2,7 @@ const fetch = require('node-superfetch');
 const { MessageEmbed } = require('discord.js')
 module.exports.run = async (client, interaction) => {
 	try {
-		let noUser = new MessageEmbed()
-			.setColor(client.config.embedColor)
-			.setTitle('Ошибка')
-			.setDescription('Пользователь не найден в базе данных.')
+		let noUser = client.utils.error('Пользователь не найден в базе данных.')
 		try {
 			var user = await client.users.fetch(interaction.member.user.id);
 		} catch (error) {
@@ -15,11 +12,8 @@ module.exports.run = async (client, interaction) => {
 			.then(res => res.json()).then((data) => {
 				if(!data) return interaction.reply({content: "Произошла ошибка при получении данных. Код ошибки: LZE-007", ephemeral: true})
 				let catURL = data.file
-				let catEmbed = new MessageEmbed()
-					.setColor(client.config.embedColor)
+				let catEmbed = client.utils.embed(undefined, undefined, user)
 					.setImage(catURL)
-					.setTimestamp()
-					.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 				interaction.reply({embeds: [catEmbed]})          
 		});
 	} catch (error) {

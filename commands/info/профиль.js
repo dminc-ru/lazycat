@@ -1,17 +1,14 @@
 const { MessageEmbed } = require('discord.js')
 module.exports.run = async (client, interaction) => {
 	try {
-		let badgebase = require(`${client.config.jsonPath}badges.json`);
+		let badgebase = client.json.badges
 		let userdb = await client.db.getUser(interaction.member.user.id)
 		try {
 			var memberProfile = await client.users.fetch(interaction.options.getUser('участник'));
 		} catch (error) {
 			memberProfile = undefined;
 		}
-		let noUser = new MessageEmbed()
-			.setColor(client.config.embedColor)
-			.setTitle('Ошибка')
-			.setDescription('Пользователь не найден в базе данных.')
+		let noUser = client.utils.error('Пользователь не найден в базе данных.')
 		try {
 			var user = await client.users.fetch(interaction.member.user.id);
 		} catch (error) {

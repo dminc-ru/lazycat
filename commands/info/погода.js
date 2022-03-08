@@ -1,11 +1,7 @@
-const { MessageEmbed } = require('discord.js')
 const weather = require('openweather-apis');
 module.exports.run = async (client, interaction) => {
 	try {
-		let noUser = new MessageEmbed()
-		.setColor(client.config.embedColor)
-		.setTitle('Ошибка')
-		.setDescription('Пользователь не найден в базе данных.')
+		let noUser = client.utils.error('Пользователь не найден в базе данных.')
 		try {
 			var user = await client.users.fetch(interaction.member.user.id);
 		} catch (error) {
@@ -27,9 +23,7 @@ module.exports.run = async (client, interaction) => {
 			};
 			let currentTemp = Math.floor(response.main.temp);
 			let feelsLike = Math.floor(response.main.feels_like);
-			let weatherEmbed = new MessageEmbed()
-				.setColor(client.config.embedColor)
-				.setTitle(`Погода: ${response.name}`)
+			let weatherEmbed = client.utils.embed(`Погода: ${response.name}`, undefined, user)
 				.setThumbnail(`http://openweathermap.org/img/wn/${response.weather[0].icon}@2x.png`)
 				.addField(`Часовой пояс:`, `UTS${sign}${shift}`, false)
 				.addField('Температура:', `${currentTemp}°C`, true)
@@ -38,8 +32,6 @@ module.exports.run = async (client, interaction) => {
 				.addField('Ощущается как:', `${feelsLike}°C`, true)
 				.addField('Влажность:', `${response.main.humidity}%`, true)
 				.addField('Облачность:', `${response.clouds.all}%`, true)
-				.setTimestamp()
-				.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 			return interaction.reply({embeds: [weatherEmbed]})
 		});
 	} catch (error) {

@@ -1,5 +1,4 @@
 const fetch = require('node-superfetch');
-const { MessageEmbed } = require('discord.js')
 module.exports.run = async (client, interaction) => {
 	try {
 		let noUser = client.utils.error('Пользователь не найден в базе данных.')

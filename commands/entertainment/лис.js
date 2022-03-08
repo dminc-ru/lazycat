@@ -1,5 +1,4 @@
 const request = require('node-superfetch');
-const { MessageEmbed } = require('discord.js')
 module.exports.run = async (client, interaction) => {
 	try {
 		const { body } = await request.get('https://randomfox.ca/floof');

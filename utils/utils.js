@@ -1,8 +1,9 @@
 const { MessageEmbed } = require('discord.js')
+const config = require('../config')
 module.exports = class Utils {
     static error (text, user) {
         let errMessage = new MessageEmbed()
-            .setColor(client.config.embedColor)
+            .setColor(config.embedColor)
             .setTitle('Ошибка')
             .setDescription(text)
             .setTimestamp()
@@ -14,7 +15,7 @@ module.exports = class Utils {
 
     static success (text, user) {
         let successMessage = new MessageEmbed()
-            .setColor(client.config.embedColor)
+            .setColor(config.embedColor)
             .setTitle('Успешно')
             .setDescription(text)
             .setTimestamp()
@@ -26,14 +27,14 @@ module.exports = class Utils {
 
     static embed (title, text, user) {
         let simpleEmbed = new MessageEmbed()
-            .setColor(client.config.embedColor)
+            .setColor(config.embedColor)
             .setTitle(title)
             .setTimestamp()
         if (text) {
-            errMessage.setDescription(text)
+            simpleEmbed.setDescription(text)
         }
         if (user) {
-            successMessage.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({ dynamic: true}) })
+            simpleEmbed.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({ dynamic: true}) })
         }
         return simpleEmbed
     }

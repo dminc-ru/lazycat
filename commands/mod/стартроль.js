@@ -46,7 +46,7 @@ class GiveRole extends Command {
 				let autoRoleEnabled = client.utils.success('Автоматическая выдача роли новым участникам включена. Отключить — /стартроль выкл', user)
 				return interaction.reply({embeds: [autoRoleEnabled]})
 			}
-			startRole = interaction.options.getRole('роль');
+			startRole = interaction.options.getRole('роль').id;
 			client.db.changeGuild(interaction.guildId, 'welcomeRole', startRole)
 			let successEmbed = client.utils.success('Теперь эта роль будет выдаваться всем участникам. Выдачу роли можно отключить командой /стартроль выкл', user)
 			return interaction.reply({embeds: [successEmbed]})

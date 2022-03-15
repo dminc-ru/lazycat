@@ -1,26 +1,27 @@
-const { MessageEmbed } = require('discord.js')
-module.exports.run = async (client, interaction) => {
-    await interaction.deferReply();
-    var user = client.users.cache.get(interaction.member.user.id)
-    const queue = client.player.getQueue(interaction.guildId);
-    let noMusic = new MessageEmbed()
-        .setColor(client.config.embedColor)
-        .setTitle('Очередь пуста.')
-        .setTimestamp()
-        .setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
-    if (!queue) return void interaction.followUp({ embeds: [noMusic] });
-        
-    queue.clear();
-    let cleared = new MessageEmbed()
-        .setColor(client.config.embedColor)
-        .setTitle('Очередь очищена.')
-        .setTimestamp()
-        .setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
-    interaction.followUp({ embeds: [cleared] });
+const Command = require('../../class/Command')
+
+class Clear extends Command {
+    constructor(client) {
+        super(client, {
+            name: 'очистить',
+            permissions: ['member'],
+            type: 'interaction',
+            enabled: true,
+            guildOnly: true
+        })
+    }
+
+    async run (client, interaction) {
+        await interaction.deferReply();
+        var user = client.users.cache.get(interaction.member.user.id)
+        const queue = client.player.getQueue(interaction.guildId);
+        let noMusic = client.utils.embed('Очередь пуста', undefined, user)
+        if (!queue) return void interaction.followUp({ embeds: [noMusic] });
+            
+        queue.clear();
+        let cleared = client.utils.embed('Очередь очищена.', undefined, user)
+        interaction.followUp({ embeds: [cleared] });
+    }
 }
 
-module.exports.data = {
-    name: "очистить",
-    permissions: ["tester"],
-    type: "interaction"
-}
+module.exports = Clear;

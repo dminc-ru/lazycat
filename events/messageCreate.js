@@ -1,9 +1,7 @@
-const fs = require("fs");
 let cooldown = new Set();
 const { MessageEmbed } = require('discord.js')
 let cdseconds = 3;
 module.exports = async (client, message) => {
-	let stats = require(`${client.config.jsonPath}stats.json`);
 	if (!message.content.startsWith('/')) return
 	const args = message.content.slice(1).split(" ");
 	if (message.author.id == client.user.id)
@@ -27,7 +25,7 @@ module.exports = async (client, message) => {
 	}
 	let commandfile = client.commands.get(lzcmd);
 	if(commandfile) {
-		switch (commandfile.permissions) {
+		switch (commandfile.data.permissions) {
 			case 'tester': {
 				if(user.permissions_tester != true)
 					return;
@@ -46,11 +44,14 @@ module.exports = async (client, message) => {
 			default: break;
 		}
 		cooldown.add(message.author.id);
-		stats.commands += 1;
-		fs.writeFileSync(`${client.config.jsonPath}stats.json`, JSON.stringify(stats, null, "\t"));
+		let stats = client.json.stats
+		stats.commands += 1
+		client.saveJSON('stats', stats)
 		client.logger.log(`MESSAGE || ${fetchedUser.tag} || ${message.author.id} || ${lzcmd}`, 'cmd')
 		if (commandfile.data.type == "message") {
-			commandfile.run(client, message, args);
+			if (commandfile.data.enabled)
+				commandfile.run(client, message, args);
+			else return
 		}else {
 			return
 		}

@@ -19,7 +19,7 @@ module.exports = async (client, interaction) => {
 	}
 	let commandfile = client.commands.get(interaction.commandName);
 	if(commandfile) {
-		switch (commandfile.permissions) {
+		switch (commandfile.data.permissions) {
 			case 'member': {
 				if(user.permissions_member != true)
 					return;
@@ -42,13 +42,15 @@ module.exports = async (client, interaction) => {
 			}
 			default: break;
 		}
-
+		let stats = client.json.stats
 		stats.commands += 1;
-        client.saveJSON(stats);
+        client.saveJSON('stats', stats);
 		if(commandfile){
 			client.logger.log(`INTERACTION ${interaction.id} || ${fetchedUser.tag} || ${interaction.member.user.id} || ${interaction.commandName}`, 'cmd')
 			try {
-				await commandfile.run(client, interaction);
+				if (commandfile.data.enabled)
+					await commandfile.run(client, interaction);
+				else await interaction.reply({ content: 'Команда временно отключена.' })
 			} catch (error) {
 				await interaction.reply({ content: `Произошла ошибка при выполнении команды. Пожалуйста, сообщите нам через Сервер Поддержки.\nКод ошибки: ${interaction.id}`})
 			}

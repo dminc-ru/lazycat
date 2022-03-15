@@ -54,14 +54,14 @@ class Shop extends Command {
 						}
 					}else{
 						let razn = Number(userdb.reward_daily) - Date.now();
-						interaction.reply({content: `Вы уже получили ежедневную награду, приходите через ${ms(razn)}`, ephemeral: true})
+						await interaction.reply({content: `Вы уже получили ежедневную награду, приходите через ${ms(razn)}`, ephemeral: true})
 						break
 					}
 					let reward = daystrike.find(day => day.dayStrike == userdb.reward_dayStrike)
 					client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_fish + reward.count))
 					client.db.changeUser(interaction.member.user.id, 'reward_dayStrike', (userdb.reward_dayStrike + 1))
 					let successEmbed = client.utils.success(`Вы получили ежедневную награду — ${reward.count} ${client.emoji.fish}`, user)
-					interaction.reply({embeds: [successEmbed]})
+					await interaction.reply({embeds: [successEmbed]})
 					break
 				}
 				case 'еженед': {
@@ -79,7 +79,7 @@ class Shop extends Command {
 						}
 					}else{
 						let razn = Number(userdb.reward_weekly) - Date.now();
-						interaction.reply({content: `Вы уже получили еженедельную награду, приходите через ${ms(razn)}`, ephemeral: true})
+						await interaction.reply({content: `Вы уже получили еженедельную награду, приходите через ${ms(razn)}`, ephemeral: true})
 						break
 					}
 					let reward = weekstrike.find(week => week.weekStrike == userdb.reward_weekStrike)
@@ -92,7 +92,7 @@ class Shop extends Command {
 					client.db.changeUser(interaction.member.user.id, 'reward_weekStrike', (userdb.reward_weekStrike + 1))
 					await client.saveJSON('inventory', inventory)
 					let successEmbed = client.utils.success(`Вы получили еженедельную награду — ${(reward.megaCase > 0) ? `${reward.megaCase} мегакейсов` : ``} ${(reward.luckyCase > 0) ? `${reward.luckyCase} лакикейсов` : ``}`, user)
-					interaction.reply({embeds: [successEmbed]})
+					await interaction.reply({embeds: [successEmbed]})
 					break
 				}
 				case 'кейс': {
@@ -102,43 +102,43 @@ class Shop extends Command {
 						count = 1
 					}
 					if (IDcase < 1 || !cases[IDcase]) {
-						interaction.reply({content: 'Укажите корректный номер кейса.', ephemeral: true})
+						await interaction.reply({content: 'Укажите корректный номер кейса.', ephemeral: true})
 						break
 					}
 					if (count < 1) {
-						interaction.reply({content: 'Укажите корректное количество кейсов', ephemeral: true})
+						await interaction.reply({content: 'Укажите корректное количество кейсов', ephemeral: true})
 						break
 					}
 					let summa = cases[IDcase].cost * count;
 					if(userdb.balance_bugs >= summa){
 						let memIndex = inventory[interaction.member.user.id].cases.findIndex((obj => obj.caseID == IDcase));
-						inventory[interaction.member.user.id].cases[memIndex].count += 1;
+						inventory[interaction.member.user.id].cases[memIndex].count += count;
 						client.db.changeUser(interaction.member.user.id, 'balance_bugs', (userdb.balance_bugs - summa))
 						await client.saveJSON('inventory', inventory)
 						let successEmbed = client.utils.success(`Вы купили ${count} ${client.declOfNum(count, ['кейс', 'кейса', 'кейсов'])}`)
-						interaction.reply({embeds: [successEmbed]})
+						await interaction.reply({embeds: [successEmbed]})
 						break
 					}else{
-						interaction.reply({content: 'У вас недостаточно жучков.', ephemeral: true})
+						await interaction.reply({content: 'У вас недостаточно жучков.', ephemeral: true})
 						break
 					}
 				}
 				case 'витрина': {
 					let itemID = interaction.options.getInteger('номер') - 1;
 					if(itemID < 0 || itemID > 1){
-						interaction.reply({content: 'Укажите корректный номер предмета на витрине.', ephemeral: true})
-						break
+						await interaction.reply({content: 'Укажите корректный номер предмета на витрине.', ephemeral: true})
+						return
 					}
 					if(itemID == 0){
 						if(userdb.shop_first == true){
-							interaction.reply({content: 'Вы уже покупали этот предмет, приходите позже!', ephemeral: true})
-							break
+							await interaction.reply({content: 'Вы уже покупали этот предмет, приходите позже!', ephemeral: true})
+							return
 						}
 					}
 					if(itemID == 1){
 						if(userdb.shop_second == true){
-							interaction.reply({content: 'Вы уже покупали этот предмет, прихожите позже!', ephemeral: true})
-							break
+							await interaction.reply({content: 'Вы уже покупали этот предмет, прихожите позже!', ephemeral: true})
+							return
 						}
 					}
 					switch(shop[itemID].type) {
@@ -156,12 +156,13 @@ class Shop extends Command {
 								await client.saveJSON('inventory', inventory)
 								client.db.changeUser(interaction.member.user.id, 'balance_bugs', (userdb.balance_bugs - shop[itemID].cost))
 								let successEmbed = client.utils.success(`Успешная покупка: ${shop[itemID].name}`, user)
-								interaction.reply({embeds: [successEmbed]})
+								await interaction.reply({embeds: [successEmbed]})
 								break
 							}else{
-								interaction.reply({content: 'У вас недостаточно жучков.', ephemeral: true})
+								await interaction.reply({content: 'У вас недостаточно жучков.', ephemeral: true})
 								break
 							}
+							break
 						}
 						case 'luckycase': {
 							let newID = shop[itemID].uid;
@@ -177,12 +178,13 @@ class Shop extends Command {
 								await client.saveJSON('inventory', inventory)
 								client.db.changeUser(interaction.member.user.id, 'balance_bugs', (userdb.balance_bugs - shop[itemID].cost))
 								let successEmbed = client.utils.success(`Успешная покупка: ${shop[itemID].name}.`, user)
-								interaction.reply({embeds: [successEmbed]})
+								await interaction.reply({embeds: [successEmbed]})
 								break
 							}else{
-								interaction.reply({content: 'У вас недостаточно жучков.', ephemeral: true})
+								await interaction.reply({content: 'У вас недостаточно жучков.', ephemeral: true})
 								break
 							}
+							break
 						}
 						case 'item': {
 							let newID = shop[itemID].uid;
@@ -227,12 +229,13 @@ class Shop extends Command {
 									await client.saveJSON('inventory', inventory)
 								}
 								let successEmbed = client.utils.success(`Успешная покупка: ${shop[itemID].name}.`, user)
-								interaction.reply({embeds: [successEmbed]})
+								await interaction.reply({embeds: [successEmbed]})
 								break
 							}else{
 								interaction.reply({content: 'У вас недостаточно жучков.', ephemeral: true})
 								break
 							}
+							break
 						}
 						case 'money': {
 							if(userdb.balance_fish >= shop[itemID].cost){
@@ -245,14 +248,16 @@ class Shop extends Command {
 								client.db.changeUser(interaction.member.user.id, 'balance_bugs', (userdb.balance_bugs + 1))
 								client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_fish - shop[itemID].cost))
 								let successEmbed = client.utils.success(`Успешная покупка: ${shop[itemID].name}.`, user)
-								interaction.reply({embeds: [successEmbed]})
+								await interaction.reply({embeds: [successEmbed]})
 								break
 							}else{
-								interaction.reply({content: 'У вас недостаточно рыбок.', ephemeral: true})
+								await interaction.reply({content: 'У вас недостаточно рыбок.', ephemeral: true})
 								break
 							}
+							break
 						}
 					}
+					break
 				}
 				case 'магазин': {
 					let shopEmbed = client.utils.embed('Магазин', undefined, user)
@@ -260,14 +265,14 @@ class Shop extends Command {
 						.addField('Витрина', `1. ${shop[0].name} | ${shop[0].cost} ${shop[0].currency}
 							2. ${shop[1].name} | ${shop[1].cost} ${shop[1].currency}`, false)
 						.addField('Кейсы', `1. ${client.emoji.tree} Кейс садовника\n2. ${client.emoji.cmd} Школьная библиотека`, false)
-					interaction.reply({embeds: [shopEmbed]})
+					await interaction.reply({embeds: [shopEmbed]})
 					break
 				}
 			}
 		} catch(error) {
 			client.logger.log(error, 'err')
 			console.error(error)
-			interaction.reply({content: `Произошла ошибка при выполнении команды.`, ephemeral: true})
+			await interaction.reply({content: `Произошла ошибка при выполнении команды.`, ephemeral: true})
 		}
 	}
 }

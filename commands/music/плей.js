@@ -32,6 +32,10 @@ class Play extends Command {
         var queue = client.player.getQueue(interaction.guildId);
         if (!queue || !queue.playing) {
             queue = await client.player.createQueue(guild, {
+                leaveOnEmpty: true,
+                leaveOnStop: true,
+                leaveOnEnd: true,
+                leaveOnEmptyCooldown: 2000,
                 ytdlOptions: {
                     filter: 'audioonly',
                     highWaterMark: 1 << 30,

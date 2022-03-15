@@ -23,8 +23,6 @@ class Bugs extends Command {
 			var whattoDo = interaction.options.getSubcommand();
 			if(bugs < 1)
 				return interaction.reply({content: `Укажите корректное количество ${client.emoji.bug}`, ephemeral: true})
-			if(userdb.balance_fish < count)
-				return interaction.reply({content: `У вас недостаточно средств.`, ephemeral: true})
 			switch (whattoDo) {
 				case 'купить': {
 					userdb = await client.db.getUser(interaction.member.user.id)	
@@ -32,7 +30,8 @@ class Bugs extends Command {
 	
 					var bugs = interaction.options.getInteger('количество');
 					var count = bugs * exchange.currentBugPrice; 
-	
+					if(userdb.balance_fish < count)
+						return interaction.reply({content: `У вас недостаточно средств.`, ephemeral: true})
 					client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_fish - count))
 					client.db.changeUser(client.user.id, 'balance_fish', (clientdb.balance_fish + count))
 					client.db.changeUser(interaction.member.user.id, 'balance_bugs', (userdb.balance_bugs + bugs))
@@ -48,7 +47,8 @@ class Bugs extends Command {
 	
 					var bugs = interaction.options.getInteger('количество');
 					var count = bugs * exchange.currentBugPrice; 
-	
+					if(userdb.balance_bugs < bugs)
+						return interaction.reply({content: `У вас недостаточно средств.`, ephemeral: true})
 					client.db.changeUser(interaction.member.user.id, 'balance_bugs', (userdb.balance_bugs - bugs))
 					client.db.changeUser(client.user.id, 'balance_bugs', (clientdb.balance_bugs + bugs))
 					client.db.changeUser(interaction.member.user.id, 'balance_fish', (userdb.balance_fish + count))

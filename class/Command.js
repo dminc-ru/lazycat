@@ -7,6 +7,6 @@ module.exports = class Command {
         guildOnly = false
 	})
 	{
-		this.data = { name, permissions, type };
+		this.data = { name, permissions, type, enabled, guildOnly };
 	}
 };

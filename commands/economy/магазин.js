@@ -45,7 +45,7 @@ class Shop extends Command {
 						if(razn > 86400000){
 							let newTime = String(Date.now() + 86400000);
 							client.db.changeUser(interaction.member.user.id, 'reward_daily', newTime)
-							client.db.changeUser(interaction.member.user.id, 'reward_dayStrike', '1')
+							client.db.changeUser(interaction.member.user.id, 'reward_dayStrike', 1)
 							userdb = await client.db.getUser(interaction.member.user.id)
 						}else{
 							let newTime = String(Date.now() + 86400000);
@@ -70,7 +70,7 @@ class Shop extends Command {
 						if(razn > 86400000){
 							let newTime = String(Date.now() + 604800000);
 							client.db.changeUser(interaction.member.user.id, 'reward_weekly', newTime)
-							client.db.changeUser(interaction.member.user.id, 'reward_weekStrike', '1')
+							client.db.changeUser(interaction.member.user.id, 'reward_weekStrike', 1)
 							userdb = await client.db.getUser(interaction.member.user.id)
 						}else{
 							let newTime = String(Date.now() + 604800000);

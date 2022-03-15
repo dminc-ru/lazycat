@@ -79,3 +79,5 @@ class LazyCat extends Client {
         return text_forms[2];
     }
 }
+
+module.exports = LazyCat;

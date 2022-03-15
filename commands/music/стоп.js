@@ -1,25 +1,26 @@
-const { MessageEmbed } = require('discord.js')
-module.exports.run = async (client, interaction) => {
-    await interaction.deferReply();
-    var user = client.users.cache.get(interaction.member.user.id)
-    const queue = client.player.getQueue(interaction.guildId);
-    let noMusic = new MessageEmbed()
-        .setColor(client.config.embedColor)
-        .setTitle('Очередь пуста.')
-        .setTimestamp()
-        .setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
-    if (!queue || !queue.playing) return void interaction.followUp({ embeds: [noMusic] });
-    queue.destroy();
-    let stopped = new MessageEmbed()
-        .setColor(client.config.embedColor)
-        .setTitle('Остановлено.')
-        .setTimestamp()
-        .setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
-    return void interaction.followUp({ embeds: [stopped] });
+const Command = require('../../class/Command')
+
+class Stop extends Command {
+    constructor(client) {
+        super(client, {
+            name: 'стоп',
+            permissions: ['member'],
+            type: 'interaction',
+            enabled: true,
+            guildOnly: true
+        })
+    }
+    
+    async run (client, interaction) {
+        await interaction.deferReply();
+        var user = client.users.cache.get(interaction.member.user.id)
+        const queue = client.player.getQueue(interaction.guildId);
+        let noMusic = client.utils.embed('Очередь пуста.', undefined, user)
+        if (!queue || !queue.playing) return void interaction.followUp({ embeds: [noMusic] });
+        queue.destroy();
+        let stopped = client.utils.embed('Остановлено.', undefined, user)
+        return void interaction.followUp({ embeds: [stopped] });
+    }
 }
 
-module.exports.data = {
-    name: "стоп",
-    permissions: ["tester"],
-    type: "interaction"
-}
+module.exports = Stop;

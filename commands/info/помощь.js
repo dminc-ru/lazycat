@@ -35,7 +35,7 @@ class Help extends Command {
 				.addField('Технические:', `\`${prefix}пинг\` \`${prefix}проверка\``, false)
 				.addField('Кейсы:', `\`${prefix}инвентарь\` \`${prefix}кейс\` \`${prefix}мегакейс\` \`${prefix}лакикейс\` \`${prefix}продать\``, false)
 				.addField('Экономика:', `\`${prefix}передать\` \`${prefix}магазин\` \`${prefix}жучки\` \`${prefix}баланс\` \`${prefix}банк\` \`${prefix}работа\``, false)
-				.addField('Радио:', `\`${prefix}плей\` \`${prefix}пауза\` \`${prefix}скип\` \`${prefix}стоп\` \`${prefix}повтор\` \`${prefix}поиск\` \`${prefix}сейчас\`  \`${prefix}фильтр\` \`${prefix}очередь\` \`${prefix}очистить\` \`${prefix}громкость\` \`${prefix}дисконнект\` \`${prefix}увед\` \`${prefix}плейлист\` \`${prefix}перемешать\``, false)
+				.addField('Радио:', `\`${prefix}громкость\` \`${prefix}назад\` \`${prefix}плей\` \`${prefix}пауза\` \`${prefix}скип\` \`${prefix}стоп\` \`${prefix}повтор\` \`${prefix}сейчас\` \`${prefix}очередь\` \`${prefix}очистить\``, false)
 			interaction.reply({embeds: [helpEmbed]})
 		} catch (error) {
 			client.logger.log(error, 'err')

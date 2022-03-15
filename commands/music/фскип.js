@@ -6,7 +6,7 @@ class Fskip extends Command {
             name: 'фскип',
             permissions: ['member'],
             type: 'interaction',
-            enabled: true,
+            enabled: false,
             guildOnly: true
         })
     }

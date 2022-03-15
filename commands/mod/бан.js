@@ -1,4 +1,3 @@
-const { MessageEmbed } = require("discord.js");
 const Command = require('../../class/Command')
 class Ban extends Command {
 	constructor(client) {
@@ -59,25 +58,17 @@ class Ban extends Command {
 			} catch (error) {
 				return interaction.reply({content: `Произошла ошибка при попытке бана. Возможно, у меня недостаточно прав для выполнения этого действия.`})
 			}
-			let banMessage = new MessageEmbed()
-				.setColor(client.config.embedColor)
-				.setTitle('Бан: успешно')
+			let banMessage = client.utils.embed('Бан: успешно', undefined, user)
 				.addField(`Модератор:`, `<@${user.id}>`, true)
 				.addField(`Пользователь:`, `<@${banUserResolve.user.id}>`, true)
 				.addField(`Причина:`, reason, false)
-				.setTimestamp()
-				.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 			interaction.reply({embeds: [banMessage]})
 			if(guilddb.logmsg_channel != ""){
 				try{
-					let banMessage = new MessageEmbed()
-						.setColor("#b88fff")
-						.setTitle(`Бан: успешно`)
+					let banMessage = client.utils.embed('Бан: успешно', undefined, user)
 						.addField(`Модератор:`, `<@${user.id}>`, true)
 						.addField(`Пользователь:`, `<@${banUserResolve.user.id}>`, true)
 						.addField(`Причина:`, `${reason}`, false)
-						.setTimestamp()
-						.setFooter({ text: user.tag, iconURL: user.avatarURL() })
 					const channel = guild.channels.fetch(guilddb.logmsg_channel);
 					channel.send(banMessage);
 				}catch(error){

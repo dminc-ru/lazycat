@@ -1,4 +1,3 @@
-const { MessageEmbed } = require("discord.js");
 const Command = require('../../class/Command')
 class Kick extends Command {
 	constructor(client) {
@@ -53,26 +52,18 @@ class Kick extends Command {
 				return interaction.reply({content: `Произошла ошибка при попытке кика. Возможно, у меня недостаточно прав для выполнения этого действия.`, ephemeral: true})
 			}
 			let usernames = toKickClientResolve.tag;
-			let kickMessage = new MessageEmbed()
-				.setColor(client.config.embedColor)
-				.setTitle('Кик: успешно')
+			let kickMessage = client.utils.embed('Кик: успешно', undefined, user)
 				.addField('Модератор:', `<@${user.id}>`, true)
 				.addField('Пользователь:', `${usernames}`, true)
 				.addField('Причина:', `${reason}`, false)
-				.setTimestamp()
-				.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 			interaction.reply({embeds: [kickMessage]})
 			if(guilddb.logmsg_channel != ""){
 				try {
 					const channel = await guild.channels.fetch(guilddb.logmsg_channel);
-					let muteMessage = new MessageEmbed()
-					.setColor(`#b88fff`)
-					.setTitle("Кик: успешно")
+					let muteMessage = client.utils.embed('Кик: успешно', undefined, user)
 					.addField('Модератор:', `<@${user.id}>`, true)
 					.addField('Пользователь:', `${usernames}`, true)
 					.addField('Причина:', `${reason}`, false)
-					.setTimestamp()
-					.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) });
 					return channel.send(muteMessage);
 				} catch(error) {
 					client.db.changeGuild(interaction.guildId, 'logmsg_channel', '');

@@ -1,4 +1,3 @@
-const { MessageEmbed } = require("discord.js");
 const Command = require('../../class/Command')
 class Unban extends Command {
 	constructor(client) {
@@ -50,25 +49,17 @@ class Unban extends Command {
 				var reason = `не указана`;
 			}
 			let usernames = toUnbanClientResolve.tag;
-			let unbanSuccess = new MessageEmbed()
-				.setColor(client.config.embedColor)
-				.setTitle('Разбан: успешно')
+			let unbanSuccess = client.utils.embed('Разбан: успешно', undefined, user)
 				.addField('Модератор:', `<@${user.id}>`, true)
 				.addField('Пользователь:', `${usernames}`, true)
 				.addField('Причина:', `${reason}`, false)
-				.setTimestamp()
-				.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 			interaction.reply({embeds: [unbanSuccess]})
 			if (guilddb.logmsg_channel != "") {
 				try{
-					let banMessage = new MessageEmbed()
-						.setColor(client.config.embedColor)
-						.setTitle(`Разбан: успешно`)
+					let banMessage = client.utils.embed('Разбан: успешно', undefined, user)
 						.addField(`Модератор:`, `<@${user.id}>`, true)
 						.addField(`Пользователь:`, `${usernames}`, true)
 						.addField(`Причина:`, `${reason}`, false)
-						.setTimestamp()
-						.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 					const channel = await guild.channels.fetch(guilddb.logmsg_channel);
 					channel.send({ embeds: [banMessage] });
 				}catch(error){

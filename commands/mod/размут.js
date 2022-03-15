@@ -1,4 +1,3 @@
-const { MessageEmbed } = require("discord.js");
 const Command = require('../../class/Command')
 class Unmute extends Command {
 	constructor(client) {
@@ -45,23 +44,15 @@ class Unmute extends Command {
 				console.log(error);
 				return interaction.reply({content: `Произошла ошибка. Обратитесь на сервер поддержки.`, ephemeral: true})
 			}
-			let unmuteSuccess = new MessageEmbed()
-				.setColor(client.config.embedColor)
-				.setTitle('Размут: успешно')
+			let unmuteSuccess = client.utils.embed('Размут: успешно', undefined, user)
 				.addField('Модератор:', `<@${user.id}>`, true)
 				.addField('Пользователь:', `<@${unMuteUserResolve.id}>`, true)
 				.addField('Причина размута:', `${reason}`, false)
-				.setTimestamp()
-				.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({dynamic: true}) })
 			interaction.reply({embeds: [unmuteSuccess]})
-			let muteMessage = new MessageEmbed()
-				.setColor(`#b88fff`)
-				.setTitle("Размут: успешно")
+			let muteMessage = client.utils.embed('Размут: успешно', undefined, client.user)
 				.addField(`Модератор:`,	`<@${user.id}>`, true)
 				.addField('Пользователь:', `<@${unMuteUserResolve.id}>`, true)
 				.addField(`Причина размута:`, `${reason}`, false)
-				.setTimestamp()
-				.setFooter({ text: `Lazy Cat`, iconURL: client.user.displayAvatarURL({dynamic: true}) });
 			if(guilddb.logmsg_channel != ""){
 				try {
 					const channel = await guild.channels.fetch(guilddb.logmsg_channel);

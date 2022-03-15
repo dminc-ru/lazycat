@@ -1,4 +1,3 @@
-const { MessageEmbed } = require('discord.js')
 const Command = require('../../class/Command')
 class BulkDelete extends Command {
 	constructor(client) {

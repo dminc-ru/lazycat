@@ -1,4 +1,3 @@
-const { MessageEmbed } = require('discord.js')
 const Command = require('../../class/Command')
 class Log extends Command {
 	constructor(client) {

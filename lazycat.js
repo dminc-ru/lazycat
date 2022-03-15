@@ -9,6 +9,7 @@ registerPlayerEvents(client.player);
 client.LazyLoader();
 
 setInterval(() =>{
+	let exchange = client.json.exchange
 	let transactions = exchange.boughtBugs + exchange.sellBugs;
 	if(transactions > 9) {
 		exchange.currentBugPrice += Math.floor(exchange.boughtBugs * (0.006))
@@ -19,13 +20,14 @@ setInterval(() =>{
 	}
 	exchange.boughtBugs = 0;
 	exchange.sellBugs = 0;
-	fs.writeFileSync(`${client.config.jsonPath}exchange.json`, JSON.stringify(exchange, null, "\t"));
+	client.saveJSON('exchange', exchange)
 }, 600000);
 setInterval(() =>{
+	let exchange = client.json.exchange
 	if (exchange.currentBugPrice >= 30) {
 		exchange.currentBugPrice -= randInt(1, 3)
 	}
-	fs.writeFileSync(`${client.config.jsonPath}exchange.json`, JSON.stringify(exchange, null, "\t"));
+	client.saveJSON('exchange', exchange)
 }, 86400000);
 
 setInterval( async () => {

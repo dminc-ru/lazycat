@@ -1,0 +1,17 @@
+module.exports = {
+    token: "",
+    databasePath: "",
+    jsonPath: "",
+    embedColor: "",
+    daLink: "",
+    qiwiSecretKey: "",
+    webhookBan: {
+        id: "",
+        token: ""
+    },
+    inviteLink: "",
+    termsLink: "",
+    privacyLink: "",
+    serverLink: "",
+    weatherID: ""
+}

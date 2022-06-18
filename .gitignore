@@ -6,6 +6,5 @@ base/
 package.json
 package-lock.json
 config.js
-emojis.js
 start.bat
 .eslintrc.json

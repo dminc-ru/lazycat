@@ -24,20 +24,6 @@ module.exports = class Utils {
         }
         return successMessage
     }
-
-    static embed (title, text, user) {
-        let simpleEmbed = new MessageEmbed()
-            .setColor(config.embedColor)
-            .setTitle(title)
-            .setTimestamp()
-        if (text) {
-            simpleEmbed.setDescription(text)
-        }
-        if (user) {
-            simpleEmbed.setFooter({ text: user.tag, iconURL: user.displayAvatarURL({ dynamic: true}) })
-        }
-        return simpleEmbed
-    }
     
     static randInt (min, max) {
         let rand = min - 0.5 + Math.random() * (max - min + 1);

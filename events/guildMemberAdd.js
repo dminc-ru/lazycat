@@ -6,10 +6,9 @@ module.exports = async (client, member) => {
 		channel.send({ content: `<@${member.id}> ${guilddb.welcomeText}` });
 	}
 	if(guilddb.giveRole != 'false'){
-		const role = member.guild.roles.cache.find(role => role.id === guilddb.welcomeRole);
-		let reason = `Выдача приветственной роли (/стартроль)`
+		const role = guild.roles.cache.find(role => role.id === guilddb.welcomeRole) || await guild.roles.fetch(guilddb.welcomeRole);
 		try{
-			member.roles.add(role, reason);
+			member.roles.add(role, client.messages.giveRoleReason);
 		} catch(error) {
 			return;
 		}

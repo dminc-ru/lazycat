@@ -9,7 +9,7 @@ module.exports = async (client, interaction) => {
 	}
 	if(!user){
 		client.logger.log(`Ошибка получения данных. User ID: ${interaction.member.user.id}`, 'err');
-		return interaction.reply({ content: `Произошла ошибка. Попробуйте ещё раз или обратитесь на наш сервер поддержки.\nКод ошибки: LZE-179`, ephemeral: true})
+		return interaction.reply({ content: `Произошла ошибка. Попробуйте ещё раз или обратитесь на наш сервер поддержки.\nКод ошибки: ${interaction.id}`, ephemeral: true})
 	}
 	if (user.banned == true) return;
 	var guild = await client.db.getGuild(interaction.guildId);
@@ -50,9 +50,9 @@ module.exports = async (client, interaction) => {
 			try {
 				if (commandfile.data.enabled)
 					await commandfile.run(client, interaction);
-				else await interaction.reply({ content: 'Команда временно отключена.' })
+				else await interaction.reply({ content: client.messages.tempDisabled })
 			} catch (error) {
-				await interaction.reply({ content: `Произошла ошибка при выполнении команды. Пожалуйста, сообщите нам через Сервер Поддержки.\nКод ошибки: ${interaction.id}`})
+				await interaction.reply({ content: client.messages.commandError.replace('{code}', interaction.id)})
 			}
 		}else{
 			return; 

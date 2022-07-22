@@ -7,8 +7,9 @@ module.exports = (client, guild) => {
         
         **Используя Lazy Cat, Вы соглашаетесь с нашими [Условиями использования](${client.config.termsLink}) и [Политикой конфиденциальности](${client.config.privacyLink})**
         `)
-        .addField(`Узнать все доступные команды:`, '`/помощь`', false)
-        .addField(`Техническая поддержка:`, `||[клик](${client.config.serverLink})||`, false)
+        .addField(`Узнать все доступные команды:`, '`/помощь`', true)
+        .addField(`Справка по командам:`, `[клик](${client.config.docsLink})`)
+        .addField(`Техническая поддержка:`, `[клик](${client.config.serverLink})`, false)
         .setTimestamp()
         .setFooter({ text: `Lazy Cat`, iconURL: client.user.displayAvatarURL({dynamic: true}) });
     try {

@@ -25,7 +25,7 @@ setInterval(() =>{
 setInterval(() =>{
 	let exchange = client.json.exchange
 	if (exchange.currentBugPrice >= 30) {
-		exchange.currentBugPrice -= randInt(1, 3)
+		exchange.currentBugPrice -= client.utils.randInt(1, 3)
 	}
 	client.saveJSON('exchange', exchange)
 }, 86400000);

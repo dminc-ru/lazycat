@@ -1,7 +1,7 @@
 module.exports = class Command {
 	constructor(client, {
 		name = null,
-		permissions = new Array(),
+		permissions = null,
 		type = null,
         enabled = true,
         guildOnly = false

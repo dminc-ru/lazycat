@@ -21,11 +21,10 @@ class Play extends Command {
         const query = interaction.options.getString('запрос');
         const searchResult = await client.player
             .search(query, {
-                requestedBy: interaction.member,
-                searchEngine: QueryType.AUTO
+                requestedBy: interaction.member
             })
             .catch(() => {
-                console.log('wtf man');
+                console.log(`[${interaction.guild_id}] Track search error.`);
             });
         let notFound = client.utils.embed('Ничего не найдено.', undefined, user)
         if (!searchResult || !searchResult.tracks.length) return void interaction.followUp({ embeds: [notFound] });
@@ -57,10 +56,17 @@ class Play extends Command {
         await interaction.followUp({ embeds: [loadingEmbed] });
         if (!playNext || !queue.playing) {
             searchResult.playlist ? queue.addTracks(searchResult.tracks) : queue.addTrack(searchResult.tracks[0]);
+            await queue.play();
         } else {
             queue.insert(searchResult.tracks[0]);
+            let trackQueued = new MessageEmbed()
+                .setColor('#b88fff')
+                .setTitle('Трек добавлен в очередь')
+                .setThumbnail(track.thumbnail)
+                .addField('Трек', `${track.title}`, false)
+                .addField('Канал', `<#${queue.connection.channel.id}>`)
+            return void interaction.reply({ embeds: [trackQueued]})
         }
-        if (!queue.playing) await queue.play();
     }
 }
 

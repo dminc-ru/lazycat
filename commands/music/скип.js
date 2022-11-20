@@ -25,8 +25,8 @@ class Skip extends Command {
             return void interaction.followUp({ embeds: [skipped] });
         } else {
             const trackIndex = count - 1;
-            if ( (queue.length - 1) > trackIndex) {
-                return interaction.followUp({ content: `Произошла ошибка.` })
+            if (trackIndex > (queue.length - 1)) {
+                return interaction.followUp({ content: `Чтобы очистить очередь, напишите /очистить` })
             }
             queue.jump(trackIndex);
             let skipped = client.utils.embed(`Пропущено ${count} тр.`, undefined, user)

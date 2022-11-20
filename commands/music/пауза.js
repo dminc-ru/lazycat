@@ -17,9 +17,15 @@ class Pause extends Command {
         const queue = client.player.getQueue(interaction.guildId);
         let noMusic = client.utils.embed('Очередь пуста.', undefined, user)
         if (!queue || !queue.playing) return void interaction.followUp({ embeds: [noMusic] });
-        const paused = queue.setPaused(true);
-        let pausedEmbed = client.utils.embed(`${paused ? `Приостановлено.` : `Произошла ошибка.`}`, undefined, user)
-        return void interaction.followUp({ embeds: [pausedEmbed] });
+        let paused = queue.setPaused(true);
+        if (!paused) {
+           paused = queue.setPaused(false);
+           let pausedEmbed = client.utils.embed(`${paused ? "Возобновлено." : "Произошла ошибка."}`, undefined, user);
+           return void interaction.followUp({ embeds: [pausedEmbed] });
+        } else {
+            let pausedEmbed = client.utils.embed(`Приостановлено.`, undefined, user);
+            return void interaction.followUp({ embeds: [pausedEmbed] });
+        }
     }
 }
 

@@ -19,11 +19,9 @@ class Info extends Command {
 			} catch (error) {
 				return message.channel.send({embeds: [noUser]})
 			}
-			var members = client.guilds.cache.reduce((a, g) => a + g.memberCount, 0);
-			let infoEmbed = client.utils.embed('Информация о боте',
-					`${client.emoji.b} Lazy Cat — универсальный бот для вашего сервера Discord.
+			let infoEmbed = client.utils.embed('Информация',
+					`${client.emoji.b} Lazy Cat — играет музыку для вашего сервера Discord.
 					${client.emoji.cloud} Серверов: **${client.guilds.cache.size}**
-					${client.emoji.users} Пользователей: **${members}**
 					${client.emoji.cmd} Команд обработано: **${stats.commands}**
 	
 					${client.emoji.ph} Версия продукта: **${stats.version}**

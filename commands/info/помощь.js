@@ -29,13 +29,13 @@ class Help extends Command {
 			let helpEmbed = client.utils.embed('Команды Lazy Cat:', 
 					`[Официальная документация](https://lazycat.dminc.ru)
 					[**Добавить на свой сервер**](${client.config.inviteLink})`, user)
-				.addField('Информация:', `\`${prefix}помощь\` \`${prefix}профиль\` \`${prefix}инфо\` \`${prefix}донат\` \`${prefix}корона\` \`${prefix}погода\` \`${prefix}описание\` \`${prefix}сервер\``, false)
-				.addField('Развлекательные:', `\`${prefix}кот\` \`${prefix}лис\` \`${prefix}своровать\` \`${prefix}пример\` \`${prefix}покрути\``, false)
-				.addField('Модерация:', `\`${prefix}бан\` \`${prefix}мут\` \`${prefix}кик\` \`${prefix}удалить\` \`${prefix}мутроль\` \`${prefix}размут\` \`${prefix}разбан\` \`${prefix}привет\` \`${prefix}пока\` \`${prefix}стартроль\``, false)
-				.addField('Технические:', `\`${prefix}пинг\` \`${prefix}проверка\``, false)
-				.addField('Кейсы:', `\`${prefix}инвентарь\` \`${prefix}кейс\` \`${prefix}мегакейс\` \`${prefix}лакикейс\` \`${prefix}продать\``, false)
-				.addField('Экономика:', `\`${prefix}передать\` \`${prefix}магазин\` \`${prefix}жучки\` \`${prefix}баланс\` \`${prefix}банк\` \`${prefix}работа\``, false)
 				.addField('Радио:', `\`${prefix}громкость\` \`${prefix}назад\` \`${prefix}плей\` \`${prefix}пауза\` \`${prefix}скип\` \`${prefix}стоп\` \`${prefix}повтор\` \`${prefix}сейчас\` \`${prefix}очередь\` \`${prefix}очистить\``, false)
+				.addField('Информация:', `\`${prefix}помощь\``, false)
+				.addField('Развлекательные:', `Теперь в [Smiley](https://dminc.ru/world)`, false)
+				.addField('Кейсы:', `Теперь в [Smiley](https://dminc.ru/world)`, false)
+				.addField('Экономика:', `Теперь в [Smiley](https://dminc.ru/world)`, false)
+				.addField('Модерация:', `Теперь в [Guard](https://dminc.ru/world)`, false)
+				
 			interaction.reply({embeds: [helpEmbed]})
 		} catch (error) {
 			client.logger.log(error, 'err')
